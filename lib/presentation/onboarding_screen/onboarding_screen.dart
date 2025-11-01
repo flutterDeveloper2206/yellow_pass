@@ -12,21 +12,24 @@ class OnboardingScreen extends GetWidget<OnboardingScreenController> {
 
   @override
   Widget build(BuildContext context) {
+    final themeColor = Theme.of(context).colorScheme;
+
     return Scaffold(
+      backgroundColor: themeColor.secondary,
       body: Obx(
             () => Stack(
           children: [
             // Animated gradient background
             AnimatedContainer(
               duration: const Duration(seconds: 1),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFFa1c4fd), Color(0xFFc2e9fb)]
-                  ,
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
+              // decoration: const BoxDecoration(
+              //   gradient: LinearGradient(
+              //     colors: [Color(0xFFa1c4fd), Color(0xFFc2e9fb)]
+              //     ,
+              //     begin: Alignment.topLeft,
+              //     end: Alignment.bottomRight,
+              //   ),
+              // ),
             ),
 
             // Main onboarding content
