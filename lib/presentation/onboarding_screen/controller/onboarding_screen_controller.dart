@@ -8,9 +8,9 @@ class OnboardingScreenController extends GetxController {
   final PageController pageController = PageController();
   RxInt currentPage = 0.obs;
 
-  List<Map<String, String>> onboardingPages = [
+  List<Map<String, String>> pages = [
     {
-      'image': ImageConstant.imgOnBoard1,
+      'image': ImageConstant.imgSplashBg,
       'title': 'Welcome to Cazipro',
       'subtitle': 'Your smart partner for professional growth.',
     },
@@ -30,16 +30,24 @@ class OnboardingScreenController extends GetxController {
     currentPage.value = index;
   }
 
-  bool get isLastPage => currentPage.value == onboardingPages.length - 1;
 
-  void nextPage() {
-    pageController.nextPage(
-      duration: const Duration(milliseconds: 400),
-      curve: Curves.easeInOut,
-    );
-  }
 
   void goToLogin() {
     Get.offAllNamed(AppRoutes.loginScreenRoute);
   }
+
+  void nextPage() {
+    if (currentPage.value == pages.length - 1) {
+      // Last page → Go to Login Screen
+     goToLogin();
+    } else {
+      // Move to next page
+      pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+
 }

@@ -18,79 +18,40 @@ class SplashScreen extends GetWidget<SplashScreenController> {
       ),
       child: SafeArea(
         child: Scaffold(
-          body: TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0.0, end: 1.0),
-            duration: const Duration(seconds: 5),
-            curve: Curves.easeInOut,
-            builder: (context, value, child) {
-              final Color middleColor = Color.lerp(
-                const Color(0xFF1C1C1C),
-                Colors.blueGrey.shade900,
-                value,
-              )!;
-              final Color bottomColor = Color.lerp(
-                ColorConstant.shadowColor,
-                Colors.black,
-                value,
-              )!;
-              return Container(
-                width: double.infinity,
-                height: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [middleColor, bottomColor],
-                  ),
-                ),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 0.0, end: 1.0),
-                        duration: const Duration(seconds: 2),
-                        curve: Curves.easeOutBack,
-                        builder: (context, value, child) {
-                          return Opacity(
-                            opacity: value.clamp(0.0, 1.0),
-                            child: Transform.scale(
-                              scale: value,
-                              child: child,
-                            ),
-                          );
-                        },
-                        child: CustomImageView(
-                          imagePath: ImageConstant.imgSplash,
-                          height: 72,
+          body: Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(ImageConstant.imgSplashBg), // <-- Your BG image
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: const Duration(seconds: 2),
+                    curve: Curves.easeOutBack,
+                    builder: (context, value, child) {
+                      return Opacity(
+                        opacity: value.clamp(0.0, 1.0),
+                        child: Transform.scale(
+                          scale: value,
+                          child: child,
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                      TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 0.0, end: 1.0),
-                        duration: const Duration(seconds: 2),
-                        curve: Curves.easeIn,
-                        builder: (context, value, child) {
-                          return Opacity(
-                            opacity: value.clamp(0.0, 1.0),
-                            child: child,
-                          );
-                        },
-                        child: const Text(
-                          'Rewards In',
-                          style: TextStyle(
-                            color: ColorConstant.primaryWhite,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
+                      );
+                    },
+                    child: CustomImageView(
+                      imagePath: ImageConstant.imgSplash,
+                      height: 72,
+                    ),
                   ),
-                ),
-              );
-            },
+                ],
+              ),
+            ),
           ),
         ),
       ),
