@@ -1,4 +1,5 @@
 import 'package:yellow_pass/core/utils/color_constant.dart';
+import 'package:yellow_pass/core/utils/size_utils.dart';
 import 'package:yellow_pass/theme/app_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,16 +14,20 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.bottom,
     this.backgroundColor,
     this.textColor,
+    this.iconColor,
     this.actions,
+    this.icon,
   });
 
   String? title;
   String? titleImageUrl;
   bool? isTitleImage;
   List<Widget>? actions;
+  IconData? icon;
   Widget? leading;
   Color? backgroundColor;
   Color? textColor;
+  Color? iconColor;
   PreferredSizeWidget? bottom;
 
   @override
@@ -40,13 +45,19 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                   height: preferredSize.height,
                   fit: BoxFit.contain,
                 )
-              : Text(
-                  title ?? '',
-                  textAlign: TextAlign.center,
-                  style: AppStyle.txtGilroy.copyWith(
-                        color: textColor,
-                      ),
-                ),
+              : Row(mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon,color:iconColor ,),
+                  SizedBox(width: getWidth(10),),
+                  Text(
+                      title ?? '',
+                      textAlign: TextAlign.center,
+                      style: AppStyle.txtGilroy.copyWith(
+                            color: textColor,
+                          ),
+                    ),
+                ],
+              ),
         ],
       ),
       backgroundColor: backgroundColor ?? Colors.transparent,

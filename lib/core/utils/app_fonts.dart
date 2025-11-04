@@ -27,6 +27,13 @@ abstract class PMT {
             fontWeight: fontWeight??_defaultFontWeight,
             color: fontColor ?? defaultFontColor);
 
+      case 24:
+        return TextStyle(
+            fontFamily: fontFamily ?? _defaultFontFamily,
+            fontSize: getFontSize(24), //7.5.sp
+            fontWeight: fontWeight??_defaultFontWeight,
+            color: fontColor ?? defaultFontColor);
+
       case 36:
         return TextStyle(
             fontFamily: fontFamily ?? _defaultFontFamily,

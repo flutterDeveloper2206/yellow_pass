@@ -69,7 +69,7 @@ class AppRoutes {
         transitionDuration: const Duration(milliseconds: 300)),
     GetPage(
         name: dashboardScreenRoute,
-        page: () => const DashboardScreen(),
+        page: () =>  DashboardScreen(),
         bindings: [
           DashboardScreenBinding(),
         ],

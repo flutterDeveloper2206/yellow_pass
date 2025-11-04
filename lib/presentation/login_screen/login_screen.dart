@@ -17,14 +17,6 @@ class LoginScreen extends GetWidget<LoginScreenController> {
           Positioned.fill(
             child: CustomImageView(imagePath: ImageConstant.imgLoginBg,fit: BoxFit.cover,),
           ),
-
-          // Dark overlay
-          Positioned.fill(
-            child: Container(
-              color: Colors.black.withOpacity(0.4),
-            ),
-          ),
-
           // Bottom Sheet UI
           Align(
             alignment: Alignment.bottomCenter,
@@ -42,29 +34,13 @@ class LoginScreen extends GetWidget<LoginScreenController> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "Get Started",
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () => Get.back(),
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: const BoxDecoration(
-                            color: Colors.white24,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.close, color: Colors.white),
-                        ),
-                      ),
-                    ],
+                  const Text(
+                    "Get Started",
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                   const SizedBox(height: 15),
                   Text(
@@ -88,7 +64,9 @@ class LoginScreen extends GetWidget<LoginScreenController> {
                           borderRadius: BorderRadius.circular(30),
                         ),
                       ),
-                      onPressed: (){},
+                      onPressed: (){
+                        controller.goToLogin();
+                      },
                       child: const Text(
                         " In Continue with Linkedin",
                         style: TextStyle(

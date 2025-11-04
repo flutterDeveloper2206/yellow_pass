@@ -1,8 +1,8 @@
+import 'package:yellow_pass/core/utils/size_utils.dart';
 import 'package:yellow_pass/widgets/custom_image_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get_state_manager/src/simple/get_view.dart';
-import 'package:yellow_pass/core/utils/color_constant.dart';
 import '../../core/utils/image_constant.dart';
 import 'controller/splash_screen_controller.dart';
 
@@ -46,7 +46,7 @@ class SplashScreen extends GetWidget<SplashScreenController> {
                     },
                     child: CustomImageView(
                       imagePath: ImageConstant.imgSplash,
-                      height: 72,
+                      height: getHeight(72),
                     ),
                   ),
                 ],
