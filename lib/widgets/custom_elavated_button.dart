@@ -46,24 +46,14 @@ class _AppElevatedButtonState extends State<AppElevatedButton> {
     return Container(
       height: getHeight(40),
       width: double.infinity,
-      decoration: BoxDecoration(
-        border:  widget.hasGradient??false? null:Border.all(color: ColorConstant.primaryOrange,width: getWidth(1)),
-        gradient: LinearGradient(colors: [
-          widget.hasGradient??false? ColorConstant.gradientStartColor:ColorConstant.primaryWhite,
-          widget.hasGradient??false? ColorConstant.gradientEndColor:ColorConstant.primaryWhite,
-        ]),
-
-        borderRadius: const BorderRadius.all(Radius.circular(8)),
-
-      ),
       child: ElevatedButton(
         onPressed: widget.onPressed,
         style: ElevatedButton.styleFrom(
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          backgroundColor: Colors.transparent,
+          backgroundColor: widget.buttonColor??Colors.transparent,
           shadowColor: Colors.transparent,
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(12))),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(widget.radius??12))),
         ),
         child: !widget.isLoading!
             ? Row(

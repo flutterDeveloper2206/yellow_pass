@@ -18,7 +18,7 @@ ColorScheme flexSchemeLight = const ColorScheme(
   onSecondary: Color(0xff132235),
   secondaryContainer: Color(0xff333333),
   onSecondaryContainer: Color(0xff696969),
-  secondaryFixedDim: Color(0xff4A4A4A),
+  secondaryFixedDim: Color(0xff5C5C5C),
   onSecondaryFixed: Color(0XFFE8E8E8),
   surfaceContainer: Color(0XFF999999),
   surfaceContainerHigh: Color(0xff000000),

@@ -117,6 +117,9 @@ class OnboardingScreen extends GetWidget<OnboardingScreenController> {
                       height: getHeight(55),
                       child: Obx(
                             () => AppElevatedButton(
+                              radius: 50,
+                              buttonColor: Colors.white,
+                          textColor: Colors.black,
                           onPressed: () {
                             controller.nextPage();
                           },
