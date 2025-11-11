@@ -1,230 +1,66 @@
-
-
 import 'package:flutter/material.dart';
 
-import '../core/utils/app_fonts.dart';
-import '../core/utils/color_constant.dart';
-import '../core/utils/size_utils.dart';
+class CommonTextField extends StatelessWidget {
+  final String? hintText;
+  final TextEditingController? controller;
+  final TextInputType? keyboardType;
+  final bool obscureText;
+  final IconData? prefixIcon;
+  final Widget? suffixIcon;
+  final Widget? suffix;
+  final Color fillColor;
+  final double borderRadius;
+  final Color borderColor;        // ✅ NEW
+  final Color focusedBorderColor; // ✅ NEW
 
-class CustomAppTextFormField extends StatelessWidget {
-
-
-  TextFormFieldShape? shape;
-
-  TextFormFieldPadding? padding;
-
-  TextFormFieldVariant? variant;
-
-  TextStyle? fontStyle;
-
-  Alignment? alignment;
-
-  double? width;
-
-  EdgeInsetsGeometry? margin;
-
-  TextEditingController? controller;
-
-  FocusNode? focusNode;
-
-  bool? isObscureText;
-
-  TextInputAction? textInputAction;
-
-  TextInputType? textInputType;
-
-  int? maxLines;
-
-  String? hintText;
-
-  Widget? prefix;
-
-  BoxConstraints? prefixConstraints;
-
-  Widget? suffix;
-
-  BoxConstraints? suffixConstraints;
-
-  FormFieldValidator<String>? validator;
-
-  bool? readOnly;
-
-  Function()? onTap;
-
-  Function(String)? onChanged;
-  CustomAppTextFormField({this.shape,
-    this.padding,
-    this.variant,
-    this.fontStyle,
-    this.alignment,
-    this.width,
-    this.margin,
-    this.controller,
-    this.focusNode,
-    this.isObscureText = false,
-    this.textInputAction = TextInputAction.next,
-    this.textInputType = TextInputType.text,
-    this.maxLines,
+  const CommonTextField({
+    super.key,
     this.hintText,
-    this.prefix,
-    this.prefixConstraints,
+    this.controller,
+    this.keyboardType,
+    this.obscureText = false,
+    this.prefixIcon,
+    this.suffixIcon,
     this.suffix,
-    this.suffixConstraints,
-    this.readOnly,
-    this.onTap,
-    this.onChanged,
-    this.validator});
+    this.fillColor = const Color(0xff2b2b2b),
+    this.borderRadius = 12,
+    this.borderColor = Colors.grey,           // ✅ default color
+    this.focusedBorderColor = Colors.yellow,  // ✅ default focused color
+  });
 
   @override
   Widget build(BuildContext context) {
-    return alignment != null
-        ? Align(
-      alignment: alignment ?? Alignment.center,
-      child: _buildTextFormFieldWidget(),
-    )
-        : _buildTextFormFieldWidget();
-  }
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: fillColor,
+        hintText: hintText,
+        hintStyle: const TextStyle(color: Colors.grey),
+        prefixIcon: prefixIcon != null
+            ? Icon(prefixIcon, color: Colors.grey)
+            : null,
+        suffixIcon: suffixIcon,
+        suffix: suffix,
+        suffixIconConstraints: const BoxConstraints(
+          minWidth: 35,
+          minHeight: 35,
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
 
-
-
-  _buildTextFormFieldWidget() {
-    return Container(
-      width: width ?? double.maxFinite,
-      margin: margin,
-      child: TextFormField(
-        controller: controller,
-        readOnly:readOnly??false ,
-        onTap: onTap,
-        onChanged: onChanged,
-        focusNode: focusNode,
-        style: fontStyle??PMT.style(14),
-        obscureText: isObscureText!,
-        textInputAction: textInputAction,
-        keyboardType: textInputType,
-        maxLines: maxLines ?? 1,
-        decoration: _buildDecoration(),
-        validator: validator,
+        // ✅ Borders
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+          borderSide: BorderSide(color: borderColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+          borderSide: BorderSide(color: focusedBorderColor, width: 2),
+        ),
       ),
     );
   }
-
-
-  _buildDecoration() {
-    return InputDecoration(
-      hintText: hintText ?? "",
-      hintStyle: fontStyle??PMT.style(14),
-      border: _setBorderStyle(),
-      enabledBorder: _setBorderStyle(),
-      focusedBorder: _setBorderStyle(),
-      disabledBorder: _setBorderStyle(),
-      prefixIcon: prefix,
-      prefixIconConstraints: prefixConstraints,
-      suffixIcon: suffix,
-      suffixIconConstraints: suffixConstraints,
-      fillColor: _setFillColor(),
-      filled: _setFilled(),
-      isDense: true,
-      // contentPadding: _setPadding(),
-    );
-  }
-
-
-  _setOutlineBorderRadius() {
-    switch (shape) {
-      default:
-        return BorderRadius.circular(
-          getWidth(
-            12.00,
-          ),
-        );
-    }
-  }
-
-  _setBorderStyle() {
-    switch (variant) {
-      case TextFormFieldVariant.White:
-        return OutlineInputBorder(
-          borderRadius: _setOutlineBorderRadius(),
-          borderSide: BorderSide(
-            color: ColorConstant.greyBack,
-            width: 1,
-          ),
-        );
-      case TextFormFieldVariant.None:
-        return InputBorder.none;
-      default:
-        return OutlineInputBorder(
-          borderRadius: _setOutlineBorderRadius(),
-          borderSide: BorderSide(
-            color: ColorConstant.greyBack,
-            width: 1,
-          ),
-        );
-    }
-  }
-
-  _setFillColor() {
-    switch (variant) {
-      case TextFormFieldVariant.White:
-        return ColorConstant.primaryWhite;
-      default:
-        return ColorConstant.lightGrey;
-    }
-  }
-
-  _setFilled() {
-    switch (variant) {
-      case TextFormFieldVariant.White:
-        return true;
-      case TextFormFieldVariant.None:
-        return false;
-      default:
-        return true;
-    }
-  }
-
-  // _setPadding() {
-  //   switch (padding) {
-  //     case TextFormFieldPadding.PaddingT13:
-  //       return getPadding(
-  //         left: 12,
-  //         top: 13,
-  //         bottom: 13,
-  //       );
-  //     default:
-  //       return getPadding(
-  //         left: 12,
-  //         top: 16,
-  //         right: 12,
-  //         bottom: 16,
-  //       );
-  //   }
-  // }
-
-  
-
 }
-
-enum TextFormFieldShape {
-  RoundedBorder12,
-}
-
-enum TextFormFieldPadding {
-  PaddingT14,
-  PaddingT13,
-}
-
-enum TextFormFieldVariant {
-  None,
-  OutlineGray200,
-  White,
-}
-
-enum TextFormFieldFontStyle {
-  GilroyMedium16Bluegray40001,
-  GilroyMedium16,
-  txtGilroyMedium
-}
-
-
-
