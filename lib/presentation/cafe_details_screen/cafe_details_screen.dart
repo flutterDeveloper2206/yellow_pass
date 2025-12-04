@@ -32,7 +32,7 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
                       _buildFeatures(context),
                       const SizedBox(height: 20),
                       Text(
-                        "10% OFF on all coffee orders when you book through Yellow Space.",
+                        "${controller.cafeDiscount} on all coffee orders when you book through Yellow Space.",
                         style: TextStyle(
                           color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700,
                           fontSize: 14,
@@ -120,9 +120,9 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
                   color: const Color(0xFFFFD54F), // Yellow color
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Text(
-                  "150 Yellow Tokens/hr",
-                  style: TextStyle(
+                child: Text(
+                  controller.cafeTokens,
+                  style: const TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
@@ -133,9 +133,9 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
             Positioned(
               bottom: 16,
               left: 16,
-              child: const Text(
-                "4 Seats Available",
-                style: TextStyle(
+              child: Text(
+                controller.cafeSeats,
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
@@ -158,7 +158,7 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "Cafe Aarosh",
+              controller.cafeName,
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -170,7 +170,7 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
                 const Icon(Icons.star, color: Colors.amber, size: 20),
                 const SizedBox(width: 4),
                 Text(
-                  "4.7/5",
+                  controller.cafeRating,
                   style: TextStyle(
                     color: Colors.amber,
                     fontWeight: FontWeight.bold,
@@ -187,7 +187,7 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
             Icon(Icons.location_on, size: 16, color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600),
             const SizedBox(width: 4),
             Text(
-              "Sadashiv Peth, Pune",
+              controller.cafeLocation,
               style: TextStyle(
                 color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
                 fontSize: 14,
@@ -197,7 +197,7 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
         ),
         const SizedBox(height: 8),
         Text(
-          "This cafe provides a cozy and pet-friendly space along with free wi-fi, you can also get beverages on 10% Off.",
+          controller.cafeDescription,
           style: TextStyle(
             color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
             fontSize: 14,
@@ -205,7 +205,7 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
         ),
         const SizedBox(height: 8),
         Text(
-          "Timings: 11:00am- 09:00pm",
+          "Timings: ${controller.cafeTimings}",
           style: TextStyle(
             color: Colors.green,
             fontWeight: FontWeight.bold,

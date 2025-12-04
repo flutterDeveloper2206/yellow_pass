@@ -191,7 +191,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             Padding(
               padding: const EdgeInsets.only(right: 16),
               child: Bounce(
-                onTap: () => Get.toNamed(AppRoutes.cafeDetailsScreenRoute),
+                onTap: () => Get.toNamed(
+                  AppRoutes.cafeDetailsScreenRoute,
+                  arguments: cafe,
+                ),
                 child: Container(
                   width: 220,
                   decoration: BoxDecoration(
@@ -366,7 +369,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           Padding(
             padding: const EdgeInsets.only(bottom: 20),
             child: Bounce(
-              onTap: () => Get.toNamed(AppRoutes.cafeDetailsScreenRoute),
+              onTap: () => Get.toNamed(
+                AppRoutes.cafeDetailsScreenRoute,
+                arguments: cafe,
+              ),
               child: Container(
                 decoration: BoxDecoration(
                   color: cardColor,

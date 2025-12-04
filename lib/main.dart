@@ -55,6 +55,14 @@ class MyApp extends StatelessWidget {
           visualDensity: FlexColorScheme.comfortablePlatformDensity,
           useMaterial3: true,
           swapLegacyOnMaterial3: true,
+        ).copyWith(
+          appBarTheme: const AppBarTheme(
+            systemOverlayStyle: SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness: Brightness.dark,
+              statusBarBrightness: Brightness.light,
+            ),
+          ),
         ),
         darkTheme:
         FlexThemeData.dark(
@@ -72,6 +80,14 @@ class MyApp extends StatelessWidget {
           visualDensity: FlexColorScheme.comfortablePlatformDensity,
           useMaterial3: true,
           swapLegacyOnMaterial3: true,
+        ).copyWith(
+          appBarTheme: const AppBarTheme(
+            systemOverlayStyle: SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness: Brightness.light,
+              statusBarBrightness: Brightness.dark,
+            ),
+          ),
         ),
         themeMode: ThemeMode.system,
             locale: Get.deviceLocale,
@@ -83,7 +99,34 @@ class MyApp extends StatelessWidget {
             initialBinding: InitialBindings(),
             initialRoute: AppRoutes.splashScreenRoute,
             getPages: AppRoutes.pages,
+            builder: (context, child) {
+              return Theme(
+                data: Theme.of(context),
+                child: _ThemeAwareStatusBar(child: child ?? const SizedBox.shrink()),
+              );
+            },
           ),
+    );
+  }
+}
+
+class _ThemeAwareStatusBar extends StatelessWidget {
+  final Widget child;
+  const _ThemeAwareStatusBar({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor:isDark ? const Color(0xFF121212) : Colors.white,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        // statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+        systemNavigationBarColor: isDark ? const Color(0xFF121212) : Colors.white,
+        systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      ),
+      child: child,
     );
   }
 }

@@ -6,12 +6,14 @@ import 'package:yellow_pass/presentation/profile_screen/profile_screen.dart';
 import 'package:yellow_pass/presentation/wallet_screen/wallet_screen.dart';
 import 'package:yellow_pass/presentation/nearby_screen/nearby_screen.dart';
 
+import 'package:yellow_pass/presentation/my_bookings_screen/my_bookings_screen.dart';
+
 class DashboardScreenController extends GetxController {
 
   final RxInt currentIndex = 0.obs;
   final iconList = <IconData>[
     Icons.home_outlined,
-    Icons.location_on_outlined,
+    Icons.receipt_long_outlined, // My Bookings
     Icons.account_balance_wallet_outlined,
     Icons.person_2_outlined,
   ];
@@ -19,7 +21,7 @@ class DashboardScreenController extends GetxController {
   // Example pages
   final List<Widget> pages = [
     HomeScreen(),
-    const NearbyScreen(),
+    const MyBookingsScreen(),
     const WalletScreen(),
     ProfileScreen(),
   ];

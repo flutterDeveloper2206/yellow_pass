@@ -33,7 +33,7 @@ class DashboardScreen extends GetWidget<DashboardScreenController> {
             body: controller.pages[controller.currentIndex.value],
             floatingActionButton: FloatingActionButton(
               backgroundColor: ColorConstant.primaryBlack,
-              onPressed: () => Get.snackbar("FAB", "QR Code Pressed"),
+              onPressed: () => Get.toNamed(AppRoutes.qrScannerScreenRoute),
               shape: const CircleBorder(
                 side: BorderSide(
                   color: ColorConstant.textGreyColor,

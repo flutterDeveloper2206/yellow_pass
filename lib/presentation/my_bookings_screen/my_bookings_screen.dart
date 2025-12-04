@@ -4,6 +4,8 @@ import 'package:yellow_pass/core/utils/app_fonts.dart';
 import 'package:yellow_pass/presentation/my_bookings_screen/controller/my_bookings_controller.dart';
 import 'package:yellow_pass/widgets/custom_image_view.dart';
 
+import 'package:yellow_pass/routes/app_routes.dart';
+
 class MyBookingsScreen extends StatefulWidget {
   const MyBookingsScreen({super.key});
 
@@ -85,7 +87,10 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> with SingleTickerPr
                           ),
                         );
                       },
-                      child: _buildBookingCard(context, booking, isDark, textColor, cardColor),
+                      child: GestureDetector(
+                        onTap: () => Get.toNamed(AppRoutes.myBookingScreenRoute),
+                        child: _buildBookingCard(context, booking, isDark, textColor, cardColor),
+                      ),
                     );
                   },
                 );

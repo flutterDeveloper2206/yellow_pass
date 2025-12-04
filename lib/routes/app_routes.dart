@@ -41,6 +41,12 @@ import 'package:yellow_pass/presentation/wallet_screen/binding/wallet_screen_bin
 import 'package:yellow_pass/presentation/wallet_screen/wallet_screen.dart';
 import 'package:yellow_pass/presentation/wallet_history_screen/binding/wallet_history_binding.dart';
 import 'package:yellow_pass/presentation/wallet_history_screen/wallet_history_screen.dart';
+import 'package:yellow_pass/presentation/my_booking_screen/binding/my_booking_binding.dart';
+import 'package:yellow_pass/presentation/my_booking_screen/my_booking_screen.dart';
+import 'package:yellow_pass/presentation/qr_scanner_screen/binding/qr_scanner_binding.dart';
+import 'package:yellow_pass/presentation/qr_scanner_screen/qr_scanner_screen.dart';
+import 'package:yellow_pass/presentation/check_in_success_screen/binding/check_in_success_binding.dart';
+import 'package:yellow_pass/presentation/check_in_success_screen/check_in_success_screen.dart';
 
 class AppRoutes {
   static const String splashScreenRoute = '/splash_screen';
@@ -62,6 +68,9 @@ class AppRoutes {
   static const String verifyOtpScreenRoute = '/verify_otp_screen';
   static const String walletScreenRoute = '/wallet_screen';
   static const String walletHistoryScreenRoute = '/wallet_history_screen';
+  static const String myBookingScreenRoute = '/my_booking_screen';
+  static const String qrScannerScreenRoute = '/qr_scanner_screen';
+  static const String checkInSuccessScreenRoute = '/check_in_success_screen';
 
   static List<GetPage> pages = [
     GetPage(
@@ -230,6 +239,33 @@ class AppRoutes {
       page: () => const WalletHistoryScreen(),
       bindings: [
         WalletHistoryBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: myBookingScreenRoute,
+      page: () => const MyBookingScreen(),
+      bindings: [
+        MyBookingBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: qrScannerScreenRoute,
+      page: () => const QrScannerScreen(),
+      bindings: [
+        QrScannerBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: checkInSuccessScreenRoute,
+      page: () => const CheckInSuccessScreen(),
+      bindings: [
+        CheckInSuccessBinding(),
       ],
       transition: Transition.rightToLeft,
       transitionDuration: const Duration(milliseconds: 300),
