@@ -13,7 +13,7 @@ class DashboardScreenController extends GetxController {
   final RxInt currentIndex = 0.obs;
   final iconList = <IconData>[
     Icons.home_outlined,
-    Icons.receipt_long_outlined, // My Bookings
+    Icons.location_on_outlined, // Nearby
     Icons.account_balance_wallet_outlined,
     Icons.person_2_outlined,
   ];
@@ -21,7 +21,7 @@ class DashboardScreenController extends GetxController {
   // Example pages
   final List<Widget> pages = [
     HomeScreen(),
-    const MyBookingsScreen(),
+    const NearbyScreen(),
     const WalletScreen(),
     ProfileScreen(),
   ];

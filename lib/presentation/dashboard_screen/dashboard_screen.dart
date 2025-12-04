@@ -17,6 +17,8 @@ class DashboardScreen extends GetWidget<DashboardScreenController> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return PopScope(
       canPop: false,
       onPopInvoked: (didPop) async {
@@ -28,42 +30,69 @@ class DashboardScreen extends GetWidget<DashboardScreenController> {
       },
       child: SafeArea(
         child: Obx(
-              () => Scaffold(
-            backgroundColor: flexSchemeLight.secondary,
-            body: controller.pages[controller.currentIndex.value],
-            floatingActionButton: FloatingActionButton(
-              backgroundColor: ColorConstant.primaryBlack,
-              onPressed: () => Get.toNamed(AppRoutes.qrScannerScreenRoute),
-              shape: const CircleBorder(
-                side: BorderSide(
-                  color: ColorConstant.textGreyColor,
-                  width: 1,
-                ),
-              ),
-              child: const Icon(Icons.qr_code, color: Colors.white),
+          () => Scaffold(
+            backgroundColor: isDark ? const Color(0xFF121212) : Colors.white,
+            extendBody: true, // Allows content to flow behind the bar for a premium feel
+            body: Stack(
+              alignment: AlignmentGeometry.bottomCenter,
+              children: [
+                controller.pages[controller.currentIndex.value],
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 15, left:15, right:15),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: AnimatedBottomNavigationBar(
+                      borderColor: isDark ? const Color(0xFF2C2C2C) : Colors.transparent,
+                      borderWidth: 1,
+                      icons: controller.iconList,
+                      shadow: BoxShadow(
+                        offset: const Offset(0, 4),
+                        blurRadius: 20,
+                        spreadRadius: 5,
+                        color: isDark ? Colors.black.withOpacity(0.5) : Colors.black.withOpacity(0.1),
+                      ),
+                      backgroundColor: !isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                      activeIndex: controller.currentIndex.value,
+                      gapLocation: GapLocation.none,
+                      notchSmoothness: NotchSmoothness.softEdge,
+                      activeColor: const Color(0xFFFFD54F),
+                      inactiveColor: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
+                      splashRadius: 0,
+                      iconSize: 28,
+                      height: 60,
+                      onTap: (index) => controller.currentIndex.value = index,
+                    ),
+                  ),
+                )
+              ],
             ),
-            floatingActionButtonLocation:
-            FloatingActionButtonLocation.centerDocked,
-            bottomNavigationBar: AnimatedBottomNavigationBar(
-              borderColor: ColorConstant.bottomSheetDragColor,
-              borderWidth: 2,
-              icons: controller.iconList,
-              shadow: const BoxShadow(
-                offset: Offset(0, 1),
-                blurRadius: 10,
-                spreadRadius: 0.5,
-                color: ColorConstant.icGrayColor,
-              ),
-              backgroundColor: ColorConstant.primaryBlack,
-              activeIndex: controller.currentIndex.value,
-              gapLocation: GapLocation.center,
-              notchSmoothness: NotchSmoothness.softEdge,
-              activeColor: ColorConstant.primaryOrange,
-              inactiveColor: ColorConstant.primaryWhite,
-              splashRadius: 0,
-
-              onTap: (index) => controller.currentIndex.value = index,
-            ),
+            // bottomNavigationBar: Padding(
+            //   padding: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+            //   child: ClipRRect(
+            //     borderRadius: BorderRadius.circular(30),
+            //     child: AnimatedBottomNavigationBar(
+            //       borderColor: isDark ? const Color(0xFF2C2C2C) : Colors.transparent,
+            //       borderWidth: 1,
+            //       icons: controller.iconList,
+            //       shadow: BoxShadow(
+            //         offset: const Offset(0, 4),
+            //         blurRadius: 20,
+            //         spreadRadius: 5,
+            //         color: isDark ? Colors.black.withOpacity(0.5) : Colors.black.withOpacity(0.1),
+            //       ),
+            //       backgroundColor: !isDark ? const Color(0xFF1E1E1E) : Colors.white,
+            //       activeIndex: controller.currentIndex.value,
+            //       gapLocation: GapLocation.none,
+            //       notchSmoothness: NotchSmoothness.softEdge,
+            //       activeColor: const Color(0xFFFFD54F),
+            //       inactiveColor: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
+            //       splashRadius: 0,
+            //       iconSize: 28,
+            //       height: 70,
+            //       onTap: (index) => controller.currentIndex.value = index,
+            //     ),
+            //   ),
+            // ),
           ),
         ),
       ),

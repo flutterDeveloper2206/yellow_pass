@@ -19,17 +19,27 @@ class CheckInSuccessScreen extends GetView<CheckInSuccessController> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-              // Success Animation (Placeholder Icon if Lottie not available)
-              Container(
-                padding: const EdgeInsets.all(30),
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.check_circle,
-                  color: Colors.green,
-                  size: 100,
+              // Success Animation
+              SizedBox(
+                height: 200,
+                width: 200,
+                child: Lottie.network(
+                  'https://lottie.host/56d0c404-566b-4786-9441-d69d49313276/7p15g2q1Y8.json', // Example success animation
+                  repeat: false,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      padding: const EdgeInsets.all(30),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.check_circle,
+                        color: Colors.green,
+                        size: 100,
+                      ),
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 40),

@@ -1,6 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:yellow_pass/routes/app_routes.dart';
 import 'package:yellow_pass/widgets/custom_image_view.dart';
 import 'controller/nearby_controller.dart';
 
@@ -44,15 +45,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
           ),
           onPressed: () => Get.back(),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.notifications_none,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
-            onPressed: () => Get.toNamed('/notification_screen'),
-          ),
-        ],
+
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -121,7 +114,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
                 ),
               );
             }),
-            const SizedBox(height: 24),
+            const SizedBox(height: 100),
           ],
         ),
       ),

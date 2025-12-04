@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:yellow_pass/routes/app_routes.dart';
 
 class MyBookingController extends GetxController {
   RxBool isCheckedIn = false.obs;
@@ -28,7 +29,7 @@ class MyBookingController extends GetxController {
 
   void checkIn() {
     // Logic to handle check-in (e.g., navigate to scanner)
-    Get.toNamed('/qr_scanner_screen');
+    Get.toNamed(AppRoutes.qrScannerScreenRoute);
   }
 
   void checkOut() {
