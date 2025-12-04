@@ -56,7 +56,8 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           swapLegacyOnMaterial3: true,
         ),
-        darkTheme: FlexThemeData.dark(
+        darkTheme:
+        FlexThemeData.dark(
           scheme: FlexScheme.blumineBlue,
           colorScheme: flexSchemeDark,
           surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffoldVariantDialog,

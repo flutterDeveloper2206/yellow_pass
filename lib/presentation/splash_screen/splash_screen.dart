@@ -47,7 +47,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
     videoPlayerController = VideoPlayerController.asset(
       ImageConstant.splashVideo,
-      videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+      videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true,),
     )..initialize().then((_) {
       setState(() {});
       videoPlayerController.play();

@@ -20,7 +20,8 @@ class OnboardingScreen extends GetWidget<OnboardingScreenController> {
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 600),
                 child: CustomImageView(
-                  width: double.infinity,
+                  height: double.infinity,
+                  fit: BoxFit.cover,
                   imagePath: controller.pages[controller.currentPage.value]["image"]!,
                 ),
               ),

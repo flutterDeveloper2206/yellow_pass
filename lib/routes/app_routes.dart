@@ -21,6 +21,26 @@ import 'package:yellow_pass/presentation/splash_screen/splash_screen.dart';
 import 'package:yellow_pass/presentation/welcome_screen/welcome_screen.dart';
 
 import '../presentation/onboarding_screen/onboarding_screen.dart';
+import 'package:yellow_pass/presentation/cafe_details_screen/binding/cafe_details_binding.dart';
+import 'package:yellow_pass/presentation/cafe_details_screen/cafe_details_screen.dart';
+import 'package:yellow_pass/presentation/cafe_book_screen/binding/cafe_book_binding.dart';
+import 'package:yellow_pass/presentation/cafe_book_screen/cafe_book_screen.dart';
+import 'package:yellow_pass/presentation/my_bookings_screen/binding/my_bookings_binding.dart';
+import 'package:yellow_pass/presentation/my_bookings_screen/my_bookings_screen.dart';
+import 'package:yellow_pass/presentation/notification_screen/binding/notification_binding.dart';
+import 'package:yellow_pass/presentation/notification_screen/notification_screen.dart';
+import 'package:yellow_pass/presentation/profile_details_screen/binding/profile_details_binding.dart';
+import 'package:yellow_pass/presentation/profile_details_screen/profile_details_screen.dart';
+import 'package:yellow_pass/presentation/settings_screen/binding/settings_binding.dart';
+import 'package:yellow_pass/presentation/settings_screen/settings_screen.dart';
+import 'package:yellow_pass/presentation/verification_screen/binding/verification_binding.dart';
+import 'package:yellow_pass/presentation/verification_screen/verification_screen.dart';
+import 'package:yellow_pass/presentation/verify_otp_screen/binding/verify_otp_binding.dart';
+import 'package:yellow_pass/presentation/verify_otp_screen/verify_otp_screen.dart';
+import 'package:yellow_pass/presentation/wallet_screen/binding/wallet_screen_binding.dart';
+import 'package:yellow_pass/presentation/wallet_screen/wallet_screen.dart';
+import 'package:yellow_pass/presentation/wallet_history_screen/binding/wallet_history_binding.dart';
+import 'package:yellow_pass/presentation/wallet_history_screen/wallet_history_screen.dart';
 
 class AppRoutes {
   static const String splashScreenRoute = '/splash_screen';
@@ -29,10 +49,19 @@ class AppRoutes {
   static const String registerScreenRoute = '/register_screen';
   static const String dashboardScreenRoute = '/dashboard_screen';
   static const String homeScreenRoute = '/home_screen';
-  static const String notificationScreenRoute = '/notification_screen';
   static const String profileScreenRoute = '/profile_screen';
   static const String networkScreenRoute = '/network_screen';
   static const String onBoardingRoute = '/onBoarding_screen';
+  static const String cafeDetailsScreenRoute = '/cafe_details_screen';
+  static const String cafeBookScreenRoute = '/cafe_book_screen';
+  static const String myBookingsScreenRoute = '/my_bookings_screen';
+  static const String notificationScreenRoute = '/notification_screen';
+  static const String profileDetailsScreenRoute = '/profile_details_screen';
+  static const String settingsScreenRoute = '/settings_screen';
+  static const String verificationScreenRoute = '/verification_screen';
+  static const String verifyOtpScreenRoute = '/verify_otp_screen';
+  static const String walletScreenRoute = '/wallet_screen';
+  static const String walletHistoryScreenRoute = '/wallet_history_screen';
 
   static List<GetPage> pages = [
     GetPage(
@@ -115,5 +144,95 @@ class AppRoutes {
         ],
         transition: Transition.rightToLeft,
         transitionDuration: const Duration(milliseconds: 300)),
+    GetPage(
+      name: cafeDetailsScreenRoute,
+      page: () => const CafeDetailsScreen(),
+      bindings: [
+        CafeDetailsBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: cafeBookScreenRoute,
+      page: () => const CafeBookScreen(),
+      bindings: [
+        CafeBookBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: myBookingsScreenRoute,
+      page: () => const MyBookingsScreen(),
+      bindings: [
+        MyBookingsBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: notificationScreenRoute,
+      page: () => const NotificationScreen(),
+      bindings: [
+        NotificationBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: profileDetailsScreenRoute,
+      page: () => const ProfileDetailsScreen(),
+      bindings: [
+        ProfileDetailsBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: settingsScreenRoute,
+      page: () => const SettingsScreen(),
+      bindings: [
+        SettingsBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: verificationScreenRoute,
+      page: () => const VerificationScreen(),
+      bindings: [
+        VerificationBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: verifyOtpScreenRoute,
+      page: () => const VerifyOtpScreen(),
+      bindings: [
+        VerifyOtpBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: walletScreenRoute,
+      page: () => const WalletScreen(),
+      bindings: [
+        WalletScreenBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: walletHistoryScreenRoute,
+      page: () => const WalletHistoryScreen(),
+      bindings: [
+        WalletHistoryBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
   ];
 }
