@@ -103,8 +103,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             ),
             child: const CircleAvatar(
               radius: 20,
-              backgroundImage: NetworkImage(
-                'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1887&auto=format&fit=crop',
+              backgroundImage: AssetImage(
+                'assets/images/profiles.png',
               ),
             ),
           ),
@@ -114,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             Icon(Icons.location_on, size: 18, color: textColor),
             const SizedBox(width: 4),
             Text(
-              "Navi Peth, Pune",
+              "Rajkot",
               style: PMT.style(14, fontColor: textColor, fontWeight: FontWeight.w500),
             ),
           ],

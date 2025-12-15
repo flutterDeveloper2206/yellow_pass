@@ -21,7 +21,7 @@ class HomeScreenController extends GetxController {
     {
       "id": "1",
       "name": "Cafe Aarosh",
-      "location": "Sadashiv Peth, Pune",
+      "location": "Rajkot",
       "rating": "4.7/5",
       "discount": "10% OFF",
       "seats": "4 Seats Available",

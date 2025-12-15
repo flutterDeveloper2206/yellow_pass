@@ -145,8 +145,8 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               ),
               child: const CircleAvatar(
                 radius: 50,
-                backgroundImage: NetworkImage(
-                  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1887&auto=format&fit=crop',
+                backgroundImage: AssetImage(
+                  'assets/images/profiles.png',
                 ),
               ),
             ),
@@ -167,17 +167,17 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         ),
         const SizedBox(height: 16),
         Text(
-          "Vaishnavi Shrivat",
+          "Kaushal Pandya",
           style: PMT.style(20, fontColor: textColor, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
         Text(
-          "UI/UX Designer",
+          "Psychologist | Coach | Entrepreneur",
           style: PMT.style(14, fontColor: subTextColor),
         ),
         const SizedBox(height: 12),
         Text(
-          "UI/UX Designer | Business Understanding | Exploring\nFrontend Development | Integrating AI for Seamless,\nData-Driven Experiences",
+          "Psychologist | Mental Health Practitioner | Life Coach | Parenting Coach | Relationship Coach | Researcher | Entrepreneur | Investor",
           textAlign: TextAlign.center,
           style: PMT.style(11, fontColor: subTextColor, fontWeight: FontWeight.w400),
         ),
