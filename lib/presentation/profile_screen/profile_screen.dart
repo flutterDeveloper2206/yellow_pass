@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:yellow_pass/core/utils/app_fonts.dart';
@@ -50,7 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     final textColor = isDark ? Colors.white : Colors.black;
     final subTextColor = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
     final cardColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
-    final accentColor = const Color(0xFFFFD54F); // Yellow
+    final accentColor =  Colors.yellow; // Yellow
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -81,6 +82,9 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                   _buildMenuItem(context, icon: Icons.settings_outlined, title: "Settings", onTap: () {
                     Get.toNamed(AppRoutes.settingsScreenRoute);
                   }, isDark: isDark, textColor: textColor, cardColor: cardColor),
+                  _buildMenuItem(context, icon: Icons.headset_mic_outlined, title: "Customer Support", onTap: () {
+                    Get.toNamed(AppRoutes.supportScreenRoute);
+                  }, isDark: isDark, textColor: textColor, cardColor: cardColor),
                   const SizedBox(height: 30),
                   _buildLogoutButton(context),
                   const SizedBox(height: 150),
@@ -107,21 +111,9 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             ),
           ],
         ),
-        Row(
+        const Row(
           children: [
-            if (isDark) ...[
-               Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.yellow, width: 1),
-                  color: Colors.transparent,
-                ),
-                child: const Icon(Icons.visibility, size: 18, color: Colors.yellow),
-              ),
-              const SizedBox(width: 10),
-            ],
-
+            // Visibility icon removed
           ],
         ),
       ],
@@ -131,7 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   Widget _buildProfileHeader(BuildContext context, Color textColor, Color subTextColor, Color accentColor) {
     return Column(
       children: [
-        Stack(
+        Obx(() => Stack(
           children: [
             Container(
               padding: const EdgeInsets.all(4),
@@ -140,47 +132,52 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 border: Border.all(
                   color: accentColor, 
                   width: 2, 
-                  style: BorderStyle.solid // Dashed border is complex in Flutter without external package, solid for now or CustomPainter
+                  style: BorderStyle.solid 
                 ),
               ),
-              child: const CircleAvatar(
+              child: CircleAvatar(
                 radius: 50,
-                backgroundImage: AssetImage(
-                  'assets/images/profiles.png',
-                ),
+                backgroundImage: (controller.userData['profile_picture'] != null && controller.userData['profile_picture'].toString().isNotEmpty)
+                    ? NetworkImage("https://api.yellowpass.in/storage/${controller.userData['profile_picture']}") as ImageProvider
+                    : const AssetImage('assets/images/profiles.png'),
               ),
             ),
             Positioned(
               bottom: 0,
               right: 0,
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: accentColor,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.black, width: 2),
+              child: GestureDetector(
+                onTap: () {
+                   Get.toNamed(AppRoutes.profileDetailsScreenRoute);
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: accentColor,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.black, width: 2),
+                  ),
+                  child: const Icon(Icons.edit, size: 14, color: Colors.black),
                 ),
-                child: const Icon(Icons.edit, size: 14, color: Colors.black),
               ),
             ),
           ],
-        ),
+        )),
         const SizedBox(height: 16),
-        Text(
-          "Kaushal Pandya",
+        Obx(() => Text(
+          controller.userData['name'] ?? "User Name",
           style: PMT.style(20, fontColor: textColor, fontWeight: FontWeight.bold),
-        ),
+        )),
         const SizedBox(height: 4),
-        Text(
-          "Psychologist | Coach | Entrepreneur",
+        Obx(() => Text(
+          controller.userData['email'] ?? "Email ID",
           style: PMT.style(14, fontColor: subTextColor),
-        ),
+        )),
         const SizedBox(height: 12),
-        Text(
-          "Psychologist | Mental Health Practitioner | Life Coach | Parenting Coach | Relationship Coach | Researcher | Entrepreneur | Investor",
+        Obx(() => Text(
+          controller.userData['description'] ?? "No Bio Added",
           textAlign: TextAlign.center,
-          style: PMT.style(11, fontColor: subTextColor, fontWeight: FontWeight.w400),
-        ),
+          style: PMT.styles(12, fontColor: subTextColor, fontWeight: FontWeight.w400),
+        )),
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -220,7 +217,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildStatItem(context, "Tokens", "150", Icons.monetization_on_outlined, textColor, subTextColor),
+          Obx(() => _buildStatItem(context, "Tokens", controller.userData['wallet_balance']?.toString() ?? "0", Icons.monetization_on_outlined, textColor, subTextColor)),
           Container(height: 40, width: 1, color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
           _buildStatItem(context, "Bookings", "06", Icons.calendar_month_outlined, textColor, subTextColor),
         ],
@@ -274,11 +271,10 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               ),
             ],
           ),
-          Switch(
+          CupertinoSwitch(
             value: controller.isProfileVisible.value,
-            onChanged: controller.toggleProfileVisibility,
+            onChanged: (value) => controller.toggleProfileVisibility(value),
             activeColor: accentColor,
-            inactiveTrackColor: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
           ),
         ],
       ),

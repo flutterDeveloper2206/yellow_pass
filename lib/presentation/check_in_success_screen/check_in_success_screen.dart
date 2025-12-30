@@ -112,7 +112,7 @@ class CheckInSuccessScreen extends GetView<CheckInSuccessController> {
                 child: ElevatedButton(
                   onPressed: () => Get.back(), // Go back to My Booking
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFD54F),
+                    backgroundColor:  Colors.yellow,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),

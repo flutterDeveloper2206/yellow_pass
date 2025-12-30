@@ -39,7 +39,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
     final backgroundColor = isDark ? const Color(0xFF121212) : const Color(0xFFFAFAFA);
     final textColor = isDark ? Colors.white : Colors.black;
     final cardColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
-    final accentColor = const Color(0xFFFFD54F);
+    final accentColor =  Colors.yellow;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -165,7 +165,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                       ),
                       child: isDark 
                         ? const Icon(Icons.nightlight_round, size: 16, color: Colors.grey)
-                        : const Icon(Icons.wb_sunny, size: 16, color: Colors.orange),
+                        : const Icon(Icons.wb_sunny, size: 16, color: Colors.yellow),
                     ),
                   ),
                    if (isDark)
@@ -220,7 +220,8 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
           Obx(() => Switch(
             value: controller.isNotificationsEnabled.value,
             onChanged: controller.toggleNotifications,
-            activeColor: accentColor,
+            activeTrackColor: accentColor,
+            activeThumbColor: Colors.black,
             inactiveTrackColor: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
           )),
         ],

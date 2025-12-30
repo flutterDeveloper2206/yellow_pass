@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:yellow_pass/core/utils/app_fonts.dart';
@@ -7,6 +8,9 @@ import 'package:yellow_pass/presentation/home_screen/controller/home_screen_cont
 import 'package:yellow_pass/routes/app_routes.dart';
 import 'package:yellow_pass/widgets/bouncing_button.dart';
 import 'package:yellow_pass/widgets/custom_image_view.dart';
+// import 'package:animate_do/animate_do.dart';
+import '../../data/models/cafe_response_model.dart';
+import '../../widgets/shimmer_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -45,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     final textColor = isDark ? Colors.white : Colors.black;
     final subTextColor = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
     final cardColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
-    final accentColor = const Color(0xFFFFD54F);
+    final accentColor =  Colors.yellow;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -95,19 +99,19 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             // Navigate to profile or open drawer
             Get.toNamed(AppRoutes.profileScreenRoute);
           },
-          child: Container(
+          child: Obx(() => Container(
             padding: const EdgeInsets.all(2),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(color: accentColor, width: 2),
             ),
-            child: const CircleAvatar(
+            child: CircleAvatar(
               radius: 20,
-              backgroundImage: AssetImage(
-                'assets/images/profiles.png',
-              ),
+              backgroundImage: (controller.userData['profile_picture'] != null && controller.userData['profile_picture'].toString().isNotEmpty)
+                  ? NetworkImage("https://api.yellowpass.in/storage/${controller.userData['profile_picture']}") as ImageProvider
+                  : const AssetImage('assets/images/profiles.png'),
             ),
-          ),
+          )),
         ),
         Row(
           children: [
@@ -121,18 +125,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         ),
         Row(
           children: [
-             if (isDark) ...[
-               Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.yellow, width: 1),
-                  color: Colors.transparent,
-                ),
-                child: const Icon(Icons.visibility, size: 18, color: Colors.yellow),
-              ),
-              const SizedBox(width: 10),
-            ],
+            Obx(() => CupertinoSwitch(
+              value: controller.isProfileVisible.value,
+              onChanged: (value) => controller.toggleVisibility(value),
+              activeColor: accentColor,
+            )),
+            const SizedBox(width: 10),
             GestureDetector(
               onTap: () {
                 Get.toNamed(AppRoutes.notificationScreenRoute);
@@ -178,135 +176,178 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildFeaturedSection(BuildContext context, bool isDark) {
+    return Obx(() {
+      if (controller.isCafeLoading.value) {
+        return _buildFeaturedShimmer();
+      }
+      
+      if (controller.featuredCafes.isEmpty) {
+        return SizedBox(
+          height: 280,
+          child: Center(
+            child: Text(
+              "No featured cafes found",
+              style: PMT.style(14, fontColor: isDark ? Colors.white : Colors.black),
+            ),
+          ),
+        );
+      }
+
+      return SizedBox(
+        height: 280,
+        child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: controller.featuredCafes.length,
+            itemBuilder: (context, index) {
+              final cafe = controller.featuredCafes[index];
+              return _buildAnimatedItem(
+                index, 
+                Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Bounce(
+                    onTap: () => Get.toNamed(
+                      AppRoutes.cafeDetailsScreenRoute,
+                      arguments: cafe,
+                    ),
+                    child: Container(
+                      width: 220,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        image: DecorationImage(
+                          image: NetworkImage(
+                            (cafe.photos != null && cafe.photos!.isNotEmpty)
+                                ? "https://api.yellowpass.in${cafe.photos![0]}"
+                                : "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2047&auto=format&fit=crop"
+                          ),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      child: Stack(
+                        children: [
+                          // Gradient overlay for better text visibility
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.black.withOpacity(0.6),
+                                  Colors.transparent,
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.8),
+                                ],
+                                stops: const [0.0, 0.3, 0.6, 1.0],
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top: 12,
+                            left: 12,
+                            child: Row(
+                              children: [
+                                const Icon(Icons.verified, color: Colors.yellow, size: 14),
+                                const SizedBox(width: 4),
+                                Text(
+                                  "Featured",
+                                  style: PMT.style(12, fontColor: Colors.yellow, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (false) // Hide mock discount
+                            Positioned(
+                              top: 12,
+                              right: 12,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  "10% OFF",
+                                  style: PMT.style(10, fontColor: Colors.black, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          Positioned(
+                            bottom: 12,
+                            left: 12,
+                            right: 12,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  cafe.name ?? "Cafe Name",
+                                  style: PMT.style(18, fontColor: Colors.white, fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.location_on, color: Colors.white70, size: 12),
+                                    const SizedBox(width: 4),
+                                    Expanded(
+                                      child: Text(
+                                        "${cafe.address}, ${cafe.city}",
+                                        style: PMT.style(12, fontColor: Colors.white70),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.star, color: Colors.yellow, size: 14),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          cafe.rating ?? "0.0",
+                                          style: PMT.style(12, fontColor: Colors.yellow, fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: const [
+                                        Icon(Icons.wifi, color: Colors.white, size: 14),
+                                        SizedBox(width: 8),
+                                        Icon(Icons.bolt, color: Colors.white, size: 14),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+        ),
+      );
+    });
+  }
+
+  Widget _buildFeaturedShimmer() {
     return SizedBox(
       height: 280,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: controller.featuredCafes.length,
+        itemCount: 5,
         itemBuilder: (context, index) {
-          final cafe = controller.featuredCafes[index];
-          return _buildAnimatedItem(
-            index, 
-            Padding(
-              padding: const EdgeInsets.only(right: 16),
-              child: Bounce(
-                onTap: () => Get.toNamed(
-                  AppRoutes.cafeDetailsScreenRoute,
-                  arguments: cafe,
-                ),
-                child: Container(
-                  width: 220,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    image: DecorationImage(
-                      image: NetworkImage(cafe['image']),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  child: Stack(
-                    children: [
-                      // Gradient overlay for better text visibility
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black.withOpacity(0.6),
-                              Colors.transparent,
-                              Colors.transparent,
-                              Colors.black.withOpacity(0.8),
-                            ],
-                            stops: const [0.0, 0.3, 0.6, 1.0],
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 12,
-                        left: 12,
-                        child: Row(
-                          children: [
-                            const Icon(Icons.verified, color: Colors.yellow, size: 14),
-                            const SizedBox(width: 4),
-                            Text(
-                              "Featured",
-                              style: PMT.style(12, fontColor: Colors.yellow, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Positioned(
-                        top: 12,
-                        right: 12,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            cafe['discount'],
-                            style: PMT.style(10, fontColor: Colors.black, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 12,
-                        left: 12,
-                        right: 12,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              cafe['name'],
-                              style: PMT.style(18, fontColor: Colors.white, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(Icons.location_on, color: Colors.white70, size: 12),
-                                const SizedBox(width: 4),
-                                Expanded(
-                                  child: Text(
-                                    cafe['location'],
-                                    style: PMT.style(12, fontColor: Colors.white70),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    const Icon(Icons.star, color: Colors.yellow, size: 14),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      cafe['rating'],
-                                      style: PMT.style(12, fontColor: Colors.yellow, fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: const [
-                                    Icon(Icons.wifi, color: Colors.white, size: 14),
-                                    SizedBox(width: 8),
-                                    Icon(Icons.bolt, color: Colors.white, size: 14),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+          return const Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: ShimmerWidget.rectangular(
+              width: 220,
+              height: 280,
             ),
           );
         },
@@ -317,71 +358,94 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Widget _buildCategories(BuildContext context, bool isDark, Color accentColor) {
     return SizedBox(
       height: 40,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: controller.categories.length,
-        itemBuilder: (context, index) {
-          return Obx(() {
-            final isSelected = controller.selectedCategoryIndex.value == index;
-            return GestureDetector(
-              onTap: () => controller.selectedCategoryIndex.value = index,
-              child: Container(
-                margin: const EdgeInsets.only(right: 12),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: isSelected ? (isDark ? Colors.grey.shade800 : Colors.black) : (isDark ? const Color(0xFF2C2C2C) : Colors.grey.shade200),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: isDark ? Colors.grey.shade700 : Colors.transparent),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.category, // Placeholder icon
-                      size: 16,
-                      color: isSelected ? Colors.white : (isDark ? Colors.grey : Colors.grey.shade600),
+      child: Obx(() {
+        if (controller.categories.isEmpty && !controller.isCafeLoading.value) {
+           return const SizedBox.shrink();
+        }
+        return Obx(
+          () =>  ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: controller.categories.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  debugPrint("Category ${controller.categories[index]} selected");
+                  controller.filterCafes(index);
+                },
+                child: Obx(
+                  () =>  Container(
+                    margin: const EdgeInsets.only(right: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: controller.selectedCategoryIndex.value == index ? (isDark ? Colors.grey.shade800 : Colors.black) : (isDark ? const Color(0xFF2C2C2C) : Colors.grey.shade200),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(                  color: controller.selectedCategoryIndex.value == index ? (isDark ? Colors.grey.shade800 : Colors.black) : (isDark ? const Color(0xFF2C2C2C) : Colors.grey.shade200),
+                      ),
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      controller.categories[index],
-                      style: PMT.style(12, fontColor: isSelected ? Colors.white : (isDark ? Colors.grey : Colors.grey.shade600), fontWeight: FontWeight.w500),
+                    child: Center(
+                      child: Text(
+                        controller.categories[index],
+                        style: PMT.style(12, fontColor: controller.selectedCategoryIndex.value == index ? Colors.white : (isDark ? Colors.grey : Colors.grey.shade600), fontWeight: FontWeight.w500),
+                      ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            );
-          });
-        },
-      ),
+              );
+            },
+          ),
+        );
+      }),
     );
   }
 
   Widget _buildRecommendedSection(BuildContext context, bool isDark, Color textColor, Color subTextColor, Color cardColor, Color accentColor) {
-    return ListView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      itemCount: controller.recommendedCafes.length,
-      itemBuilder: (context, index) {
-        final cafe = controller.recommendedCafes[index];
-        return _buildAnimatedItem(
-          index + 5, // Stagger after featured items
-          Padding(
-            padding: const EdgeInsets.only(bottom: 20),
-            child: Bounce(
+    return Obx(() {
+      if (controller.isCafeLoading.value) {
+        return _buildRecommendedShimmer(isDark, cardColor);
+      }
+      if (controller.filteredCafes.isEmpty) {
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 40),
+            child: Column(
+              children: [
+                Icon(Icons.search_off, size: 48, color: subTextColor),
+                const SizedBox(height: 16),
+                Text(
+                  "No cafes available in this category",
+                  style: PMT.style(14, fontColor: subTextColor),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
+      return ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: controller.filteredCafes.length,
+        itemBuilder: (context, index) {
+          final cafe = controller.filteredCafes[index];
+          return _buildAnimatedItem(
+            index, 
+            GestureDetector(
               onTap: () => Get.toNamed(
                 AppRoutes.cafeDetailsScreenRoute,
                 arguments: cafe,
               ),
               child: Container(
+                margin: const EdgeInsets.only(bottom: 20),
                 decoration: BoxDecoration(
                   color: cardColor,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: isDark ? [] : [
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
                     ),
                   ],
                 ),
@@ -391,47 +455,32 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     Stack(
                       children: [
                         ClipRRect(
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                          child: Image.network(
-                            cafe['image'],
-                            height: 150,
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                          child: CustomImageView(
+                            url: (cafe.photos != null && cafe.photos!.isNotEmpty)
+                                ? "https://api.yellowpass.in${cafe.photos![0]}"
+                                : "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2047&auto=format&fit=crop",
+                            height: 200,
                             width: double.infinity,
                             fit: BoxFit.cover,
                           ),
                         ),
-                        // Gradient overlay for better text visibility
-                        Container(
-                          height: 150,
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.black.withOpacity(0.4),
-                                Colors.transparent,
-                                Colors.transparent,
-                                Colors.black.withOpacity(0.6),
-                              ],
-                              stops: const [0.0, 0.25, 0.7, 1.0],
+                        if (false) // Hide mock discount
+                          Positioned(
+                            top: 12,
+                            right: 12,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                "10% OFF", 
+                                style: PMT.style(10, fontColor: Colors.black, fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          top: 12,
-                          left: 12,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              cafe['discount'],
-                              style: PMT.style(10, fontColor: Colors.black, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
                         Positioned(
                           bottom: 12,
                           left: 12,
@@ -442,7 +491,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              cafe['seats'],
+                              "${cafe.totalSeats ?? 0} Seats",
                               style: PMT.style(10, fontColor: Colors.white),
                             ),
                           ),
@@ -458,15 +507,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                cafe['name'],
+                                cafe.name ?? "Cafe Name",
                                 style: PMT.style(18, fontColor: textColor, fontWeight: FontWeight.bold),
                               ),
                               Row(
                                 children: [
-                                  const Icon(Icons.star, color: Colors.white, size: 14), // Star color white in dark mode design? Or yellow? Design shows white star with rating text
+                                  const Icon(Icons.star, color: Colors.yellow, size: 14),
                                   const SizedBox(width: 4),
                                   Text(
-                                    cafe['rating'],
+                                    cafe.rating ?? "0.0",
                                     style: PMT.style(12, fontColor: textColor, fontWeight: FontWeight.w500),
                                   ),
                                 ],
@@ -478,15 +527,18 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             children: [
                               Icon(Icons.location_on, color: subTextColor, size: 14),
                               const SizedBox(width: 4),
-                              Text(
-                                cafe['location'],
-                                style: PMT.style(12, fontColor: subTextColor),
+                              Expanded(
+                                child: Text(
+                                  "${cafe.address}, ${cafe.city}",
+                                  style: PMT.style(12, fontColor: subTextColor),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            cafe['description'],
+                            cafe.description ?? "No description available",
                             style: PMT.style(12, fontColor: subTextColor),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -508,6 +560,46 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 ),
               ),
             ),
+          );
+        },
+      );
+    });
+  }
+
+  Widget _buildRecommendedShimmer(bool isDark, Color cardColor) {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      itemCount: 3,
+      itemBuilder: (context, index) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: cardColor,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            children: [
+              const ShimmerWidget.rectangular(
+                width: 100,
+                height: 100,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    ShimmerWidget.rectangular(height: 15, width: 80),
+                    SizedBox(height: 8),
+                    ShimmerWidget.rectangular(height: 20),
+                    SizedBox(height: 8),
+                    ShimmerWidget.rectangular(height: 15, width: 120),
+                  ],
+                ),
+              ),
+            ],
           ),
         );
       },

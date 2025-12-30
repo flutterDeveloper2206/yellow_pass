@@ -38,7 +38,7 @@ class OnboardingScreenController extends GetxController {
 
   void nextPage() {
     if (currentPage.value == pages.length - 1) {
-      // Last page → Go to Login Screen
+      // Last page → ToGo to Login Screen
      goToLogin();
     } else {
       // Move to next page

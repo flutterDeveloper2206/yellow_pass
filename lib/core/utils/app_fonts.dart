@@ -10,6 +10,15 @@ abstract class PMT {
   static const FontWeight _defaultFontWeight = FontWeight.w400;
   //static var defaultFontColor = LmgColors().fontBlack;
 
+  static TextStyle styles(int size, {Color? fontColor, String? fontFamily, FontWeight? fontWeight}) {
+    final defaultFontColor = ColorConstant.textDarkBrown;
+
+    return TextStyle(
+        fontFamily: fontFamily ?? _defaultFontFamily,
+        fontSize: getFontSize(double.parse(size.toString())),
+        fontWeight: fontWeight??_defaultFontWeight,
+        color: fontColor ?? defaultFontColor);
+  }
   static TextStyle style(int size, {Color? fontColor, String? fontFamily, FontWeight? fontWeight}) {
     final defaultFontColor = ColorConstant.textDarkBrown;
     switch (size) {
@@ -19,11 +28,17 @@ abstract class PMT {
             fontSize: getFontSize(7),
             fontWeight: fontWeight??_defaultFontWeight,
             color: fontColor ?? defaultFontColor);
+        case 11:
+        return TextStyle(
+            fontFamily: fontFamily ?? _defaultFontFamily,
+            fontSize: getFontSize(11),
+            fontWeight: fontWeight??_defaultFontWeight,
+            color: fontColor ?? defaultFontColor);
 
       case 12:
         return TextStyle(
             fontFamily: fontFamily ?? _defaultFontFamily,
-            fontSize: getFontSize(9), //7.5.sp
+            fontSize: getFontSize(12), //7.5.sp
             fontWeight: fontWeight??_defaultFontWeight,
             color: fontColor ?? defaultFontColor);
 
@@ -35,6 +50,11 @@ abstract class PMT {
             color: fontColor ?? defaultFontColor);
 
       case 18:
+        return TextStyle(
+            fontFamily: fontFamily ?? _defaultFontFamily,
+            fontSize: getFontSize(18), //7.5.sp
+            fontWeight: fontWeight??_defaultFontWeight,
+            color: fontColor ?? defaultFontColor); case 20:
         return TextStyle(
             fontFamily: fontFamily ?? _defaultFontFamily,
             fontSize: getFontSize(18), //7.5.sp

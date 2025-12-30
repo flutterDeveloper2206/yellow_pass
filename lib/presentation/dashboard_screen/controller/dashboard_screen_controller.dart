@@ -5,8 +5,15 @@ import 'package:yellow_pass/presentation/home_screen/home_screen.dart';
 import 'package:yellow_pass/presentation/profile_screen/profile_screen.dart';
 import 'package:yellow_pass/presentation/wallet_screen/wallet_screen.dart';
 import 'package:yellow_pass/presentation/nearby_screen/nearby_screen.dart';
-
 import 'package:yellow_pass/presentation/my_bookings_screen/my_bookings_screen.dart';
+import '../repository/dashboard_repository.dart';
+import '../../../../core/utils/shared_prefs.dart';
+import '../../profile_screen/controller/profile_screen_controller.dart';
+import '../../profile_details_screen/controller/profile_details_controller.dart';
+import '../../home_screen/controller/home_screen_controller.dart';
+import '../../../../widgets/common_snackbar.dart';
+import '../../../../core/utils/commonConstant.dart';
+import 'package:geolocator/geolocator.dart';
 
 class DashboardScreenController extends GetxController {
 
@@ -25,6 +32,60 @@ class DashboardScreenController extends GetxController {
     const WalletScreen(),
     ProfileScreen(),
   ];
+
+  @override
+  void onInit() {
+    super.onInit();
+    _fetchUserProfile();
+    _updateUserLocation();
+  }
+
+  Future<void> _fetchUserProfile() async {
+    try {
+      final repository = Get.find<DashboardRepository>();
+      final dynamic response = await repository.getUserProfile();
+      
+      if (response != null) {
+        final data = response; // ApiService returns response.body directly
+        
+        if (data is Map && data['status'] == true) {
+           final userData = data['data']['user'];
+            if (userData != null) {
+             await SharedPrefs.setUser(userData);
+             
+             // Refresh data in other controllers if they exist
+             if (Get.isRegistered<ProfileScreenController>()) {
+               Get.find<ProfileScreenController>().loadUserData();
+             }
+             if (Get.isRegistered<ProfileDetailsController>()) {
+               Get.find<ProfileDetailsController>().loadUserData();
+             }
+             if (Get.isRegistered<HomeScreenController>()) {
+               Get.find<HomeScreenController>().loadUserData();
+             }
+           }
+        }
+      }
+    } catch (e) {
+      debugPrint("Error fetching profile: $e");
+       // Silent failure or show snackbar if critical
+    }
+  }
+
+  Future<void> _updateUserLocation() async {
+    try {
+      Position? position = await CommonConstant.instance.getCurrentLocation();
+      if (position != null) {
+        final repository = Get.put(DashboardRepository());
+        await repository.updateLocation(
+          latitude: position.latitude,
+          longitude: position.longitude,
+        );
+      }
+    } catch (e) {
+      debugPrint("Error updating location: $e");
+    }
+  }
 
   // Handle back button press
   Future<bool> onWillPop() async {
@@ -52,7 +113,7 @@ class DashboardScreenController extends GetxController {
               const Icon(
                 Icons.exit_to_app,
                 size: 60,
-                color: Colors.orange,
+                color: Colors.yellow,
               ),
               const SizedBox(height: 20),
               const Text(
@@ -100,7 +161,7 @@ class DashboardScreenController extends GetxController {
                         SystemNavigator.pop();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
+                        backgroundColor: Colors.yellow,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),

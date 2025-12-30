@@ -1,8 +1,14 @@
 import 'package:get/get.dart';
+import 'package:yellow_pass/data/models/cafe_response_model.dart';
+import 'package:yellow_pass/data/models/cafe_details_response_model.dart';
+import '../repository/cafe_details_repository.dart';
 
 class CafeDetailsController extends GetxController {
-  // Cafe data received from arguments
-  late Map<String, dynamic> cafeData;
+  final CafeDetailsRepository _repository = Get.find<CafeDetailsRepository>();
+  
+  // Cafe data received from arguments or API
+  Rx<Cafe?> cafe = Rx<Cafe?>(null);
+  RxBool isLoading = false.obs;
   
   RxList<String> images = <String>[].obs;
   RxInt currentImageIndex = 0.obs;
@@ -11,14 +17,45 @@ class CafeDetailsController extends GetxController {
   void onInit() {
     super.onInit();
     // Get the cafe data passed from home screen
-    cafeData = Get.arguments ?? {};
-    
-    // Set images from cafe data
-    if (cafeData['images'] != null && cafeData['images'] is List) {
-      images.value = List<String>.from(cafeData['images']);
-    } else if (cafeData['image'] != null) {
-      // Fallback to single image if images array not available
-      images.value = [cafeData['image']];
+    if (Get.arguments is Cafe) {
+      cafe.value = Get.arguments;
+      _updateImages();
+    }
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    // Fetch fresh details for tables/reviews
+    if (cafe.value?.id != null) {
+      fetchCafeDetails(cafe.value!.id!);
+    } else if (Get.arguments is String) {
+      // If only ID is passed
+      fetchCafeDetails(Get.arguments);
+    }
+  }
+
+  Future<void> fetchCafeDetails(String id) async {
+    isLoading.value = true;
+    try {
+      var response = await _repository.getCafeDetails(id);
+      if (response != null && response['status'] == true) {
+        CafeDetailsResponse cafeDetailsResponse = CafeDetailsResponse.fromJson(response);
+        if (cafeDetailsResponse.data != null) {
+          cafe.value = cafeDetailsResponse.data;
+          _updateImages();
+        }
+      }
+    } catch (e) {
+      print("Error fetching cafe details: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void _updateImages() {
+    if (cafe.value?.photos != null && cafe.value!.photos!.isNotEmpty) {
+      images.value = cafe.value!.photos!.map((e) => "https://api.yellowpass.in$e").toList();
     } else {
       // Default images if no data
       images.value = [
@@ -34,31 +71,48 @@ class CafeDetailsController extends GetxController {
   }
 
   // Get cafe name
-  String get cafeName => cafeData['name'] ?? 'Cafe Aarosh';
+  String get cafeName => cafe.value?.name ?? 'Cafe Name';
   
   // Get cafe location
-  String get cafeLocation => cafeData['location'] ?? 'Sadashiv Peth, Pune';
+  String get cafeLocation => (cafe.value?.address != null && cafe.value?.city != null) 
+      ? "${cafe.value!.address}, ${cafe.value!.city}" 
+      : (cafe.value?.address ?? cafe.value?.city ?? 'Location');
   
   // Get cafe rating
-  String get cafeRating => cafeData['rating'] ?? '4.7/5';
+  String get cafeRating => (cafe.value?.averageRating != null) 
+      ? "${cafe.value!.averageRating} (${cafe.value!.totalReviews ?? 0})" 
+      : (cafe.value?.rating ?? '0.0');
   
   // Get cafe description
-  String get cafeDescription => cafeData['description'] ?? 'This cafe provides a cozy and pet-friendly space along with free wi-fi, you can also get beverages on 10% Off.';
+  String get cafeDescription => cafe.value?.description ?? 'No description available.';
   
   // Get cafe timings
-  String get cafeTimings => cafeData['timings'] ?? '11:00am- 09:00pm';
+  String get cafeTimings {
+    if (cafe.value?.timings != null && cafe.value!.timings!.isNotEmpty) {
+      return cafe.value!.timings!.join("\n");
+    }
+    return (cafe.value?.openTime != null && cafe.value?.closeTime != null)
+        ? "${cafe.value!.openTime} - ${cafe.value!.closeTime}"
+        : 'Timings not set';
+  }
   
-  // Get cafe discount
-  String get cafeDiscount => cafeData['discount'] ?? '10% OFF';
+  // Get cafe discount (not yet in API)
+  String get cafeDiscount => '';
   
   // Get cafe seats
-  String get cafeSeats => cafeData['seats'] ?? '4 Seats Available';
+  String get cafeSeats => "${cafe.value?.totalSeats ?? 0} Seats Available";
   
   // Get cafe tokens
-  String get cafeTokens => cafeData['tokens'] ?? '150 Yellow Tokens/hr';
+  String get cafeTokens => "${cafe.value?.pricePerHour ?? '0'} Yellow Tokens/hr";
 
-  final List<String> dates = ['11', '12', '13', '14', '15'];
-  final List<String> days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-  final List<String> timeSlots = ['11:00 am', '12:45 pm', '3:00 pm', '6:15 pm'];
-  final List<String> tableSizes = ['Table of 2', 'Table of 4', 'Meeting Room'];
+  List<Review> get cafeReviews => cafe.value?.reviews ?? [];
+
+  List<String> get tableSizes {
+    if (cafe.value?.tables != null && cafe.value!.tables!.isNotEmpty) {
+      return cafe.value!.tables!
+          .where((t) => t.name != null)
+          .map((t) => "${t.name} (${t.capacity} Person)").toList();
+    }
+    return [];
+  }
 }

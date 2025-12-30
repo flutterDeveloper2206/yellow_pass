@@ -4,10 +4,12 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import '../../../core/utils/shared_prefs.dart';
 
 class ProfileDetailsController extends GetxController {
   RxBool isEditing = false.obs;
   Rx<File?> profileImage = Rx<File?>(null);
+  RxMap userData = {}.obs;
 
   late TextEditingController nameController;
   late TextEditingController bioController;
@@ -17,11 +19,22 @@ class ProfileDetailsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    nameController = TextEditingController(text: "Vaishnavi Shrivat");
-    bioController = TextEditingController(
-        text: "UI/UX Designer | Business Understanding | Exploring Frontend Development | Integrating AI for Seamless, Data-Driven Experiences");
-    mobileController = TextEditingController(text: "+91 8605927522");
-    emailController = TextEditingController(text: "vaishushrivat@gmail.com");
+    nameController = TextEditingController();
+    bioController = TextEditingController();
+    mobileController = TextEditingController();
+    emailController = TextEditingController();
+    loadUserData();
+  }
+
+  void loadUserData() {
+    final data = SharedPrefs.getUser();
+    if (data != null) {
+      userData.value = data;
+      nameController.text = data['name'] ?? "";
+      bioController.text = data['description'] ?? "";
+      mobileController.text = data['mobile'] ?? "";
+      emailController.text = data['email'] ?? "";
+    }
   }
 
   @override

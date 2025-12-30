@@ -47,6 +47,8 @@ import 'package:yellow_pass/presentation/qr_scanner_screen/binding/qr_scanner_bi
 import 'package:yellow_pass/presentation/qr_scanner_screen/qr_scanner_screen.dart';
 import 'package:yellow_pass/presentation/check_in_success_screen/binding/check_in_success_binding.dart';
 import 'package:yellow_pass/presentation/check_in_success_screen/check_in_success_screen.dart';
+import 'package:yellow_pass/presentation/support_screen/binding/support_binding.dart';
+import 'package:yellow_pass/presentation/support_screen/support_screen.dart';
 
 class AppRoutes {
   static const String splashScreenRoute = '/splash_screen';
@@ -71,6 +73,7 @@ class AppRoutes {
   static const String myBookingScreenRoute = '/my_booking_screen';
   static const String qrScannerScreenRoute = '/qr_scanner_screen';
   static const String checkInSuccessScreenRoute = '/check_in_success_screen';
+  static const String supportScreenRoute = '/support_screen';
 
   static List<GetPage> pages = [
     GetPage(
@@ -118,14 +121,6 @@ class AppRoutes {
         page: () => const HomeScreen(),
         bindings: [
           HomeScreenBinding(),
-        ],
-        transition: Transition.rightToLeft,
-        transitionDuration: const Duration(milliseconds: 300)),
-    GetPage(
-        name: notificationScreenRoute,
-        page: () => const NotificationScreen(),
-        bindings: [
-          NotificationScreenBinding(),
         ],
         transition: Transition.rightToLeft,
         transitionDuration: const Duration(milliseconds: 300)),
@@ -266,6 +261,15 @@ class AppRoutes {
       page: () => const CheckInSuccessScreen(),
       bindings: [
         CheckInSuccessBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: supportScreenRoute,
+      page: () => const SupportScreen(),
+      bindings: [
+        SupportBinding(),
       ],
       transition: Transition.rightToLeft,
       transitionDuration: const Duration(milliseconds: 300),

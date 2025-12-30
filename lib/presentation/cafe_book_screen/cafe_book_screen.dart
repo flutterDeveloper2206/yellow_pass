@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:yellow_pass/presentation/cafe_book_screen/controller/cafe_book_controller.dart';
+import 'package:yellow_pass/data/models/cafe_response_model.dart';
+import 'package:yellow_pass/data/models/table_type_response_model.dart';
+import 'package:intl/intl.dart';
 
 class CafeBookScreen extends GetView<CafeBookController> {
   const CafeBookScreen({super.key});
@@ -31,11 +34,14 @@ class CafeBookScreen extends GetView<CafeBookController> {
               children: [
                 _buildDateSelection(context),
                 const SizedBox(height: 20),
-                _buildTimeSlots(context),
-                const SizedBox(height: 20),
                 _buildTableSize(context),
                 const SizedBox(height: 20),
+
                 _buildDurationSlider(context),
+                const SizedBox(height: 20),
+                _buildTimeSlots(context),
+
+
                 const SizedBox(height: 100), // Space for bottom button
               ],
             ),
@@ -69,80 +75,122 @@ class CafeBookScreen extends GetView<CafeBookController> {
                 color: isDarkMode ? Colors.white : Colors.black,
               ),
             ),
-            Text(
-              "Oct, 2025", 
+            Obx(() => Text(
+              controller.dateObjects.isEmpty ? "" :
+              controller.formatMonthYear(controller.dateObjects[controller.selectedDateIndex.value]), 
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.green,
                 fontWeight: FontWeight.bold,
               ),
-            ),
+            )),
           ],
         ),
         const SizedBox(height: 12),
         SizedBox(
           height: 80,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: controller.dates.length,
-            separatorBuilder: (context, index) => const SizedBox(width: 12),
-            itemBuilder: (context, index) {
-              return Obx(() {
-                final isSelected = controller.selectedDateIndex.value == index;
-                return GestureDetector(
-                  onTap: () => controller.selectDate(index),
-                  child: Container(
-                    width: 60,
-                    decoration: BoxDecoration(
-                      color: isSelected 
-                          ? (isDarkMode ? Colors.yellow.shade700 : const Color(0xFFFFF3E0)) 
-                          : (isDarkMode ? Colors.grey.shade800 : Colors.grey.shade100),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: isSelected 
-                            ? (isDarkMode ? Colors.yellow.shade700 : Colors.orange) 
-                            : (isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300),
-                        width: isSelected ? 2 : 1,
-                      ),
-                      boxShadow: [
-                        if (!isSelected && !isDarkMode)
-                          BoxShadow(
-                            color: theme.shadowColor.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
+          child: Row(
+            children: [
+              Expanded(
+                child: Obx(() => ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: controller.dateObjects.length,
+                  separatorBuilder: (context, index) => const SizedBox(width: 12),
+                  itemBuilder: (context, index) {
+                    final date = controller.dateObjects[index];
+                    return Obx(
+                      () =>  GestureDetector(
+                        onTap: () => controller.selectDate(index),
+                        child: Container(
+                          width: 60,
+                          decoration: BoxDecoration(
+                            color: controller.selectedDateIndex.value == index
+                                ? (isDarkMode ? Colors.yellow : const Color(0xFFFFF3E0))
+                                : (isDarkMode ? Colors.grey.shade800 : Colors.grey.shade100),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: controller.selectedDateIndex.value == index
+                                  ? (isDarkMode ? Colors.yellow : Colors.yellow)
+                                  : (isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300),
+                              width: controller.selectedDateIndex.value == index ? 2 : 1,
+                            ),
+                            boxShadow: [
+                              if (!(controller.selectedDateIndex.value == index) && !isDarkMode)
+                                BoxShadow(
+                                  color: theme.shadowColor.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                            ],
                           ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                      Text(
-                        controller.days[index],
-                        style: TextStyle(
-                          color: isSelected 
-                              ? Colors.black 
-                              : (isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                controller.formatDayValue(date),
+                                style: TextStyle(
+                                  color: controller.selectedDateIndex.value == index
+                                      ? Colors.black
+                                      : (isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                controller.formatDateValue(date),
+                                style: TextStyle(
+                                  color: controller.selectedDateIndex.value == index
+                                      ? Colors.black
+                                      : (isDarkMode ? Colors.white : Colors.black),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                      ),
+                    );
+                  },
+                )),
+              ),
+              const SizedBox(width: 12),
+              GestureDetector(
+                onTap: () => controller.pickDate(context),
+                child: Container(
+                  width: 60,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300,
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.calendar_month,
+                        color: isDarkMode ? Colors.white : Colors.black,
+                        size: 24,
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        controller.dates[index],
+                        "Other",
                         style: TextStyle(
-                          color: isSelected 
-                              ? Colors.black 
-                              : (isDarkMode ? Colors.white : Colors.black),
+                          color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700,
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          fontSize: 18,
                         ),
                       ),
-                      ],
-                    ),
+                    ],
                   ),
-                );
-              });
-            },
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -165,11 +213,20 @@ class CafeBookScreen extends GetView<CafeBookController> {
           ),
         ),
         const SizedBox(height: 12),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: List.generate(controller.timeSlots.length, (index) {
-            return Obx(() {
+        Obx(() {
+          if (controller.isSlotsLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (controller.timeSlots.isEmpty) {
+            return Text(
+              "No slots available for this selection.",
+              style: TextStyle(color: Colors.red.shade400),
+            );
+          }
+          return Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: List.generate(controller.timeSlots.length, (index) {
               final isSelected = controller.selectedTimeSlotIndex.value == index;
               return GestureDetector(
                 onTap: () => controller.selectTimeSlot(index),
@@ -177,12 +234,12 @@ class CafeBookScreen extends GetView<CafeBookController> {
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
                     color: isSelected 
-                        ? (isDarkMode ? Colors.yellow.shade700 : const Color(0xFFFFF3E0)) 
+                        ? (isDarkMode ? Colors.yellow : const Color(0xFFFFF3E0)) 
                         : (isDarkMode ? Colors.grey.shade800 : Colors.grey.shade100),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: isSelected 
-                          ? (isDarkMode ? Colors.yellow.shade700 : Colors.orange) 
+                          ? (isDarkMode ? Colors.yellow : Colors.yellow)
                           : (isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300),
                     ),
                     boxShadow: [
@@ -205,9 +262,9 @@ class CafeBookScreen extends GetView<CafeBookController> {
                   ),
                 )
               );
-            });
-          }),
-        ),
+            }),
+          );
+        }),
       ],
     );
   }
@@ -228,24 +285,28 @@ class CafeBookScreen extends GetView<CafeBookController> {
           ),
         ),
         const SizedBox(height: 12),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: List.generate(controller.tableSizes.length, (index) {
-            return Obx(() {
-              final isSelected = controller.selectedTableSizeIndex.value == index;
+        Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          return Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: List.generate(controller.tableTypes.length, (index) {
+              final table = controller.tableTypes[index];
+              final isSelected = controller.selectedTableTypeIndex.value == index;
               return GestureDetector(
-                onTap: () => controller.selectTableSize(index),
+                onTap: () => controller.selectTableType(index),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
                     color: isSelected 
-                        ? (isDarkMode ? Colors.yellow.shade700 : const Color(0xFFFFF3E0)) 
+                        ? (isDarkMode ? Colors.yellow : const Color(0xFFFFF3E0)) 
                         : (isDarkMode ? Colors.grey.shade800 : Colors.grey.shade100),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: isSelected 
-                          ? (isDarkMode ? Colors.yellow.shade700 : Colors.orange) 
+                          ? (isDarkMode ? Colors.yellow : Colors.yellow)
                           : (isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300),
                     ),
                     boxShadow: [
@@ -258,7 +319,7 @@ class CafeBookScreen extends GetView<CafeBookController> {
                     ],
                   ),
                   child: Text(
-                    controller.tableSizes[index],
+                    table.name ?? "",
                     style: TextStyle(
                       color: isSelected 
                           ? Colors.black 
@@ -268,9 +329,9 @@ class CafeBookScreen extends GetView<CafeBookController> {
                   ),
                 )
               );
-            });
-          }),
-        ),
+            }),
+          );
+        }),
       ],
     );
   }
@@ -295,7 +356,7 @@ class CafeBookScreen extends GetView<CafeBookController> {
           data: SliderTheme.of(context).copyWith(
             activeTrackColor: theme.colorScheme.outlineVariant,
             inactiveTrackColor: theme.colorScheme.outlineVariant,
-            thumbColor: Colors.yellow.shade700,
+            thumbColor: Colors.yellow,
             overlayColor: Colors.yellow.withOpacity(0.2),
             trackHeight: 4,
             thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8, elevation: 2),
@@ -339,25 +400,32 @@ class CafeBookScreen extends GetView<CafeBookController> {
     return SizedBox(
       width: double.infinity,
       height: 56,
-      child: ElevatedButton(
-        onPressed: () {
-          // Implement booking confirmation logic
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isDarkMode ? Colors.white : Colors.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
+      child: Obx(() {
+        final isEnabled = controller.selectedTimeSlotIndex.value != -1;
+        return ElevatedButton(
+          onPressed: isEnabled ? () {
+            // Implement booking confirmation logic
+          } : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: isEnabled 
+                ? (isDarkMode ? Colors.white : Colors.black)
+                : (isDarkMode ? Colors.grey.shade800 : Colors.grey.shade300),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(28),
+            ),
           ),
-        ),
-        child: Text(
-          "Proceed to Pay",
-          style: TextStyle(
-            color: isDarkMode ? Colors.black : Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+          child: Text(
+            "Proceed to Pay",
+            style: TextStyle(
+              color: isEnabled 
+                  ? (isDarkMode ? Colors.black : Colors.white)
+                  : (isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700),
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 }

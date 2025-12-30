@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:yellow_pass/core/utils/app_fonts.dart';
 import 'package:yellow_pass/presentation/notification_screen/controller/notification_controller.dart';
+import 'package:yellow_pass/data/models/notification_response_model.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -17,7 +18,7 @@ class _NotificationScreenState extends State<NotificationScreen> with SingleTick
   @override
   void initState() {
     super.initState();
-    controller = Get.put(NotificationController());
+    controller = Get.find<NotificationController>();
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -51,17 +52,52 @@ class _NotificationScreenState extends State<NotificationScreen> with SingleTick
               child: _buildAppBar(context, textColor, isDark),
             ),
             Expanded(
-              child: Obx(() => ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                itemCount: controller.notifications.length,
-                itemBuilder: (context, index) {
-                  final notification = controller.notifications[index];
-                  return _buildAnimatedItem(
-                    index,
-                    _buildNotificationItem(context, notification, isDark, textColor, subTextColor, cardColor),
+              child: Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                
+                if (controller.notifications.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "No notifications found",
+                      style: PMT.style(14, fontColor: subTextColor),
+                    ),
                   );
-                },
-              )),
+                }
+
+                final grouped = controller.groupedNotifications;
+                final sections = grouped.keys.toList();
+
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  itemCount: sections.length,
+                  itemBuilder: (context, sectionIndex) {
+                    final type = sections[sectionIndex];
+                    final sectionNotifications = grouped[type]!;
+                    
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12.0),
+                          child: Text(
+                            type.toUpperCase(),
+                            style: PMT.style(12, fontColor: Colors.yellow, fontWeight: FontWeight.bold, ),
+                          ),
+                        ),
+                        ...List.generate(sectionNotifications.length, (index) {
+                          final notification = sectionNotifications[index];
+                          return _buildAnimatedItem(
+                            index + (sectionIndex * 10), // Unique index for animation
+                            _buildNotificationItem(context, notification, isDark, textColor, subTextColor, cardColor),
+                          );
+                        }),
+                      ],
+                    );
+                  },
+                );
+              }),
             ),
           ],
         ),
@@ -81,7 +117,7 @@ class _NotificationScreenState extends State<NotificationScreen> with SingleTick
             ),
             const SizedBox(width: 8),
             Text(
-              "Notification",
+              "Notifications",
               style: PMT.style(18, fontColor: textColor, fontWeight: FontWeight.bold),
             ),
           ],
@@ -114,8 +150,27 @@ class _NotificationScreenState extends State<NotificationScreen> with SingleTick
     );
   }
 
-  Widget _buildNotificationItem(BuildContext context, Map<String, dynamic> notification, bool isDark, Color textColor, Color subTextColor, Color cardColor) {
-    final isReminder = notification['type'] == 'reminder';
+  Widget _buildNotificationItem(BuildContext context, NotificationData notification, bool isDark, Color textColor, Color subTextColor, Color cardColor) {
+    IconData iconData;
+    Color iconColor;
+    
+    switch (notification.type) {
+      case 'booking':
+        iconData = Icons.bookmark_added;
+        iconColor = Colors.blue;
+        break;
+      case 'offer':
+        iconData = Icons.local_offer;
+        iconColor = Colors.orange;
+        break;
+      case 'reminder':
+        iconData = Icons.notifications_active;
+        iconColor = Colors.green;
+        break;
+      default:
+        iconData = Icons.notifications;
+        iconColor = Colors.grey;
+    }
     
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -134,13 +189,14 @@ class _NotificationScreenState extends State<NotificationScreen> with SingleTick
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (isReminder)
-            const Icon(Icons.notifications_active, color: Colors.green, size: 24)
-          else
-            CircleAvatar(
-              radius: 16,
-              backgroundImage: NetworkImage(notification['image']),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.1),
+              shape: BoxShape.circle,
             ),
+            child: Icon(iconData, color: iconColor, size: 20),
+          ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -149,11 +205,13 @@ class _NotificationScreenState extends State<NotificationScreen> with SingleTick
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      notification['title'],
-                      style: PMT.style(14, fontColor: textColor, fontWeight: FontWeight.bold),
+                    Expanded(
+                      child: Text(
+                        notification.title ?? "",
+                        style: PMT.style(14, fontColor: textColor, fontWeight: FontWeight.bold),
+                      ),
                     ),
-                    if (notification['isUnread'])
+                    if (notification.read == false)
                       Container(
                         width: 8,
                         height: 8,
@@ -166,7 +224,7 @@ class _NotificationScreenState extends State<NotificationScreen> with SingleTick
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  notification['description'],
+                  notification.message ?? "",
                   style: PMT.style(12, fontColor: subTextColor, fontWeight: FontWeight.w400),
                 ),
               ],
@@ -184,7 +242,7 @@ class _NotificationScreenState extends State<NotificationScreen> with SingleTick
         final animation = CurvedAnimation(
           parent: _animationController,
           curve: Interval(
-            (index * 0.1).clamp(0.0, 1.0),
+            (index * 0.05).clamp(0.0, 1.0), // Faster staggered animation
             1.0,
             curve: Curves.easeOut,
           ),

@@ -285,7 +285,7 @@ class LoginScreen extends GetWidget<LoginScreenController> {
                 controller.proceedWithReferral();
               },
               child: Text(
-                "Proceed",
+                "Continue with Linkedin",
                 style: TextStyle(
                   fontSize: 16,
                   color: isDarkMode ? Colors.black : Colors.white,

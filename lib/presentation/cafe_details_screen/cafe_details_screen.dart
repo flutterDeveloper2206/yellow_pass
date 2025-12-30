@@ -16,51 +16,70 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
 
     return Scaffold(
       backgroundColor: isDarkMode ? Color(0xFF121212) : Colors.white,
-      body: Stack(
-        children: [
-          CustomScrollView(
-            slivers: [
-              _buildAppBar(context),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildCafeInfo(context),
-                      const SizedBox(height: 20),
-                      _buildFeatures(context),
-                      const SizedBox(height: 20),
-                      Text(
-                        "${controller.cafeDiscount} on all coffee orders when you book through Yellow Space.",
-                        style: TextStyle(
-                          color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      _buildDateSelection(context),
-                      const SizedBox(height: 20),
-                      _buildTimeSlots(context),
-                      const SizedBox(height: 20),
-                      _buildTableSize(context),
-                      const SizedBox(height: 20),
-                      _buildDurationSlider(context),
-                      const SizedBox(height: 100), // Space for bottom button
-                    ],
+      body: Obx(() {
+        if (controller.isLoading.value && controller.cafe.value == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (controller.cafe.value == null) {
+          return const Center(child: Text("Cafe not found"));
+        }
+
+        return Stack(
+          children: [
+            CustomScrollView(
+              slivers: [
+                _buildAppBar(context),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildCafeInfo(context),
+                        const SizedBox(height: 20),
+                        _buildFeatures(context),
+                        const SizedBox(height: 20),
+                        _buildTables(context),
+                        const SizedBox(height: 20),
+                        if (controller.cafeDiscount.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 20),
+                            child: Text(
+                              "${controller.cafeDiscount} on all coffee orders when you book through Yellow Space.",
+                              style: TextStyle(
+                                color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        const SizedBox(height: 20),
+                        _buildTimings(context),
+                        const SizedBox(height: 20),
+                        _buildReviews(context),
+                        const SizedBox(height: 100), // Space for bottom button
+                      ],
+                    ),
                   ),
                 ),
+              ],
+            ),
+            Positioned(
+              bottom: 20,
+              left: 16,
+              right: 16,
+              child: _buildBottomButton(context),
+            ),
+            if (controller.isLoading.value)
+              const Positioned(
+                top: 100,
+                left: 0,
+                right: 0,
+                child: Center(child: CircularProgressIndicator()),
               ),
-            ],
-          ),
-          Positioned(
-            bottom: 20,
-            left: 16,
-            right: 16,
-            child: _buildBottomButton(context),
-          ),
-        ],
-      ),
+          ],
+        );
+      }),
     );
   }
 
@@ -117,7 +136,7 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFD54F), // Yellow color
+                  color: Colors.yellow, // Yellow color
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -150,7 +169,7 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
 
   Widget _buildCafeInfo(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -167,12 +186,12 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
             ),
             Row(
               children: [
-                const Icon(Icons.star, color: Colors.amber, size: 20),
+                const Icon(Icons.star, color: Colors.yellow, size: 20),
                 const SizedBox(width: 4),
                 Text(
                   controller.cafeRating,
                   style: TextStyle(
-                    color: Colors.amber,
+                    color: Colors.yellow,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
@@ -186,11 +205,13 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
           children: [
             Icon(Icons.location_on, size: 16, color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600),
             const SizedBox(width: 4),
-            Text(
-              controller.cafeLocation,
-              style: TextStyle(
-                color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
-                fontSize: 14,
+            Expanded(
+              child: Text(
+                controller.cafeLocation,
+                style: TextStyle(
+                  color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                  fontSize: 14,
+                ),
               ),
             ),
           ],
@@ -205,10 +226,9 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
         ),
         const SizedBox(height: 8),
         Text(
-          "Timings: ${controller.cafeTimings}",
+          "Address: ${controller.cafeLocation}",
           style: TextStyle(
-            color: Colors.green,
-            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
             fontSize: 14,
           ),
         ),
@@ -216,24 +236,256 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
     );
   }
 
+  Widget _buildTimings(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final cafe = controller.cafe.value;
+
+    if (cafe?.timings == null || cafe!.timings!.isEmpty) return const SizedBox();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Opening Hours",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isDarkMode ? Colors.grey.shade900 : Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200),
+          ),
+          child: Column(
+            children: cafe.timings!.map((timing) {
+              final parts = timing.split(' (');
+              final day = parts[0];
+              final time = parts.length > 1 ? parts[1].replaceAll(')', '') : '';
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      day,
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      time,
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.green : Colors.green.shade700,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildReviews(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final reviews = controller.cafeReviews;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Reviews",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+            if (reviews.isNotEmpty)
+              Text(
+                "${reviews.length} total",
+                style: TextStyle(
+                  color: Colors.yellow.shade700,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (reviews.isEmpty)
+          Text(
+            "No reviews yet.",
+            style: TextStyle(color: isDarkMode ? Colors.grey.shade500 : Colors.grey.shade600),
+          )
+        else
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: reviews.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 16),
+            itemBuilder: (context, index) {
+              final review = reviews[index];
+              return Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isDarkMode ? Colors.grey.shade900 : Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 20,
+                          backgroundImage: review.user?.profilePicture != null
+                              ? NetworkImage(review.user!.profilePicture!)
+                              : null,
+                          child: review.user?.profilePicture == null
+                              ? const Icon(Icons.person)
+                              : null,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                review.user?.name ?? "Anonymous",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: isDarkMode ? Colors.white : Colors.black,
+                                ),
+                              ),
+                              Row(
+                                children: List.generate(5, (starIndex) {
+                                  return Icon(
+                                    Icons.star,
+                                    size: 14,
+                                    color: starIndex < (review.rating ?? 0)
+                                        ? Colors.yellow
+                                        : Colors.grey.shade400,
+                                  );
+                                }),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          review.createdAt?.split('T')[0] ?? "",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDarkMode ? Colors.grey.shade500 : Colors.grey.shade500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      review.reviewText ?? "",
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.grey.shade300 : Colors.grey.shade800,
+                        fontSize: 14,
+                      ),
+                    ),
+                    if (review.photos != null && review.photos!.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        height: 80,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: review.photos!.length,
+                          separatorBuilder: (context, index) => const SizedBox(width: 8),
+                          itemBuilder: (context, index) {
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: CustomImageView(
+                                url: "https://api.yellowpass.in${review.photos![index]}",
+                                height: 80,
+                                width: 80,
+                                fit: BoxFit.cover,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              );
+            },
+          ),
+      ],
+    );
+  }
+
   Widget _buildFeatures(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border.all(color: theme.colorScheme.outlineVariant),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildFeatureItem(context, Icons.wifi, "Free Wi-\nFi"),
-          _buildVerticalDivider(context),
-          _buildFeatureItem(context, Icons.power, "Power\nOutlets"),
-          _buildVerticalDivider(context),
-          _buildFeatureItem(context, Icons.local_offer, "10%\nOFF"),
-        ],
-      ),
+    final amenities = controller.cafe.value?.amenities ?? [];
+
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    if (amenities.isEmpty) return const SizedBox();
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Amenities",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
+        SizedBox(height: 10,),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isDarkMode ? Colors.grey.shade900 : Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200),
+          ),
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 24,
+            runSpacing: 16,
+            children: amenities.map((amenity) {
+              IconData icon;
+              String label = amenity;
+
+              if (amenity.toLowerCase().contains("wifi")) {
+                icon = Icons.wifi;
+              } else if (amenity.toLowerCase().contains("coffee")) {
+                icon = Icons.coffee;
+              } else if (amenity.toLowerCase().contains("parking")) {
+                icon = Icons.local_parking;
+              } else if (amenity.toLowerCase().contains("power")) {
+                icon = Icons.power;
+              } else {
+                icon = Icons.star_outline;
+              }
+
+              return _buildFeatureItem(context, icon, label);
+            }).toList(),
+          ),
+        ),
+      ],
     );
   }
 
@@ -247,7 +499,7 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
 
   Widget _buildFeatureItem(BuildContext context, IconData icon, String label) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Column(
       children: [
         CircleAvatar(
@@ -269,70 +521,63 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
     );
   }
 
-  Widget _buildDateSelection(BuildContext context) {
-    final theme = Theme.of(context);
+  Widget _buildTables(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final tables = controller.cafe.value?.tables ?? [];
+
+    if (tables.isEmpty) return const SizedBox();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "Choose Date", 
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black,
-              ),
-            ),
-            Text(
-              "Oct, 2025", 
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.green,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+        Text(
+          "Available Tables",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 80,
+          height: 100,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            itemCount: controller.dates.length,
+            itemCount: tables.length,
             separatorBuilder: (context, index) => const SizedBox(width: 12),
             itemBuilder: (context, index) {
+              final table = tables[index];
               return Container(
-                width: 60,
+                width: 120,
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade100,
+                  color: isDarkMode ? Colors.grey.shade900 : Colors.grey.shade50,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300,
-                    width: 1,
-                  ),
+                  border: Border.all(color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    Icon(
+                      table.capacity! > 4 ? Icons.groups : (table.capacity! > 1 ? Icons.group : Icons.person),
+                      color: Colors.yellow.shade700,
+                    ),
+                    const SizedBox(height: 8),
                     Text(
-                      controller.days[index],
+                      (table.name == null || table.name!.isEmpty) ? "Standard Table" : table.name!,
                       style: TextStyle(
-                        color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700,
                         fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.white : Colors.black,
                         fontSize: 12,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
                     Text(
-                      controller.dates[index],
+                      "${table.capacity} Person",
                       style: TextStyle(
-                        color: isDarkMode ? Colors.white : Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                        color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                        fontSize: 10,
                       ),
                     ),
                   ],
@@ -345,161 +590,17 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
     );
   }
 
-  Widget _buildTimeSlots(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Available Time slots", 
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: isDarkMode ? Colors.white : Colors.black,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: List.generate(controller.timeSlots.length, (index) {
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300,
-                ),
-              ),
-              child: Text(
-                controller.timeSlots[index],
-                style: TextStyle(
-                  color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-            );
-          }),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTableSize(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Select Table Size", 
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: isDarkMode ? Colors.white : Colors.black,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: List.generate(controller.tableSizes.length, (index) {
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300,
-                ),
-              ),
-              child: Text(
-                controller.tableSizes[index],
-                style: TextStyle(
-                  color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-            );
-          }),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDurationSlider(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final theme = Theme.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Time Duration", 
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: isDarkMode ? Colors.white : Colors.black,
-          ),
-        ),
-        const SizedBox(height: 12),
-        IgnorePointer(
-          child: SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              activeTrackColor: theme.colorScheme.outlineVariant,
-              inactiveTrackColor: theme.colorScheme.outlineVariant,
-              thumbColor: theme.colorScheme.outlineVariant,
-              overlayColor: Colors.transparent,
-              trackHeight: 4,
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8, elevation: 0),
-            ),
-            child: Slider(
-              value: 1,
-              min: 1,
-              max: 5,
-              divisions: 4,
-              onChanged: (value) {},
-            ),
-          ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "Min: 1hr", 
-              style: TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
-            ),
-            Text(
-              "Max: 5hrs", 
-              style: TextStyle(
-                color: Colors.green,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
   Widget _buildBottomButton(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     return SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
         onPressed: () {
-          Get.toNamed(AppRoutes.cafeBookScreenRoute);
+          if (controller.cafe.value != null) {
+            Get.toNamed(AppRoutes.cafeBookScreenRoute, arguments: controller.cafe.value);
+          }
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: isDarkMode ? Colors.white : Colors.black,

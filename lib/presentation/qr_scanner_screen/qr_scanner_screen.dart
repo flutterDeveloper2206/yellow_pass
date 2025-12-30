@@ -19,7 +19,7 @@ class QrScannerScreen extends GetView<QrScannerController> {
           Container(
             decoration: ShapeDecoration(
               shape: QrScannerOverlayShape(
-                borderColor: const Color(0xFFFFD54F),
+                borderColor:  Colors.yellow,
                 borderRadius: 10,
                 borderLength: 30,
                 borderWidth: 10,

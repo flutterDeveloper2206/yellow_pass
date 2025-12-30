@@ -6,7 +6,7 @@ ColorScheme flexSchemeLight = const ColorScheme(
   ///Fix Color for both theme
   onPrimaryContainer: Color(0xff070707),
 
-  primary: Color(0xffFF9100),
+  primary: Colors.yellow,
   onPrimary: Color(0xffffab3d),
   primaryFixed: Color(0xffFF9100),
   onPrimaryFixed: Color(0xffffab3d),

@@ -40,7 +40,7 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.yellow.shade700,
+                    color: Colors.yellow,
                   ),
                   child: Icon(icon, size: 30, color: Colors.black),
                 ),
@@ -78,11 +78,14 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
               FadeInUp(
                 duration: const Duration(milliseconds: 800),
                 delay: const Duration(milliseconds: 300),
-                child: Obx(() => Text(
-                  "(0:${controller.timer.value.toString().padLeft(2, '0')}) Resend Code",
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.green,
-                    fontWeight: FontWeight.bold,
+                child: Obx(() => TextButton(
+                  onPressed: controller.timer.value == 0 ? controller.resendCode : null,
+                  child: Text(
+                    "(0:${controller.timer.value.toString().padLeft(2, '0')}) Resend Code",
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: controller.timer.value == 0 ? Colors.green : Colors.grey,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 )),
               ),
@@ -94,10 +97,11 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: () {
-                      if (controller.otp.value == "1234") {
+                    onPressed: () async {
+                      bool success = await controller.verifyOtp();
+                      if (success && context.mounted) {
                         _showSuccessDialog(context, colorScheme);
-                      } else {
+                      } else if (context.mounted) {
                         _showFailureDialog(context, colorScheme);
                       }
                     },
@@ -183,10 +187,10 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.yellow.shade700, width: 2),
+        border: Border.all(color: Colors.yellow, width: 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.yellow.shade700.withOpacity(0.3),
+            color: Colors.yellow.withOpacity(0.3),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -198,12 +202,12 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.yellow.shade700),
+        border: Border.all(color: Colors.yellow),
       ),
     );
 
     return Pinput(
-      length: 4,
+      length: 6,
       defaultPinTheme: defaultPinTheme,
       focusedPinTheme: focusedPinTheme,
       submittedPinTheme: submittedPinTheme,
@@ -212,7 +216,7 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
         width: 2,
         height: 24,
         decoration: BoxDecoration(
-          color: Colors.yellow.shade700,
+          color: Colors.yellow,
           borderRadius: BorderRadius.circular(1),
         ),
       ),

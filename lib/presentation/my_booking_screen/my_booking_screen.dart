@@ -68,7 +68,7 @@ class MyBookingScreen extends GetView<MyBookingController> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Cafe Aarosh",
+                            "Chai Point",
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -77,7 +77,7 @@ class MyBookingScreen extends GetView<MyBookingController> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "Sadashiv Peth, Pune",
+                            "Raiya Road, Rajkot",
                             style: TextStyle(
                               color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                               fontSize: 14,
@@ -180,7 +180,7 @@ class MyBookingScreen extends GetView<MyBookingController> {
                                 Text(
                                   item['price'],
                                   style: const TextStyle(
-                                    color: Color(0xFFFFD54F),
+                                    color: Colors.yellow,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                   ),
@@ -193,7 +193,7 @@ class MyBookingScreen extends GetView<MyBookingController> {
                           padding: const EdgeInsets.only(right: 16),
                           child: Container(
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFFD54F),
+                              color:  Colors.yellow,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: IconButton(

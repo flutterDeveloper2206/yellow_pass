@@ -8,16 +8,14 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'package:geolocator/geolocator.dart';
 import 'navigation_service.dart';
-
-
 
 class CommonConstant {
   CommonConstant._();
 
-  String mapApiKey = '';
-
   static final instance = CommonConstant._();
+
   String? getCurrentRoute() {
     String? currentRoute = null;
     NavigationService.navigatorKey.currentState?.popUntil((route) {
@@ -26,6 +24,26 @@ class CommonConstant {
     });
     return currentRoute;
   }
+
+  Future<Position?> getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) return null;
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) return null;
+    }
+
+    if (permission == LocationPermission.deniedForever) return null;
+
+    return await Geolocator.getCurrentPosition();
+  }
+
+
 
   Future<File> showImagePickBottomSheet(context, {bool isDismissible = true,void Function()? onPressedDelete }) async {
     final ImagePicker picker = ImagePicker();

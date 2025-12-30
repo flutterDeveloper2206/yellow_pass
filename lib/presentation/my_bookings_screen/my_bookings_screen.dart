@@ -171,7 +171,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> with SingleTickerPr
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: controller.selectedTabIndex.value == 0
-                      ? const Color(0xFFFFD54F)
+                      ?  Colors.yellow
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -196,7 +196,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> with SingleTickerPr
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: controller.selectedTabIndex.value == 1
-                      ? const Color(0xFFFFD54F)
+                      ?  Colors.yellow
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -323,7 +323,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> with SingleTickerPr
                   child: Center(
                     child: Text(
                       booking.status,
-                      style: PMT.style(12, fontColor: isDark ? const Color(0xFFFFD54F) : Colors.black, fontWeight: FontWeight.bold),
+                      style: PMT.style(12, fontColor: isDark ?  Colors.yellow : Colors.black, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),

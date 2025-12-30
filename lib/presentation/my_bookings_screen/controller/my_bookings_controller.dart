@@ -25,8 +25,8 @@ class MyBookingsController extends GetxController {
 
   final List<BookingModel> upcomingBookings = <BookingModel>[
     BookingModel(
-      name: "Cafe Aarosh",
-      location: "Sadashiv Peth, Pune",
+      name: "Chai Point",
+      location: "Raiya Road, Rajkot",
       date: "11 Oct 2025, Tuesday",
       time: "12:30 pm-2:00pm",
       rating: "4.7/5",
@@ -34,8 +34,8 @@ class MyBookingsController extends GetxController {
       status: "Meeting Room booked",
     ),
     BookingModel(
-      name: "Cafe Aarosh",
-      location: "Sadashiv Peth, Pune",
+      name: "Tea Post",
+      location: "Kalavad Road, Rajkot",
       date: "11 Oct 2025, Tuesday",
       time: "12:30 pm-2:00pm",
       rating: "4.7/5",
@@ -43,8 +43,8 @@ class MyBookingsController extends GetxController {
       status: "Meeting Room booked",
     ),
     BookingModel(
-      name: "Cafe Aarosh",
-      location: "Sadashiv Peth, Pune",
+      name: "Third Wave Coffee",
+      location: "Amin Marg, Rajkot",
       date: "11 Oct 2025, Tuesday",
       time: "12:30 pm-2:00pm",
       rating: "4.7/5",
@@ -55,8 +55,8 @@ class MyBookingsController extends GetxController {
 
   final List<BookingModel> pastBookings = <BookingModel>[
     BookingModel(
-      name: "Cafe Aarosh",
-      location: "Sadashiv Peth, Pune",
+      name: "Blue Tokai Coffee",
+      location: "150 Feet Ring Road, Rajkot",
       date: "10 Sep 2025, Monday",
       time: "10:00 am-11:00am",
       rating: "4.7/5",

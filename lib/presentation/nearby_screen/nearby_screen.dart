@@ -163,7 +163,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.amber,
+                      color: Colors.yellow,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -245,7 +245,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Icon(Icons.star, size: 14, color: Colors.amber),
+                    const Icon(Icons.star, size: 14, color: Colors.yellow),
                     const SizedBox(width: 4),
                     Text(
                       '${cafe.rating}',

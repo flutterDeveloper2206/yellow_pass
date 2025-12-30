@@ -19,7 +19,7 @@ class ProfileDetailsScreen extends GetView<ProfileDetailsController> {
     final subTextColor = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
     final cardColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
     final inputFillColor = isDark ? const Color(0xFF2C2C2C) : Colors.white;
-    final accentColor = const Color(0xFFFFD54F); // Yellow
+    final accentColor =  Colors.yellow; // Yellow
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -64,21 +64,9 @@ class ProfileDetailsScreen extends GetView<ProfileDetailsController> {
             )),
           ],
         ),
-        Row(
+        const Row(
           children: [
-            if (isDark) ...[
-               Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.yellow, width: 1),
-                  color: Colors.transparent,
-                ),
-                child: const Icon(Icons.visibility, size: 18, color: Colors.yellow),
-              ),
-              const SizedBox(width: 10),
-            ],
-
+            // Visibility icon removed
           ],
         ),
       ],
@@ -106,11 +94,16 @@ class ProfileDetailsScreen extends GetView<ProfileDetailsController> {
                     radius: 50,
                     backgroundImage: FileImage(controller.profileImage.value!),
                   );
+                } else if (controller.userData['profile_picture'] != null && controller.userData['profile_picture'].toString().isNotEmpty) {
+                  return CircleAvatar(
+                    radius: 50,
+                    backgroundImage: NetworkImage("https://api.yellowpass.in/storage/${controller.userData['profile_picture']}"),
+                  );
                 } else {
                   return const CircleAvatar(
                     radius: 50,
-                    backgroundImage: NetworkImage(
-                      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1887&auto=format&fit=crop',
+                    backgroundImage: AssetImage(
+                      'assets/images/profiles.png',
                     ),
                   );
                 }
@@ -139,15 +132,15 @@ class ProfileDetailsScreen extends GetView<ProfileDetailsController> {
           ],
         ),
         const SizedBox(height: 16),
-        Text(
-          "Vaishnavi Shrivat",
+        Obx(() => Text(
+          controller.userData['name'] ?? "User Name",
           style: PMT.style(20, fontColor: textColor, fontWeight: FontWeight.bold),
-        ),
+        )),
         const SizedBox(height: 4),
-        Text(
-          "UI/UX Designer",
+        Obx(() => Text(
+          controller.userData['email'] ?? "Email ID",
           style: PMT.style(14, fontColor: subTextColor),
-        ),
+        )),
         const SizedBox(height: 12),
         // Bio is moved to form in this design, but kept short description here if needed, 
         // or we can hide it if it's redundant with the form field. 
@@ -157,11 +150,11 @@ class ProfileDetailsScreen extends GetView<ProfileDetailsController> {
           ? const SizedBox.shrink()
           : Column(
               children: [
-                Text(
-                  "UI/UX Designer | Business Understanding | Exploring\nFrontend Development | Integrating AI for Seamless,\nData-Driven Experiences",
+                Obx(() => Text(
+                  controller.userData['description'] ?? "No Bio Added",
                   textAlign: TextAlign.center,
                   style: PMT.style(11, fontColor: subTextColor, fontWeight: FontWeight.w400),
-                ),
+                )),
                 const SizedBox(height: 12),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

@@ -84,7 +84,7 @@ class _WalletScreenState extends State<WalletScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.yellow.shade700,
+                        color: Colors.yellow,
                       ),
                     ),
                   ],
@@ -141,7 +141,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   color: isDarkMode ? const Color(0xFF3C3C3C) : Colors.white,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(Icons.monetization_on, color: Colors.yellow.shade700, size: 30),
+                child: Icon(Icons.monetization_on, color: Colors.yellow, size: 30),
               ),
               const SizedBox(width: 16),
               Column(

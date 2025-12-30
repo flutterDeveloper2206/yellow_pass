@@ -1,38 +1,46 @@
 import 'package:get/get.dart';
+import 'package:yellow_pass/data/models/notification_response_model.dart';
+import '../repository/notification_repository.dart';
 
 class NotificationController extends GetxController {
-  final RxList<Map<String, dynamic>> notifications = <Map<String, dynamic>>[
-    {
-      "type": "reminder",
-      "title": "Reminder",
-      "description": "You have booked Cafe Aarosh today at 12:00. Don't forget to be there on time",
-      "isUnread": true,
-    },
-    {
-      "type": "reminder",
-      "title": "Reminder",
-      "description": "You have to check-out at Cafe Aarosh in coming 15 mins.",
-      "isUnread": true,
-    },
-    {
-      "type": "connection",
-      "title": "Connection",
-      "description": "New connection. Amaliya has accepted your connection request.",
-      "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1887&auto=format&fit=crop",
-      "isUnread": true,
-    },
-    {
-      "type": "reminder",
-      "title": "Booking Confirmed",
-      "description": "Your booking at Cafe Coffee Day is confirmed for tomorrow.",
-      "isUnread": false,
-    },
-    {
-      "type": "connection",
-      "title": "Connection",
-      "description": "John Doe sent you a connection request.",
-      "image": "https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=1887&auto=format&fit=crop",
-      "isUnread": false,
-    },
-  ].obs;
+  final NotificationRepository _repository = Get.find<NotificationRepository>();
+  
+  RxList<NotificationData> notifications = <NotificationData>[].obs;
+  RxBool isLoading = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchNotifications();
+  }
+
+  Future<void> fetchNotifications() async {
+    isLoading.value = true;
+    try {
+      var response = await _repository.getNotifications();
+      if (response != null && response['status'] == true) {
+        NotificationResponse notificationResponse = NotificationResponse.fromJson(response);
+        if (notificationResponse.data != null) {
+          notifications.value = notificationResponse.data!;
+        }
+      }
+    } catch (e) {
+      print("Error fetching notifications: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // Group notifications by type
+  Map<String, List<NotificationData>> get groupedNotifications {
+    Map<String, List<NotificationData>> grouped = {};
+    for (var notification in notifications) {
+      String type = notification.type ?? 'other';
+      if (!grouped.containsKey(type)) {
+        grouped[type] = [];
+      }
+      grouped[type]!.add(notification);
+    }
+    return grouped;
+  }
 }
