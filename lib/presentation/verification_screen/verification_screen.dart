@@ -110,7 +110,7 @@ class VerificationScreen extends GetView<VerificationController> {
           child: CircleAvatar(
             radius: 50,
             backgroundImage: (controller.userData['profile_picture'] != null && controller.userData['profile_picture'].toString().isNotEmpty)
-                ? NetworkImage("https://api.yellowpass.in/storage/${controller.userData['profile_picture']}") as ImageProvider
+                ? NetworkImage("${controller.userData['profile_picture']}") as ImageProvider
                 : const AssetImage('assets/images/profiles.png'),
           ),
         )),

@@ -1,6 +1,9 @@
 import 'dart:developer';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/connect.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import '../core/utils/common_function.dart';
 import '../core/utils/progress_dialog_utils.dart';
@@ -41,7 +44,8 @@ class ApiService extends GetConnect {
       {required body,
       required url,
       bool showLoader = true,
-      bool headerWithToken = true}) async {
+      bool headerWithToken = true,
+      bool handleError = true}) async {
 
     if(isLogPrint) {
       log("API :- $url");
@@ -69,13 +73,105 @@ class ApiService extends GetConnect {
       }
       
       if (response.status.hasError) {
-        _handleError(response);
-        return null;
+        if (handleError) {
+          _handleError(response);
+          return null;
+        } else {
+          return response.body;
+        }
       } else {
         if (_checkUnauthenticated(response.body)) {
           return null;
         }
         return response.body;
+      }
+    } catch (e) {
+      if (showLoader) {
+        ProgressDialogUtils.hideProgressDialog();
+      }
+      log("Exception: $e");
+      CommonSnackbar.showError(message: "An unexpected error occurred: $e");
+      return null;
+    }
+  }
+
+  Future<dynamic> uploadMultipart({
+    required String url,
+    required Map<String, String> fields,
+    List<Map<String, String>>? files, 
+    bool showLoader = true,
+    bool headerWithToken = true,
+  }) async {
+    if (isLogPrint) {
+      log("API :- $url");
+    }
+
+    if (showLoader) {
+      ProgressDialogUtils.showProgressDialog(isCancellable: false);
+    }
+
+    try {
+      await initApiService();
+      
+      var request = http.MultipartRequest('POST', Uri.parse(url));
+
+      // 🔹 Headers
+      if (headerWithToken) {
+        request.headers.addAll({
+          "Authorization": "Bearer $authToken",
+          "Accept": "application/json",
+           // "Content-Type": "multipart/form-data" // http package sets this automatically with boundary
+        });
+      }
+
+      // 🔹 Text fields
+      fields.forEach((key, value) {
+        request.fields[key] = value;
+      });
+
+      // 🔹 File fields
+      if (files != null) {
+        for (var fileData in files) {
+          if (fileData['field'] != null && fileData['path'] != null) {
+             request.files.add(
+              await http.MultipartFile.fromPath(
+                fileData['field']!,
+                fileData['path']!,
+              ),
+            );
+          }
+        }
+      }
+
+      // 🔹 Send request
+      var streamedResponse = await request.send();
+       var response = await http.Response.fromStream(streamedResponse);
+
+      if (showLoader) {
+        ProgressDialogUtils.hideProgressDialog();
+      }
+
+      if (isLogPrint) {
+        log("RESPONSE :- ${response.body}");
+      }
+      
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+         try {
+           final bodyMap = json.decode(response.body);
+           if (_checkUnauthenticated(bodyMap)) {
+            return null;
+           }
+           return bodyMap;
+         } catch(e) {
+            return response.body; 
+         }
+      } else {
+        // Create a Get Response object to reuse existing error handling logic or handle manually
+        // Since _handleError takes Get's Response, we might refactor or just handle here simpler
+        
+        // Let's reuse _handleError by converting basic props
+        _handleError(Response(statusCode: response.statusCode, statusText: response.reasonPhrase, body:  json.decode(response.body)));
+        return null;
       }
     } catch (e) {
       if (showLoader) {
@@ -99,7 +195,8 @@ class ApiService extends GetConnect {
     }
 
     if (showLoader) {
-      ProgressDialogUtils.showProgressDialog(isCancellable: false);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+      ProgressDialogUtils.showProgressDialog(isCancellable: false);});
     }
     
     try {

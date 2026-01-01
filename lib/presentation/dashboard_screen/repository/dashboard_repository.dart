@@ -34,4 +34,17 @@ class DashboardRepository {
       headerWithToken: true,
     );
   }
+
+  Future<dynamic> updateProfile({
+    required Map<String, String> fields,
+    List<Map<String, String>>? files,
+  }) async {
+    return await _apiService.uploadMultipart(
+      url: ApiEndPoints.userProfileApi,
+      fields: fields,
+      files: files,
+      showLoader: true,
+      headerWithToken: true,
+    );
+  }
 }

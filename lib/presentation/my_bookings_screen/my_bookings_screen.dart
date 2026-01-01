@@ -3,6 +3,10 @@ import 'package:get/get.dart';
 import 'package:yellow_pass/core/utils/app_fonts.dart';
 import 'package:yellow_pass/presentation/my_bookings_screen/controller/my_bookings_controller.dart';
 import 'package:yellow_pass/widgets/custom_image_view.dart';
+import 'package:yellow_pass/widgets/shimmer_widget.dart';
+import 'package:yellow_pass/data/models/user_booking_response_model.dart';
+import 'package:yellow_pass/ApiServices/api_end_points.dart';
+import 'package:yellow_pass/presentation/my_bookings_screen/write_review_screen.dart';
 
 import 'package:yellow_pass/routes/app_routes.dart';
 
@@ -20,7 +24,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> with SingleTickerPr
   @override
   void initState() {
     super.initState();
-    controller = Get.put(MyBookingsController());
+    controller = Get.find<MyBookingsController>();
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -56,10 +60,18 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> with SingleTickerPr
             const SizedBox(height: 20),
             Expanded(
               child: Obx(() {
+                if (controller.isLoading.value) {
+                  return _buildShimmerList(isDark, cardColor);
+                }
+                
                 final bookings = controller.selectedTabIndex.value == 0
                     ? controller.upcomingBookings
                     : controller.pastBookings;
                 
+                if (bookings.isEmpty) {
+                  return _buildEmptyState(textColor, isDark);
+                }
+
                 return ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   itemCount: bookings.length,
@@ -71,7 +83,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> with SingleTickerPr
                         final animation = CurvedAnimation(
                           parent: _animationController,
                           curve: Interval(
-                            (index / bookings.length) * 0.5,
+                            (index / (bookings.isEmpty ? 1 : bookings.length)) * 0.5,
                             1.0,
                             curve: Curves.easeOut,
                           ),
@@ -88,7 +100,12 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> with SingleTickerPr
                         );
                       },
                       child: GestureDetector(
-                        onTap: () => Get.toNamed(AppRoutes.myBookingScreenRoute),
+                        onTap: () {
+                           Get.toNamed(AppRoutes.myBookingScreenRoute, arguments: booking)?.then((value) {
+                             controller.    fetchUserBookings();
+
+                           },);
+                        },
                         child: _buildBookingCard(context, booking, isDark, textColor, cardColor),
                       ),
                     );
@@ -119,30 +136,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> with SingleTickerPr
             ),
           ],
         ),
-        Row(
-          children: [
-            if (isDark) ...[
-               Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.yellow, width: 1),
-                  color: Colors.transparent,
-                ),
-                child: const Icon(Icons.visibility, size: 18, color: Colors.yellow),
-              ),
-              const SizedBox(width: 10),
-            ],
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isDark ? const Color(0xFF2C2C2C) : Colors.grey.shade200,
-              ),
-              child: Icon(Icons.delete_outline, size: 20, color: isDark ? Colors.grey : Colors.black54),
-            ),
-          ],
-        ),
+
       ],
     );
   }
@@ -219,16 +213,24 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> with SingleTickerPr
     );
   }
 
-  Widget _buildBookingCard(BuildContext context, BookingModel booking, bool isDark, Color textColor, Color cardColor) {
+  Widget _buildBookingCard(BuildContext context, UserBookingData booking, bool isDark, Color textColor, Color cardColor) {
+    String imageUrl = "";
+    if (booking.cafe?.image != null) {
+      imageUrl = booking.cafe!.image!.startsWith('/') 
+        ? "https://api.yellowpass.in" + booking.cafe!.image!
+        : booking.cafe!.image!;
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(16),
+        border: booking.checkInStatus == 'checked_in' ? Border.all(color: Colors.green, width: 2) : null,
         boxShadow: isDark ? [] : [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: booking.checkInStatus == 'checked_in' ? Colors.green.withOpacity(0.2) : Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -242,7 +244,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> with SingleTickerPr
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: CustomImageView(
-                  url: booking.imageUrl,
+                  url: imageUrl,
                   height: 80,
                   width: 80,
                   fit: BoxFit.cover,
@@ -256,20 +258,25 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> with SingleTickerPr
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          booking.name,
-                          style: PMT.style(16, fontColor: textColor, fontWeight: FontWeight.bold),
+                        Expanded(
+                          child: Text(
+                            booking.cafe?.name ?? "N/A",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: PMT.style(16, fontColor: textColor, fontWeight: FontWeight.bold),
+                          ),
                         ),
-                        Row(
-                          children: [
-                            const Icon(Icons.star, size: 14, color: Colors.grey),
-                            const SizedBox(width: 2),
-                            Text(
-                              booking.rating,
-                              style: PMT.style(12, fontColor: Colors.grey),
-                            ),
-                          ],
-                        ),
+                        if (booking.review?.rating != null)
+                          Row(
+                            children: [
+                              const Icon(Icons.star, size: 14, color: Colors.orange),
+                              const SizedBox(width: 2),
+                              Text(
+                                booking.review!.rating.toString(),
+                                style: PMT.style(12, fontColor: Colors.grey),
+                              ),
+                            ],
+                          ),
                       ],
                     ),
                     const SizedBox(height: 4),
@@ -277,9 +284,13 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> with SingleTickerPr
                       children: [
                         const Icon(Icons.location_on, size: 14, color: Colors.grey),
                         const SizedBox(width: 4),
-                        Text(
-                          booking.location,
-                          style: PMT.style(12, fontColor: Colors.grey),
+                        Expanded(
+                          child: Text(
+                            booking.cafe?.address ?? "N/A",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: PMT.style(12, fontColor: Colors.grey),
+                          ),
                         ),
                       ],
                     ),
@@ -289,7 +300,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> with SingleTickerPr
                         const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
                         const SizedBox(width: 4),
                         Text(
-                          booking.date,
+                          booking.bookingDate ?? "N/A",
                           style: PMT.style(12, fontColor: textColor, fontWeight: FontWeight.w500),
                         ),
                       ],
@@ -300,8 +311,8 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> with SingleTickerPr
                         const Icon(Icons.access_time, size: 14, color: Colors.grey),
                         const SizedBox(width: 4),
                         Text(
-                          booking.time,
-                          style: PMT.style(12, fontColor: textColor, fontWeight: FontWeight.w500),
+                          "${booking.startTime} - ${booking.endTime}",
+                          style: PMT.style(10, fontColor: textColor, fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
@@ -317,52 +328,246 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> with SingleTickerPr
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF332F00) : const Color(0xFFFFF8E1), // Darker yellow bg for dark mode
+                    color: isDark ? const Color(0xFF332F00) : const Color(0xFFFFF8E1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Center(
                     child: Text(
-                      booking.status,
+                      booking.status?.toUpperCase() ?? "BOOKED",
                       style: PMT.style(12, fontColor: isDark ?  Colors.yellow : Colors.black, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    Get.defaultDialog(
-                      title: "Cancel Booking",
-                      middleText: "Are you sure you want to cancel this booking?",
-                      textConfirm: "Yes, Cancel",
-                      textCancel: "No",
-                      confirmTextColor: Colors.white,
-                      buttonColor: Colors.red,
-                      cancelTextColor: Colors.black,
-                      onConfirm: () {
-                        Get.back(); // Close dialog
-                        Get.find<MyBookingsController>().cancelBooking(booking);
-                      },
-                      onCancel: () {},
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.red.shade300),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Center(
-                      child: Text(
-                        "Cancel Booking",
-                        style: PMT.style(12, fontColor: Colors.red.shade300, fontWeight: FontWeight.bold),
+              if (booking.status == 'completed') ...[
+                if (booking.review == null) ...[
+                 const SizedBox(width: 12),
+                 Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                         Get.to(() => WriteReviewScreen(booking: booking))?.then((value) {
+                             controller.fetchUserBookings();
+                         });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.amber.shade700),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "Write Review",
+                          style: PMT.style(12, fontColor: Colors.amber.shade700, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ),
                 ),
+               ] else ...[
+                 const SizedBox(width: 12),
+                  Expanded(
+                  child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                           const Icon(Icons.check_circle, size: 16, color: Colors.green),
+                            const SizedBox(width: 4),
+                          Text(
+                            "Reviewed",
+                            style: PMT.style(12, fontColor: Colors.green, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                ),
+               ]
+              ] else if(booking.status!='completed'&&booking.checkInStatus!='checked_in')
+              if (booking.type == "upcoming") ...[
+                const SizedBox(width: 12),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      _showCancelConfirmationDialog(context, booking);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.red.shade300),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "Cancel Booking",
+                          style: PMT.style(12, fontColor: Colors.red.shade300, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCancelConfirmationDialog(BuildContext context, UserBookingData booking) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: isDark ? Colors.black : Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 40),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                "Cancel Booking?",
+                style: PMT.style(20, fontColor: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "Are you sure you want to cancel this booking for ${booking.cafe?.name}?",
+                textAlign: TextAlign.center,
+                style: PMT.style(14, fontColor: Colors.grey),
+              ),
+              const SizedBox(height: 30),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Get.back(),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: Text(
+                        "No, Keep it",
+                        style: PMT.style(14, fontColor: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Get.back();
+                        controller.cancelBooking(booking);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: Text(
+                        "Yes, Cancel",
+                        style: PMT.style(14, fontColor: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerList(bool isDark, Color cardColor) {
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      itemCount: 5,
+      itemBuilder: (context, index) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 20),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: cardColor,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  const ShimmerWidget.rectangular(height: 80, width: 80),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        ShimmerWidget.rectangular(height: 20, width: 150),
+                        SizedBox(height: 8),
+                        ShimmerWidget.rectangular(height: 15, width: 200),
+                        SizedBox(height: 8),
+                        ShimmerWidget.rectangular(height: 15, width: 100),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: const [
+                  Expanded(child: ShimmerWidget.rectangular(height: 40)),
+                  SizedBox(width: 12),
+                  Expanded(child: ShimmerWidget.rectangular(height: 40)),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildEmptyState(Color textColor, bool isDark) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.calendar_today_outlined, size: 80, color: Colors.grey.shade400),
+          const SizedBox(height: 20),
+          Text(
+            "No bookings found",
+            style: PMT.style(18, fontColor: textColor, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            "You haven't made any bookings yet.",
+            style: PMT.style(14, fontColor: Colors.grey),
+          ),
+          const SizedBox(height: 30),
+          ElevatedButton(
+            onPressed: () => Get.back(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.yellow,
+              foregroundColor: Colors.black,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+            ),
+            child: const Text("Book Now", style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),

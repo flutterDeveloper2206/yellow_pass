@@ -1,40 +1,68 @@
 import 'package:get/get.dart';
 import 'package:yellow_pass/routes/app_routes.dart';
+import 'package:yellow_pass/data/models/user_booking_response_model.dart';
+import '../repository/my_booking_repository.dart';
+import 'package:yellow_pass/data/models/check_in_response_model.dart';
+import 'package:yellow_pass/data/models/check_out_response_model.dart';
+import 'package:yellow_pass/data/models/booking_detail_response_model.dart';
+import 'package:yellow_pass/widgets/common_snackbar.dart';
 
 class MyBookingController extends GetxController {
+  final MyBookingRepository _repository = Get.find<MyBookingRepository>();
+  RxBool isLoading = false.obs;
   RxBool isCheckedIn = false.obs;
+  RxBool isCheckingOut = false.obs;
+  Rx<DetailedBooking?> bookingDetails = Rx<DetailedBooking?>(null);
+  Rx<UserBookingData?> booking = Rx<UserBookingData?>(null);
   
-  final List<Map<String, dynamic>> menuItems = [
-    {
-      "name": "Cappuccino",
-      "price": "150 Tokens",
-      "image": "https://images.unsplash.com/photo-1572442388796-11668a67e53d?q=80&w=3535&auto=format&fit=crop",
-    },
-    {
-      "name": "Croissant",
-      "price": "120 Tokens",
-      "image": "https://images.unsplash.com/photo-1555507036-ab1f4038808a?q=80&w=3326&auto=format&fit=crop",
-    },
-    {
-      "name": "Blueberry Muffin",
-      "price": "100 Tokens",
-      "image": "https://images.unsplash.com/photo-1607958996333-41aef7caefaa?q=80&w=3387&auto=format&fit=crop",
-    },
-     {
-      "name": "Iced Latte",
-      "price": "160 Tokens",
-      "image": "https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?q=80&w=3387&auto=format&fit=crop",
-    },
-  ];
+
+  @override
+  void onInit() {
+    super.onInit();
+    if (Get.arguments is UserBookingData) {
+      booking.value = Get.arguments;
+      fetchBookingDetails();
+    }
+  }
+
+  Future<void> fetchBookingDetails() async {
+    if (booking.value?.id == null) return;
+    
+    isLoading.value = true;
+    try {
+      var response = await _repository.getBookingDetails(booking.value!.id!);
+      if (response != null) {
+        BookingDetailResponse detailResponse = BookingDetailResponse.fromJson(response);
+        if (detailResponse.status == true) {
+          bookingDetails.value = detailResponse.data?.booking;
+          if (bookingDetails.value?.checkInStatus == "checked_in") {
+            isCheckedIn.value = true;
+          } else {
+            isCheckedIn.value = false;
+          }
+        }
+      }
+    } catch (e) {
+      print("Error fetching booking details: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   void checkIn() {
-    // Logic to handle check-in (e.g., navigate to scanner)
-    Get.toNamed(AppRoutes.qrScannerScreenRoute);
+    if (bookingDetails.value == null) return;
+    Get.toNamed(AppRoutes.qrScannerScreenRoute, arguments: {
+      'booking': booking.value, 
+      'isCheckOut': false
+    })?.then((_) => fetchBookingDetails());
   }
 
   void checkOut() {
-    isCheckedIn.value = false;
-    Get.snackbar("Success", "Checked out successfully");
+    if (booking.value == null) return;
+    Get.toNamed(AppRoutes.qrScannerScreenRoute, arguments: {
+      'booking': booking.value, 
+      'isCheckOut': true
+    })?.then((_) => fetchBookingDetails());
   }
   
   void setCheckedIn() {

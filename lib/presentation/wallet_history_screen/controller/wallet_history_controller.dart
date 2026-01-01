@@ -1,59 +1,46 @@
 import 'package:get/get.dart';
-
-class Transaction {
-  final String title;
-  final String date;
-  final String type; // 'credited' or 'debited'
-  final String icon;
-
-  Transaction({
-    required this.title,
-    required this.date,
-    required this.type,
-    required this.icon,
-  });
-}
+import 'package:yellow_pass/presentation/wallet_screen/repository/wallet_repository.dart';
+import 'package:yellow_pass/data/models/transaction_history_response_model.dart';
 
 class WalletHistoryController extends GetxController {
-  final RxString selectedMonth = 'Aug 2025'.obs;
+  final WalletRepository _repository = Get.find<WalletRepository>();
   
-  final List<String> months = [
-    'Aug 2025',
-    'Jul 2025',
-    'Jun 2025',
-    'May 2025',
-    'Apr 2025',
-  ];
+  final RxBool isLoading = false.obs;
+  final RxInt walletBalance = 0.obs;
+  final RxInt totalTokensSpent = 0.obs;
+  final RxInt totalTokensPurchased = 0.obs;
+  final RxList<Transaction> transactions = <Transaction>[].obs;
 
-  final RxList<Transaction> transactions = <Transaction>[
-    Transaction(
-      title: 'Wallet Recharge',
-      date: '12 Aug 2025, 12:00 pm',
-      type: 'credited',
-      icon: 'wallet',
-    ),
-    Transaction(
-      title: 'Booking',
-      date: '12 Aug 2025, 10:00 pm',
-      type: 'debited',
-      icon: 'booking',
-    ),
-    Transaction(
-      title: 'Booking',
-      date: '12 Aug 2025, 10:00 pm',
-      type: 'debited',
-      icon: 'booking',
-    ),
-    Transaction(
-      title: 'Wallet Recharge',
-      date: '12 Aug 2025, 10:00 pm',
-      type: 'credited',
-      icon: 'wallet',
-    ),
-  ].obs;
+  @override
+  void onInit() {
+    super.onInit();
+    fetchTransactionHistory();
+  }
 
-  void changeMonth(String month) {
-    selectedMonth.value = month;
-    // Here you can add logic to fetch transactions for the selected month
+  Future<void> fetchTransactionHistory() async {
+    try {
+      isLoading.value = true;
+      
+      var response = await _repository.getTransactionHistory();
+      
+      if (response != null && response['status'] == true) {
+        TransactionHistoryResponse historyResponse = 
+            TransactionHistoryResponse.fromJson(response);
+        
+        if (historyResponse.data != null) {
+          walletBalance.value = historyResponse.data!.walletBalance ?? 0;
+          totalTokensSpent.value = historyResponse.data!.totalTokensSpent ?? 0;
+          totalTokensPurchased.value = historyResponse.data!.totalTokensPurchased ?? 0;
+          
+          if (historyResponse.data!.transactions != null) {
+            transactions.value = historyResponse.data!.transactions!;
+          }
+        }
+      }
+    } catch (e) {
+      print("Error fetching transaction history: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

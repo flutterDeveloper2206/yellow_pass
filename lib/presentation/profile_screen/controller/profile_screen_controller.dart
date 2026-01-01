@@ -37,4 +37,67 @@ class ProfileScreenController extends GetxController {
       debugPrint("Error updating profile visibility: $e");
     }
   }
+
+  Future<void> fetchProfile() async {
+     try {
+       final repository = Get.find<DashboardRepository>();
+       final dynamic response = await repository.getUserProfile();
+      
+       if (response != null && response['status'] == true) {
+         if (response['data'] != null ) {
+           await SharedPrefs.setUser(response['data']);
+           loadUserData();
+         }
+       }
+     } catch (e) {
+       debugPrint("Error fetching profile: $e");
+     }
+  }
+
+  Future<bool> updateProfile({
+    required String name,
+    required String mobile,
+    String? description,
+    String? profilePicturePath,
+  }) async {
+    try {
+      final repository = Get.find<DashboardRepository>();
+      
+      final fields = <String, String>{
+        'name': name,
+        'mobile': mobile,
+      };
+      
+      if (description != null && description.isNotEmpty) {
+        fields['description'] = description;
+      }
+      
+      List<Map<String, String>>? files;
+      if (profilePicturePath != null && profilePicturePath.isNotEmpty) {
+        files = [
+          {
+            'field': 'profile_picture',
+            'path': profilePicturePath,
+          }
+        ];
+      }
+      
+      final dynamic response = await repository.updateProfile(
+        fields: fields,
+        files: files,
+      );
+      
+      if (response != null && response['status'] == true) {
+        if (response['data'] != null && response['data']['user'] != null) {
+          await SharedPrefs.setUser(response['data']['user']);
+          loadUserData();
+          return true;
+        }
+      }
+      return false;
+    } catch (e) {
+      debugPrint("Error updating profile: $e");
+      return false;
+    }
+  }
 }

@@ -122,30 +122,7 @@ class _NotificationScreenState extends State<NotificationScreen> with SingleTick
             ),
           ],
         ),
-        Row(
-          children: [
-             if (isDark) ...[
-               Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.yellow, width: 1),
-                  color: Colors.transparent,
-                ),
-                child: const Icon(Icons.visibility, size: 18, color: Colors.yellow),
-              ),
-              const SizedBox(width: 10),
-            ],
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isDark ? const Color(0xFF2C2C2C) : Colors.grey.shade200,
-              ),
-              child: Icon(Icons.delete_outline, size: 20, color: isDark ? Colors.grey : Colors.black54),
-            ),
-          ],
-        ),
+
       ],
     );
   }

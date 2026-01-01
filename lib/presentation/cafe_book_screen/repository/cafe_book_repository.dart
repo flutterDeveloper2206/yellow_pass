@@ -26,4 +26,13 @@ class CafeBookRepository {
       headerWithToken: true,
     );
   }
+
+  Future<dynamic> bookCafe(Map<String, dynamic> bookingData) async {
+    return await _apiService.callPostApi(
+      url: ApiEndPoints.bookings,
+      body: bookingData,
+      showLoader: true,
+      headerWithToken: true,
+    );
+  }
 }

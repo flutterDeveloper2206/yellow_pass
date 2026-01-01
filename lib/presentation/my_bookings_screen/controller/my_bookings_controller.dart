@@ -1,76 +1,120 @@
 import 'package:get/get.dart';
-
-class BookingModel {
-  final String name;
-  final String location;
-  final String date;
-  final String time;
-  final String rating;
-  final String imageUrl;
-  final String status; // "Meeting Room booked" etc.
-
-  BookingModel({
-    required this.name,
-    required this.location,
-    required this.date,
-    required this.time,
-    required this.rating,
-    required this.imageUrl,
-    required this.status,
-  });
-}
+import 'package:yellow_pass/presentation/my_bookings_screen/repository/my_bookings_repository.dart';
+import 'package:yellow_pass/data/models/user_booking_response_model.dart';
+import 'package:yellow_pass/data/models/cancel_booking_response_model.dart';
+import 'package:yellow_pass/widgets/common_snackbar.dart';
 
 class MyBookingsController extends GetxController {
+  final MyBookingsRepository _repository = Get.find<MyBookingsRepository>();
+
   RxInt selectedTabIndex = 0.obs; // 0: Upcoming, 1: Past
+  RxBool isLoading = false.obs;
+  
+  RxList<UserBookingData> upcomingBookings = <UserBookingData>[].obs;
+  RxList<UserBookingData> pastBookings = <UserBookingData>[].obs;
 
-  final List<BookingModel> upcomingBookings = <BookingModel>[
-    BookingModel(
-      name: "Chai Point",
-      location: "Raiya Road, Rajkot",
-      date: "11 Oct 2025, Tuesday",
-      time: "12:30 pm-2:00pm",
-      rating: "4.7/5",
-      imageUrl: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2047&auto=format&fit=crop",
-      status: "Meeting Room booked",
-    ),
-    BookingModel(
-      name: "Tea Post",
-      location: "Kalavad Road, Rajkot",
-      date: "11 Oct 2025, Tuesday",
-      time: "12:30 pm-2:00pm",
-      rating: "4.7/5",
-      imageUrl: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1974&auto=format&fit=crop",
-      status: "Meeting Room booked",
-    ),
-    BookingModel(
-      name: "Third Wave Coffee",
-      location: "Amin Marg, Rajkot",
-      date: "11 Oct 2025, Tuesday",
-      time: "12:30 pm-2:00pm",
-      rating: "4.7/5",
-      imageUrl: "https://images.unsplash.com/photo-1521017432531-fbd92d768814?q=80&w=2070&auto=format&fit=crop",
-      status: "Meeting Room booked",
-    ),
-  ].obs;
+  @override
+  void onInit() {
+    super.onInit();
+    fetchUserBookings();
+  }
 
-  final List<BookingModel> pastBookings = <BookingModel>[
-    BookingModel(
-      name: "Blue Tokai Coffee",
-      location: "150 Feet Ring Road, Rajkot",
-      date: "10 Sep 2025, Monday",
-      time: "10:00 am-11:00am",
-      rating: "4.7/5",
-      imageUrl: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2047&auto=format&fit=crop",
-      status: "Completed",
-    ),
-  ].obs;
+  Future<void> fetchUserBookings() async {
+    isLoading.value = true;
+    try {
+      var response = await _repository.getUserBookings();
+      if (response != null && response['status'] == true) {
+        UserBookingResponse bookingResponse = UserBookingResponse.fromJson(response);
+        if (bookingResponse.data != null) {
+          _processBookings(bookingResponse.data!);
+        }
+      } else {
+        CommonSnackbar.showError(message: response?['message'] ?? "Failed to fetch bookings");
+      }
+    } catch (e) {
+      print("Error fetching bookings: $e");
+      CommonSnackbar.showError(message: "Something went wrong while fetching bookings");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void _processBookings(List<UserBookingData> allBookings) {
+    upcomingBookings.clear();
+    pastBookings.clear();
+    
+    for (var booking in allBookings) {
+      if (booking.type == "upcoming") {
+        upcomingBookings.add(booking);
+      } else {
+        pastBookings.add(booking);
+      }
+    }
+  }
 
   void changeTab(int index) {
     selectedTabIndex.value = index;
   }
 
-  void cancelBooking(BookingModel booking) {
-    upcomingBookings.remove(booking);
-    update();
+  Future<void> cancelBooking(UserBookingData booking) async {
+    if (booking.id == null) return;
+    
+    try {
+      var response = await _repository.cancelBooking(booking.id!);
+      if (response != null) {
+        CancelBookingResponse cancelResponse = CancelBookingResponse.fromJson(response);
+        if (cancelResponse.status == true) {
+          CommonSnackbar.showSuccess(message: cancelResponse.message ?? "Booking cancelled successfully");
+          fetchUserBookings(); // Refresh the list
+        } else {
+          CommonSnackbar.showError(message: cancelResponse.message ?? "Failed to cancel booking");
+        }
+      }
+    } catch (e) {
+      print("Error cancelling booking: $e");
+      CommonSnackbar.showError(message: "Something went wrong while cancelling the booking");
+    }
+  }
+
+  Future<bool> submitReview({
+    required String bookingId,
+    required double rating,
+    required String reviewText,
+    required List<String> imagePaths,
+  }) async {
+    try {
+      final fields = <String, String>{
+        'booking_id': bookingId,
+        'rating': rating.toInt().toString(),
+        'review_text': reviewText,
+      };
+
+      final List<Map<String, String>> files = [];
+      for (String path in imagePaths) {
+        files.add({
+          'field': 'photos[]',
+          'path': path,
+        });
+      }
+
+      var response = await _repository.submitReview(fields: fields, files: files);
+      
+      if (response != null) {
+        // Assuming generic success response or parsing specific one
+         if (response is Map && response['status'] == true) {
+          CommonSnackbar.showSuccess(message: response['message'] ?? "Review submitted successfully");
+          fetchUserBookings(); // Refresh to show the review
+          return true;
+        } else {
+           CommonSnackbar.showError(message: response?['message'] ?? "Failed to submit review");
+           return false;
+        }
+      }
+      return false;
+    } catch (e) {
+      print("Error submitting review: $e");
+      CommonSnackbar.showError(message: "Something went wrong while submitting review");
+      return false;
+    }
   }
 }

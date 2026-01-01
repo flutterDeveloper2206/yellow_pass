@@ -25,8 +25,7 @@ class CafeBookScreen extends GetView<CafeBookController> {
           onPressed: () => Get.back(),
         ),
       ),
-      body: Stack(
-        children: [
+      body:
           SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -40,20 +39,16 @@ class CafeBookScreen extends GetView<CafeBookController> {
                 _buildDurationSlider(context),
                 const SizedBox(height: 20),
                 _buildTimeSlots(context),
+                const SizedBox(height: 20),
+                _buildSpecialRequests(context),
+                const SizedBox(height: 20),
 
-
+                _buildBottomButton(context),
                 const SizedBox(height: 100), // Space for bottom button
               ],
             ),
           ),
-          Positioned(
-            bottom: 20,
-            left: 16,
-            right: 16,
-            child: _buildBottomButton(context),
-          ),
-        ],
-      ),
+
     );
   }
 
@@ -379,6 +374,15 @@ class CafeBookScreen extends GetView<CafeBookController> {
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
+            ), Obx(
+              () =>  Text(
+                "Total: ${controller.duration.value.toStringAsFixed(0)}hr",
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
             ),
             Text(
               "Max: 5hrs", 
@@ -404,7 +408,7 @@ class CafeBookScreen extends GetView<CafeBookController> {
         final isEnabled = controller.selectedTimeSlotIndex.value != -1;
         return ElevatedButton(
           onPressed: isEnabled ? () {
-            // Implement booking confirmation logic
+            _showConfirmationDialog(context);
           } : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: isEnabled 
@@ -415,7 +419,7 @@ class CafeBookScreen extends GetView<CafeBookController> {
             ),
           ),
           child: Text(
-            "Proceed to Pay",
+            "Proceed ",
             style: TextStyle(
               color: isEnabled 
                   ? (isDarkMode ? Colors.black : Colors.white)
@@ -426,6 +430,157 @@ class CafeBookScreen extends GetView<CafeBookController> {
           ),
         );
       }),
+    );
+  }
+
+  Widget _buildSpecialRequests(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Special Requests", 
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: controller.specialRequestsController,
+          maxLines: 3,
+          style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+          decoration: InputDecoration(
+            hintText: "e.g. Near window please, extra chair, etc.",
+            hintStyle: TextStyle(color: Colors.grey),
+            filled: true,
+            fillColor: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade100,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showConfirmationDialog(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final cafe = controller.cafe.value;
+    final date = controller.dateObjects[controller.selectedDateIndex.value];
+    final timeSlot = controller.timeSlots[controller.selectedTimeSlotIndex.value];
+    final tableType = controller.tableTypes[controller.selectedTableTypeIndex.value];
+    
+    int hourlyRate = 200;
+    if (cafe?.pricePerHour != null) {
+      hourlyRate = int.tryParse(cafe!.pricePerHour!) ?? 200;
+    }
+    int totalTokenCost = (hourlyRate * controller.duration.value).toInt();
+
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: isDarkMode ? Colors.black : Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Confirm Booking",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildDetailRow("Cafe", cafe?.name ?? "N/A", isDarkMode),
+              _buildDetailRow("Date", DateFormat('dd MMM, yyyy').format(date), isDarkMode),
+              _buildDetailRow("Time", timeSlot, isDarkMode),
+              _buildDetailRow("Duration", "${controller.duration.value.toInt()} Hours", isDarkMode),
+              _buildDetailRow("Table", tableType.name ?? "N/A", isDarkMode),
+              const Divider(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Total Tokens",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  Text(
+                    "$totalTokenCost Tokens",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Get.back(),
+                      child: Text("Cancel", style: TextStyle(color: Colors.red)),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => controller.bookCafe(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.yellow,
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text("Process", style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value, bool isDarkMode) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+              fontSize: 14,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              color: isDarkMode ? Colors.white : Colors.black,
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

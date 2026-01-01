@@ -26,7 +26,8 @@ class HomeScreenController extends GetxController {
     fetchCafes();
   }
 
-  void loadUserData() {
+  void
+  loadUserData() {
     final data = SharedPrefs.getUser();
     if (data != null) {
       userData.value = data;

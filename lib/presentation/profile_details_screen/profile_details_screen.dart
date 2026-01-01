@@ -97,7 +97,7 @@ class ProfileDetailsScreen extends GetView<ProfileDetailsController> {
                 } else if (controller.userData['profile_picture'] != null && controller.userData['profile_picture'].toString().isNotEmpty) {
                   return CircleAvatar(
                     radius: 50,
-                    backgroundImage: NetworkImage("https://api.yellowpass.in/storage/${controller.userData['profile_picture']}"),
+                    backgroundImage: NetworkImage("${controller.userData['profile_picture']}"),
                   );
                 } else {
                   return const CircleAvatar(
@@ -293,7 +293,7 @@ class ProfileDetailsScreen extends GetView<ProfileDetailsController> {
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
-        onPressed: () {
+        onPressed: controller.isUpdating.value ? null : () {
           controller.toggleEditMode();
         },
         style: ElevatedButton.styleFrom(
@@ -305,18 +305,29 @@ class ProfileDetailsScreen extends GetView<ProfileDetailsController> {
           ),
           elevation: 0,
         ),
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          child: Text(
-            controller.isEditing.value ? "Update Profile" : "Edit Profile",
-            key: ValueKey(controller.isEditing.value),
-            style: TextStyle(
-              color: isDark ? Colors.black : Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
+        child: controller.isUpdating.value
+            ? SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    isDark ? Colors.black : Colors.white,
+                  ),
+                ),
+              )
+            : AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: Text(
+                  controller.isEditing.value ? "Update Profile" : "Edit Profile",
+                  key: ValueKey(controller.isEditing.value),
+                  style: TextStyle(
+                    color: isDark ? Colors.black : Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
       ),
     ));
   }

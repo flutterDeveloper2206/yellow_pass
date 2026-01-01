@@ -1,6 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:yellow_pass/presentation/wallet_screen/recharge_screen.dart';
 import 'controller/wallet_screen_controller.dart';
 
 class WalletScreen extends StatefulWidget{
@@ -13,11 +14,12 @@ class WalletScreen extends StatefulWidget{
 
 class _WalletScreenState extends State<WalletScreen> {
   late WalletScreenController controller;
+
   @override
   void initState() {
     super.initState();
     controller = Get.put(WalletScreenController());
-
+controller.fetchUserBalance();
   }
   @override
   Widget build(BuildContext context) {
@@ -168,7 +170,9 @@ class _WalletScreenState extends State<WalletScreen> {
             ],
           ),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+               Get.to(() => const RechargeScreen());
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: isDarkMode ? Colors.white : Colors.black,
               shape: RoundedRectangleBorder(

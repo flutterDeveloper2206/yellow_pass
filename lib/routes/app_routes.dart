@@ -49,6 +49,8 @@ import 'package:yellow_pass/presentation/check_in_success_screen/binding/check_i
 import 'package:yellow_pass/presentation/check_in_success_screen/check_in_success_screen.dart';
 import 'package:yellow_pass/presentation/support_screen/binding/support_binding.dart';
 import 'package:yellow_pass/presentation/support_screen/support_screen.dart';
+import 'package:yellow_pass/presentation/search_screen/binding/search_binding.dart';
+import 'package:yellow_pass/presentation/search_screen/search_screen.dart';
 
 class AppRoutes {
   static const String splashScreenRoute = '/splash_screen';
@@ -74,6 +76,7 @@ class AppRoutes {
   static const String qrScannerScreenRoute = '/qr_scanner_screen';
   static const String checkInSuccessScreenRoute = '/check_in_success_screen';
   static const String supportScreenRoute = '/support_screen';
+  static const String searchScreenRoute = '/search_screen';
 
   static List<GetPage> pages = [
     GetPage(
@@ -270,6 +273,15 @@ class AppRoutes {
       page: () => const SupportScreen(),
       bindings: [
         SupportBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: searchScreenRoute,
+      page: () => const SearchScreen(),
+      bindings: [
+        SearchBinding(),
       ],
       transition: Transition.rightToLeft,
       transitionDuration: const Duration(milliseconds: 300),

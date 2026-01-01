@@ -22,6 +22,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   void initState() {
     super.initState();
     controller = Get.put(ProfileScreenController());
+    controller.fetchProfile();
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -103,7 +104,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
       children: [
         Row(
           children: [
-            Icon(Icons.arrow_back_ios, size: 20, color: textColor),
             const SizedBox(width: 8),
             Text(
               "Profile",
@@ -138,7 +138,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               child: CircleAvatar(
                 radius: 50,
                 backgroundImage: (controller.userData['profile_picture'] != null && controller.userData['profile_picture'].toString().isNotEmpty)
-                    ? NetworkImage("https://api.yellowpass.in/storage/${controller.userData['profile_picture']}") as ImageProvider
+                    ? NetworkImage("${controller.userData['profile_picture']}") as ImageProvider
                     : const AssetImage('assets/images/profiles.png'),
               ),
             ),

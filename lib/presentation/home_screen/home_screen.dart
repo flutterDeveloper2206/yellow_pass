@@ -27,6 +27,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   void initState() {
     super.initState();
     controller = Get.put(HomeScreenController());
+  controller. loadUserData();
+  controller. fetchCategories();
+  controller. fetchCafes();
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
@@ -108,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             child: CircleAvatar(
               radius: 20,
               backgroundImage: (controller.userData['profile_picture'] != null && controller.userData['profile_picture'].toString().isNotEmpty)
-                  ? NetworkImage("https://api.yellowpass.in/storage/${controller.userData['profile_picture']}") as ImageProvider
+                  ? NetworkImage("${controller.userData['profile_picture']}") as ImageProvider
                   : const AssetImage('assets/images/profiles.png'),
             ),
           )),
@@ -151,26 +154,31 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildSearchBar(BuildContext context, bool isDark, Color textColor) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      height: 50,
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF2C2C2C) : Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: isDark ? Colors.grey.shade700 : Colors.transparent),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.search, color: isDark ? Colors.grey : Colors.grey.shade600),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              "Search cafe, co-workers",
-              style: PMT.style(14, fontColor: isDark ? Colors.grey : Colors.grey.shade600),
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed(AppRoutes.searchScreenRoute);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        height: 50,
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF2C2C2C) : Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(25),
+          border: Border.all(color: isDark ? Colors.grey.shade700 : Colors.transparent),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.search, color: isDark ? Colors.grey : Colors.grey.shade600),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                "Search cafe, co-workers",
+                style: PMT.style(14, fontColor: isDark ? Colors.grey : Colors.grey.shade600),
+              ),
             ),
-          ),
-          Icon(Icons.tune, color: isDark ? Colors.grey : Colors.grey.shade600),
-        ],
+            Icon(Icons.tune, color: isDark ? Colors.grey : Colors.grey.shade600),
+          ],
+        ),
       ),
     );
   }

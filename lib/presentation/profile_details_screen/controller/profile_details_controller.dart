@@ -2,12 +2,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image_cropper/image_cropper.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:yellow_pass/core/utils/commonConstant.dart';
+import 'package:yellow_pass/presentation/profile_screen/controller/profile_screen_controller.dart';
+import 'package:yellow_pass/widgets/common_snackbar.dart';
 import '../../../core/utils/shared_prefs.dart';
 
 class ProfileDetailsController extends GetxController {
   RxBool isEditing = false.obs;
+  RxBool isUpdating = false.obs;
   Rx<File?> profileImage = Rx<File?>(null);
   RxMap userData = {}.obs;
 
@@ -46,82 +48,71 @@ class ProfileDetailsController extends GetxController {
     super.onClose();
   }
 
-  void toggleEditMode() {
-    isEditing.value = !isEditing.value;
+  Future<void> toggleEditMode() async {
+    if (isEditing.value) {
+      // Save changes
+      await _updateProfile();
+    } else {
+      // Enter edit mode
+      isEditing.value = true;
+    }
+  }
+
+  Future<void> _updateProfile() async {
+    try {
+      isUpdating.value = true;
+      
+      final profileController = Get.find<ProfileScreenController>();
+      
+      bool success = await profileController.updateProfile(
+        name: nameController.text.trim(),
+        mobile: mobileController.text.trim(),
+        description: bioController.text.trim(),
+        profilePicturePath: profileImage.value?.path,
+      );
+      
+      if (success) {
+        CommonSnackbar.showSuccess(message: "Profile updated successfully");
+        isEditing.value = false;
+        profileImage.value = null; // Reset after successful upload
+        loadUserData(); // Reload data
+      } else {
+        CommonSnackbar.showError(message: "Failed to update profile");
+      }
+    } catch (e) {
+      CommonSnackbar.showError(message: "Error updating profile: $e");
+    } finally {
+      isUpdating.value = false;
+    }
   }
 
   Future<void> pickImage(ImageSource source) async {
     try {
       final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(source: source);
+      final XFile? image = await picker.pickImage(
+        source: source,
+        imageQuality: 50, // Initial quality reduction
+      );
 
       if (image != null) {
-        await _cropImage(image.path);
-      }
-    } catch (e) {
-      Get.snackbar("Error", "Failed to pick image: $e");
-    }
-  }
-
-  Future<void> _cropImage(String path) async {
-    try {
-      final croppedFile = await ImageCropper().cropImage(
-        sourcePath: path,
-        uiSettings: [
-          AndroidUiSettings(
-            toolbarTitle: 'Crop Image',
-            toolbarColor: Colors.black,
-            toolbarWidgetColor: Colors.white,
-            initAspectRatio: CropAspectRatioPreset.square,
-            lockAspectRatio: true,
-          ),
-          IOSUiSettings(
-            title: 'Crop Image',
-          ),
-        ],
-      );
-
-      if (croppedFile != null) {
-        await _compressImage(croppedFile.path);
-      }
-    } catch (e) {
-      Get.snackbar("Error", "Failed to crop image: $e");
-    }
-  }
-
-  Future<void> _compressImage(String path) async {
-    try {
-      // Compress to approx 500kb. 
-      // We start with a quality and check size, but for simplicity here we use a fixed quality 
-      // which usually reduces size significantly.
-      final targetPath = '${path}_compressed.jpg';
-      var result = await FlutterImageCompress.compressAndGetFile(
-        path,
-        targetPath,
-        quality: 70, // Adjust quality to manage size
-      );
-
-      if (result != null) {
-        File compressedFile = File(result.path);
+        File originalFile = File(image.path);
+        
+        // Compress to 500 KB using CommonConstant
+        File compressedFile = await CommonConstant.instance.compressImage(
+          originalFile, 
+          500 * 1024, // 500 KB
+        );
+        
+        profileImage.value = compressedFile;
+        
+        // Show size info
         int sizeInBytes = await compressedFile.length();
         double sizeInKb = sizeInBytes / 1024;
-        
-        if (sizeInKb > 500) {
-           // If still > 500kb, compress again with lower quality
-           var result2 = await FlutterImageCompress.compressAndGetFile(
-            path,
-            targetPath,
-            quality: 50, 
-          );
-          if (result2 != null) {
-             profileImage.value = File(result2.path);
-          }
-        } else {
-          profileImage.value = compressedFile;
-        }
+        print("Compressed image size: ${sizeInKb.toStringAsFixed(2)} KB");
       }
     } catch (e) {
-      Get.snackbar("Error", "Failed to compress image: $e");
+      print("Error picking/compressing image: $e");
+      CommonSnackbar.showError(message: "Failed to process image");
     }
   }
 }
