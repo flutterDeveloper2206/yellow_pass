@@ -27,4 +27,8 @@ class ApiEndPoints {
   static const String buyTokens = "$baseUrl/tokens/buy";
   static const String verifyTokens = "$baseUrl/tokens/verify";
   static const String transactionHistoryApi = "$baseUrl/wallet/user-transaction-history";
+  
+  // Nearby
+  static const String nearbyUsers = "$baseUrl/users/nearby";
+  static const String nearbyCafes = "$baseUrl/cafes";
 }
