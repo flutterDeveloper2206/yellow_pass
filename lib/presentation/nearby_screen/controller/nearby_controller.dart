@@ -22,6 +22,8 @@ class NearbyController extends GetxController {
   }
 
   Future<void> fetchAllNearbyData() async {
+    isLoadingCafes.value = true;
+    isLoadingCoWorkers.value = true;
     try {
       Position? position = await CommonConstant.instance.getCurrentLocation();
       if (position != null) {

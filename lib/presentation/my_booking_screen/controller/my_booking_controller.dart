@@ -51,7 +51,7 @@ class MyBookingController extends GetxController {
 
   void checkIn() {
     if (bookingDetails.value == null) return;
-    Get.toNamed(AppRoutes.qrScannerScreenRoute, arguments: {
+    Get.toNamed(AppRoutes.checkInOtpScreenRoute, arguments: {
       'booking': booking.value, 
       'isCheckOut': false
     })?.then((_) => fetchBookingDetails());
@@ -59,7 +59,7 @@ class MyBookingController extends GetxController {
 
   void checkOut() {
     if (booking.value == null) return;
-    Get.toNamed(AppRoutes.qrScannerScreenRoute, arguments: {
+    Get.toNamed(AppRoutes.checkInOtpScreenRoute, arguments: {
       'booking': booking.value, 
       'isCheckOut': true
     })?.then((_) => fetchBookingDetails());

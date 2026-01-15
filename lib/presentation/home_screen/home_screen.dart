@@ -10,6 +10,8 @@ import 'package:yellow_pass/widgets/bouncing_button.dart';
 import 'package:yellow_pass/widgets/custom_image_view.dart';
 // import 'package:animate_do/animate_do.dart';
 import '../../data/models/cafe_response_model.dart';
+import '../../data/models/user_booking_response_model.dart';
+import '../../data/models/active_booking_response_model.dart';
 import '../../widgets/shimmer_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -22,24 +24,29 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   late HomeScreenController controller;
   late AnimationController _animationController;
+  late PageController _pageController;
 
   @override
   void initState() {
     super.initState();
     controller = Get.put(HomeScreenController());
-  controller. loadUserData();
-  controller. fetchCategories();
-  controller. fetchCafes();
+    controller.loadUserData();
+    controller.fetchCategories();
+    controller.fetchCafes();
+    controller.fetchBannerAds();
+    controller.fetchActiveBooking();
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     );
     _animationController.forward();
+    _pageController = PageController(viewportFraction: 0.9, initialPage: 0);
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -71,8 +78,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: _buildSearchBar(context, isDark, textColor),
               ),
-              const SizedBox(height: 30),
-              _buildFeaturedSection(context, isDark),
+              const SizedBox(height: 20),
+              Obx(() => controller.activeBooking.value != null
+                  ? _buildActiveBookingWidget(context, isDark, textColor, accentColor)
+                  : const SizedBox.shrink()),
+              const SizedBox(height: 10),
+
+              _buildBannerAds(context, isDark),
+
               const SizedBox(height: 30),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -150,6 +163,234 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildActiveBookingWidget(BuildContext context, bool isDark, Color textColor, Color accentColor) {
+    final booking = controller.activeBooking.value!;
+    final cafe = booking.cafe;
+    
+    String imageUrl = "";
+    if (cafe?.photos != null && cafe!.photos!.isNotEmpty) {
+      imageUrl = cafe.photos![0].startsWith('/') 
+        ? "https://api.yellowpass.in" + cafe.photos![0]
+        : cafe.photos![0];
+    } else {
+      imageUrl = "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=200";
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Bounce(
+        onTap: () {
+          // Map ActiveBooking to UserBookingData for MyBookingScreen
+          // We also need to map the Cafe to BookingCafe
+          final bookingCafe = cafe != null ? BookingCafe(
+            name: cafe.name,
+            address: cafe.address,
+            image: (cafe.photos != null && cafe.photos!.isNotEmpty) ? cafe.photos![0] : null,
+          ) : null;
+
+          final userBookingData = UserBookingData(
+            id: booking.id,
+            bookingCode: booking.bookingCode,
+            cafeId: booking.cafeId,
+            status: booking.status,
+            checkInStatus: booking.checkInStatus,
+            startTime: booking.startTime,
+            endTime: booking.endTime,
+            bookingDate: booking.bookingDate,
+            bookingDay: booking.bookingDay,
+            durationHours: booking.durationHours,
+            price: booking.price,
+            cafe: bookingCafe,
+          );
+          
+          Get.toNamed(AppRoutes.myBookingScreenRoute, arguments: userBookingData);
+        },
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E1E1E) : Colors.black,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: accentColor.withOpacity(0.2),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+            border: Border.all(color: accentColor.withOpacity(0.5), width: 1),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 45,
+                height: 45,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: accentColor, width: 2),
+                  image: DecorationImage(
+                    image: NetworkImage(imageUrl),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      booking.checkInStatus == "checked_in" ? "Currently Checked-in" : "Upcoming Booking",
+                      style: PMT.style(12, fontColor: accentColor, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      cafe?.name ?? "Yellow Space",
+                      style: PMT.style(16, fontColor: Colors.white, fontWeight: FontWeight.bold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: accentColor,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  "DETAILS",
+                  style: PMT.style(10, fontColor: Colors.black, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBannerAds(BuildContext context, bool isDark) {
+    return Obx(() {
+      if (controller.isAdsLoading.value) {
+        return _buildBannerShimmer();
+      }
+      
+      if (controller.bannerAds.isEmpty) {
+        return const SizedBox.shrink();
+      }
+
+      return SizedBox(
+        height: 180,
+        child: PageView.builder(
+            controller: _pageController,
+            itemCount: controller.bannerAds.length,
+            onPageChanged: (index) {
+              // Optional: dots logic
+            },
+            itemBuilder: (context, index) {
+              final ad = controller.bannerAds[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Bounce(
+                  onTap: () => Get.toNamed(
+                    AppRoutes.cafeDetailsScreenRoute,
+                    arguments: ad,
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                         BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                      image: DecorationImage(
+                        image: NetworkImage(
+                          (ad.photos != null && ad.photos!.isNotEmpty)
+                              ? "https://api.yellowpass.in${ad.photos![0]}"
+                              : "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2047&auto=format&fit=crop"
+                        ),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    child: Stack(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(24),
+                            gradient: LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                Colors.black.withOpacity(0.8),
+                                Colors.black.withOpacity(0.4),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          left: 20,
+                          top: 0,
+                          bottom: 0,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.yellow,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  "PROMOTED",
+                                  style: PMT.style(10, fontColor: Colors.black, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                ad.name ?? "",
+                                style: PMT.style(22, fontColor: Colors.white, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Icon(Icons.location_on, color: Colors.white70, size: 14),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    ad.city ?? "Location",
+                                    style: PMT.style(14, fontColor: Colors.white70),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+        ),
+      );
+    });
+  }
+
+  Widget _buildBannerShimmer() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: ShimmerWidget.rectangular(
+        height: 180,
+        width: double.infinity,
+        // borderRadius: BorderRadius.circular(24),
+      ),
     );
   }
 

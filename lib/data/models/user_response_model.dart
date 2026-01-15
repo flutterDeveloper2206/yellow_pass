@@ -64,7 +64,7 @@ class User {
   String? description;
   dynamic walletBalance;
   String? totalTokensSpent;
-  String? totalTokensPurchased;
+  int? totalTokensPurchased;
   String? latitude;
   String? longitude;
   String? createdAt;

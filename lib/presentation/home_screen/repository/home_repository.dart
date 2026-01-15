@@ -20,4 +20,20 @@ class HomeRepository {
       headerWithToken: true,
     );
   }
+
+  Future<dynamic> getActiveAds() async {
+    return await _apiService.callGetApi(
+      url: ApiEndPoints.activeAdsAPI,
+      showLoader: false,
+      headerWithToken: true,
+    );
+  }
+
+  Future<dynamic> getActiveBooking() async {
+    return await _apiService.callGetApi(
+      url: ApiEndPoints.activeBooking,
+      showLoader: false,
+      headerWithToken: true,
+    );
+  }
 }

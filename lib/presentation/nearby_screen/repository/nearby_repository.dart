@@ -23,7 +23,7 @@ class NearbyRepository {
   }) async {
     final categoryParam = category ?? 'null';
     return await _apiService.callGetApi(
-      url: '${ApiEndPoints.nearbyCafes}?category=$categoryParam&lat=$latitude&lng=$longitude',
+      url: '${ApiEndPoints.nearbyCafes}?lat=$latitude&lng=$longitude',
       showLoader: false,
       headerWithToken: true,
     );

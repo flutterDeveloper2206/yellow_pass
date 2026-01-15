@@ -59,102 +59,112 @@ class _NearbyScreenState extends State<NearbyScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Nearby Yellow Spaces Section
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: FadeInDown(
-                  duration: const Duration(milliseconds: 400),
-                  child: Text(
-                    "Nearby Yellow Spaces",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.black,
-                    ),
-                  ),
-                ),
-              ),
               Obx(() {
                 if (controller.isLoadingCafes.value && controller.nearbyCafes.isEmpty) {
-                  return _buildCafeShimmer();
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionTitle(context, "Nearby Yellow Spaces", isDarkMode),
+                      _buildCafeShimmer(),
+                    ],
+                  );
                 }
 
                 if (controller.nearbyCafes.isEmpty) {
-                  return SizedBox(
-                    height: 200,
-                    child: Center(
-                      child: Text(
-                        "No nearby spaces found",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                  );
+                  return const SizedBox.shrink();
                 }
 
-                return SizedBox(
-                  height: 280,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: controller.nearbyCafes.length,
-                    itemBuilder: (context, index) {
-                      return FadeInRight(
-                        duration: const Duration(milliseconds: 400),
-                        delay: Duration(milliseconds: 100 * index),
-                        child: _buildCafeCard(context, controller.nearbyCafes[index]),
-                      );
-                    },
-                  ),
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSectionTitle(context, "Nearby Yellow Spaces", isDarkMode, isFadeInDown: true),
+                    SizedBox(
+                      height: 280,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: controller.nearbyCafes.length,
+                        itemBuilder: (context, index) {
+                          return FadeInRight(
+                            duration: const Duration(milliseconds: 400),
+                            delay: Duration(milliseconds: 100 * index),
+                            child: _buildCafeCard(context, controller.nearbyCafes[index]),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 );
               }),
-              const SizedBox(height: 24),
+              // const SizedBox(height: 24),
               // Nearby Co-workers Section
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: FadeInUp(
-                  duration: const Duration(milliseconds: 400),
-                  child: Text(
-                    "Nearby Co-workers",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
               Obx(() {
-                if (controller.isLoadingCoWorkers.value ) {
-                  return _buildCoWorkerShimmer();
+                if (controller.isLoadingCoWorkers.value && controller.nearbyCoWorkers.isEmpty) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 24),
+                      _buildSectionTitle(context, "Nearby Co-workers", isDarkMode),
+                      _buildCoWorkerShimmer(),
+                    ],
+                  );
                 }
 
-                if (!controller.isLoadingCoWorkers.value&&controller.nearbyCoWorkers.isEmpty) {
-                  return const Padding(
-                    padding: EdgeInsets.all(20.0),
+                if (controller.nearbyCoWorkers.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // const SizedBox(height: 24),
+                    _buildSectionTitle(context, "Nearby Co-workers", isDarkMode, isFadeInUp: true),
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Wrap(
+                        spacing: 0,
+                        runSpacing: 12,
+                        children: List.generate(
+                          controller.nearbyCoWorkers.length,
+                          (index) => FadeInUp(
+                            duration: const Duration(milliseconds: 400),
+                            delay: Duration(milliseconds: 100 * index),
+                            child: _buildCoWorkerCard(context, controller.nearbyCoWorkers[index], index),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }),
+              Obx(() {
+                if (!controller.isLoadingCafes.value && 
+                    !controller.isLoadingCoWorkers.value && 
+                    controller.nearbyCafes.isEmpty && 
+                    controller.nearbyCoWorkers.isEmpty) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.7,
                     child: Center(
-                      child: Text(
-                        "No nearby co-workers found",
-                        style: TextStyle(color: Colors.grey),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.location_off_outlined, size: 64, color: Colors.grey.shade400),
+                          const SizedBox(height: 16),
+                          Text(
+                            "Nothing found nearby",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey.shade500,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   );
                 }
-
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Wrap(
-                    spacing: 0,
-                    runSpacing: 12,
-                    children: List.generate(
-                      controller.nearbyCoWorkers.length,
-                      (index) => FadeInUp(
-                        duration: const Duration(milliseconds: 400),
-                        delay: Duration(milliseconds: 100 * index),
-                        child: _buildCoWorkerCard(context, controller.nearbyCoWorkers[index], index),
-                      ),
-                    ),
-                  ),
-                );
+                return const SizedBox.shrink();
               }),
               const SizedBox(height: 100),
             ],
@@ -162,6 +172,24 @@ class _NearbyScreenState extends State<NearbyScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildSectionTitle(BuildContext context, String title, bool isDarkMode, {bool isFadeInDown = false, bool isFadeInUp = false}) {
+    Widget text = Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: isDarkMode ? Colors.white : Colors.black,
+        ),
+      ),
+    );
+
+    if (isFadeInDown) return FadeInDown(duration: const Duration(milliseconds: 400), child: text);
+    if (isFadeInUp) return FadeInUp(duration: const Duration(milliseconds: 400), child: text);
+    return text;
   }
 
   Widget _buildCafeShimmer() {
