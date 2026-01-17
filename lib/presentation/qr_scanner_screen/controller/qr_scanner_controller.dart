@@ -65,50 +65,14 @@ class QrScannerController extends GetxController {
     isProcessing.value = true;
     scannerController.stop();
 
-    try {
-      Map<String, dynamic> body = {
-        "booking_id": booking!.id,
-        "qr_code": qrCode
-      };
-
-      var response = await _repository.checkIn(body);
-      if (response != null) {
-        CheckInResponse checkInResponse = CheckInResponse.fromJson(response);
-        
-        bool isSuccess = checkInResponse.status == true;
-        
-        Get.offNamed(
-          AppRoutes.checkInSuccessScreenRoute, 
-          arguments: {
-            'isSuccess': isSuccess,
-            'title': isSuccess ? 'Check-in Successful!' : 'Check-in Failed',
-            'message': checkInResponse.message,
-            'cafeName': booking?.cafe?.name ?? "the Cafe"
-          }
-        );
-      } else {
-         Get.offNamed(
-          AppRoutes.checkInSuccessScreenRoute, 
-          arguments: {
-            'isSuccess': false,
-            'title': 'Check-in Failed',
-            'message': "Server error. Please try again later.",
-            'cafeName': booking?.cafe?.name ?? "the Cafe"
-          }
-        );
+    // Instead of calling check-in directly, we now go to OTP screen
+    Get.offNamed(
+      AppRoutes.checkInOtpScreenRoute,
+      arguments: {
+        'booking': booking,
+        'qr_code': qrCode // Passing qrCode just in case it's needed later or for validation
       }
-    } catch (e) {
-      print("Check-in error: $e");
-       Get.offNamed(
-          AppRoutes.checkInSuccessScreenRoute, 
-          arguments: {
-            'isSuccess': false,
-            'title': 'Check-in Failed',
-            'message': "Something went wrong during check-in",
-            'cafeName': booking?.cafe?.name ?? "the Cafe"
-          }
-        );
-    }
+    );
   }
 
   Future<void> _performCheckOut(String qrCode) async {

@@ -5,6 +5,8 @@ import '../../../core/utils/shared_prefs.dart';
 import '../../dashboard_screen/repository/dashboard_repository.dart';
 import '../repository/home_repository.dart';
 import 'package:yellow_pass/data/models/cafe_response_model.dart';
+import 'package:yellow_pass/data/models/banner_ads_response_model.dart';
+import 'package:yellow_pass/data/models/active_booking_response_model.dart';
 
 class HomeScreenController extends GetxController {
   final HomeRepository _homeRepository = Get.put(HomeRepository());
@@ -15,8 +17,11 @@ class HomeScreenController extends GetxController {
   RxBool isProfileVisible = false.obs;
   RxList<String> categories = <String>["All"].obs;
   RxBool isCafeLoading = false.obs;
+  RxBool isAdsLoading = false.obs;
   RxList<Cafe> cafes = <Cafe>[].obs;
   RxList<Cafe> filteredCafes = <Cafe>[].obs;
+  RxList<Cafe> bannerAds = <Cafe>[].obs;
+  Rxn<ActiveBooking> activeBooking = Rxn<ActiveBooking>();
 
   @override
   void onInit() {
@@ -24,6 +29,8 @@ class HomeScreenController extends GetxController {
     loadUserData();
     fetchCategories();
     fetchCafes();
+    fetchBannerAds();
+    fetchActiveBooking();
   }
 
   void
@@ -78,6 +85,48 @@ class HomeScreenController extends GetxController {
     } finally {
       isCafeLoading.value = false;
       debugPrint("HOME_CONTROLLER: Cafe loading finished. isCafeLoading: ${isCafeLoading.value}");
+    }
+  }
+
+  Future<void> fetchBannerAds() async {
+    try {
+      debugPrint("HOME_CONTROLLER: Fetching banner ads...");
+      isAdsLoading.value = true;
+      final response = await _homeRepository.getActiveAds();
+      
+      if (response != null && (response['status'] == true || response['status_code'] == 200)) {
+        final adsResponse = BannerAdsResponse.fromJson(response);
+        if (adsResponse.data != null) {
+          bannerAds.assignAll(adsResponse.data!);
+          debugPrint("HOME_CONTROLLER: Banner ads loaded: ${bannerAds.length}");
+        }
+      }
+    } catch (e) {
+      debugPrint("HOME_CONTROLLER: Error fetching banner ads: $e");
+    } finally {
+      isAdsLoading.value = false;
+    }
+  }
+
+  Future<void> fetchActiveBooking() async {
+    try {
+      debugPrint("HOME_CONTROLLER: Fetching active booking...");
+      final response = await _homeRepository.getActiveBooking();
+      
+      if (response != null && (response['status'] == true || response['status_code'] == 200)) {
+        final activeBookingResponse = ActiveBookingResponse.fromJson(response);
+        if (activeBookingResponse.data?.booking != null) {
+          activeBooking.value = activeBookingResponse.data!.booking;
+          debugPrint("HOME_CONTROLLER: Active booking found: ${activeBooking.value?.bookingCode}");
+        } else {
+          activeBooking.value = null; // Ensure it's cleared if no active booking
+        }
+      } else {
+        activeBooking.value = null;
+      }
+    } catch (e) {
+      debugPrint("HOME_CONTROLLER: Error fetching active booking: $e");
+      activeBooking.value = null;
     }
   }
 

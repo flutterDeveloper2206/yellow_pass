@@ -1,8 +1,10 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:yellow_pass/routes/app_routes.dart';
 import 'package:yellow_pass/widgets/custom_image_view.dart';
+import 'package:yellow_pass/widgets/shimmer_widget.dart';
+import '../../../data/models/cafe_response_model.dart';
+import '../../../data/models/nearby_users_response_model.dart';
 import 'controller/nearby_controller.dart';
 
 class NearbyScreen extends StatefulWidget {
@@ -19,6 +21,9 @@ class _NearbyScreenState extends State<NearbyScreen> {
   void initState() {
     super.initState();
     controller = Get.put(NearbyController());
+    controller.fetchAllNearbyData();
+    controller.nearbyCafes.clear();
+    controller.nearbyCoWorkers.clear();
   }
 
   @override
@@ -45,90 +50,244 @@ class _NearbyScreenState extends State<NearbyScreen> {
           ),
           onPressed: () => Get.back(),
         ),
-
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Nearby Yellow Spaces Section
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: FadeInDown(
-                duration: const Duration(milliseconds: 400),
-                child: Text(
-                  "Nearby Yellow Spaces",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 280,
-              child: Obx(() {
-                return ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: controller.nearbyCafes.length,
-                  itemBuilder: (context, index) {
-                    return FadeInRight(
-                      duration: const Duration(milliseconds: 400),
-                      delay: Duration(milliseconds: 100 * index),
-                      child: _buildCafeCard(context, controller.nearbyCafes[index]),
-                    );
-                  },
+      body: RefreshIndicator(
+        onRefresh: () => controller.fetchAllNearbyData(),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Nearby Yellow Spaces Section
+              Obx(() {
+                if (controller.isLoadingCafes.value && controller.nearbyCafes.isEmpty) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionTitle(context, "Nearby Yellow Spaces", isDarkMode),
+                      _buildCafeShimmer(),
+                    ],
+                  );
+                }
+
+                if (controller.nearbyCafes.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSectionTitle(context, "Nearby Yellow Spaces", isDarkMode, isFadeInDown: true),
+                    SizedBox(
+                      height: 280,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: controller.nearbyCafes.length,
+                        itemBuilder: (context, index) {
+                          return FadeInRight(
+                            duration: const Duration(milliseconds: 400),
+                            delay: Duration(milliseconds: 100 * index),
+                            child: _buildCafeCard(context, controller.nearbyCafes[index]),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 );
               }),
-            ),
-            const SizedBox(height: 24),
-            // Nearby Co-workers Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: FadeInUp(
-                duration: const Duration(milliseconds: 400),
-                child: Text(
-                  "Nearby Co-workers",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Obx(() {
-              return Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: List.generate(
-                  controller.nearbyCoWorkers.length,
-                  (index) => FadeInUp(
-                    duration: const Duration(milliseconds: 400),
-                    delay: Duration(milliseconds: 100 * index),
-                    child: _buildCoWorkerCard(context, controller.nearbyCoWorkers[index], index),
-                  ),
-                ),
-              );
-            }),
-            const SizedBox(height: 100),
-          ],
+              // const SizedBox(height: 24),
+              // Nearby Co-workers Section
+              Obx(() {
+                if (controller.isLoadingCoWorkers.value && controller.nearbyCoWorkers.isEmpty) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 24),
+                      _buildSectionTitle(context, "Nearby Co-workers", isDarkMode),
+                      _buildCoWorkerShimmer(),
+                    ],
+                  );
+                }
+
+                if (controller.nearbyCoWorkers.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // const SizedBox(height: 24),
+                    _buildSectionTitle(context, "Nearby Co-workers", isDarkMode, isFadeInUp: true),
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Wrap(
+                        spacing: 0,
+                        runSpacing: 12,
+                        children: List.generate(
+                          controller.nearbyCoWorkers.length,
+                          (index) => FadeInUp(
+                            duration: const Duration(milliseconds: 400),
+                            delay: Duration(milliseconds: 100 * index),
+                            child: _buildCoWorkerCard(context, controller.nearbyCoWorkers[index], index),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }),
+              Obx(() {
+                if (!controller.isLoadingCafes.value && 
+                    !controller.isLoadingCoWorkers.value && 
+                    controller.nearbyCafes.isEmpty && 
+                    controller.nearbyCoWorkers.isEmpty) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.7,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.location_off_outlined, size: 64, color: Colors.grey.shade400),
+                          const SizedBox(height: 16),
+                          Text(
+                            "Nothing found nearby",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey.shade500,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
+              const SizedBox(height: 100),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildCafeCard(BuildContext context, CafeModel cafe) {
+  Widget _buildSectionTitle(BuildContext context, String title, bool isDarkMode, {bool isFadeInDown = false, bool isFadeInUp = false}) {
+    Widget text = Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: isDarkMode ? Colors.white : Colors.black,
+        ),
+      ),
+    );
+
+    if (isFadeInDown) return FadeInDown(duration: const Duration(milliseconds: 400), child: text);
+    if (isFadeInUp) return FadeInUp(duration: const Duration(milliseconds: 400), child: text);
+    return text;
+  }
+
+  Widget _buildCafeShimmer() {
+    return SizedBox(
+      height: 280,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: 3,
+        itemBuilder: (context, index) {
+          final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+          return Container(
+            width: 220,
+            margin: const EdgeInsets.only(right: 16, bottom: 10),
+            decoration: BoxDecoration(
+              color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  child: ShimmerWidget.rectangular(height: 140, width: 220),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      ShimmerWidget.rectangular(height: 16, width: 150),
+                      SizedBox(height: 8),
+                      ShimmerWidget.rectangular(height: 12, width: 100),
+                      SizedBox(height: 12),
+                      ShimmerWidget.rectangular(height: 14, width: 60),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildCoWorkerShimmer() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Wrap(
+        spacing: 0,
+        runSpacing: 12,
+        children: List.generate(
+          4,
+          (index) {
+            final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+            return Container(
+              width: (MediaQuery.of(context).size.width - 48) / 2,
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              decoration: BoxDecoration(
+                color: isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                children: const [
+                  ShimmerWidget.circular(width: 80, height: 80),
+                  SizedBox(height: 12),
+                  ShimmerWidget.rectangular(height: 16, width: 100),
+                  SizedBox(height: 8),
+                  ShimmerWidget.rectangular(height: 12, width: 80),
+                  SizedBox(height: 12),
+                  ShimmerWidget.rectangular(height: 14, width: 60),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCafeCard(BuildContext context, Cafe cafe) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final imageUrl = (cafe.photos != null && cafe.photos!.isNotEmpty)
+        ? cafe.photos![0]
+        : "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400";
+
+    // Prepend base url if it's a relative path
+    final fullImageUrl = imageUrl.startsWith("http") 
+        ? imageUrl 
+        : "https://api.yellowpass.in$imageUrl";
 
     return GestureDetector(
-      onTap: () => Get.toNamed('/cafe_details_screen'),
+      onTap: () => Get.toNamed('/cafe_details_screen', arguments: cafe.id),
       child: Container(
-        width: 200,
-        margin: const EdgeInsets.only(right: 16),
+        width: 220,
+        margin: const EdgeInsets.only(right: 16, bottom: 10),
         decoration: BoxDecoration(
           color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -141,140 +300,132 @@ class _NearbyScreenState extends State<NearbyScreen> {
               ),
           ],
         ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                child: CustomImageView(
-                  url: cafe.imageUrl,
-                  height: 140,
-                  width: 200,
-                  fit: BoxFit.cover,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  child: CustomImageView(
+                    url: fullImageUrl,
+                    height: 140,
+                    width: 220,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
-              if (cafe.isFeatured)
                 Positioned(
                   top: 12,
-                  left: 12,
+                  right: 12,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.yellow,
+                      color: Colors.black.withOpacity(0.6),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(Icons.star, size: 12, color: Colors.white),
-                        SizedBox(width: 4),
-                        Text(
-                          'Featured',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              Positioned(
-                top: 12,
-                right: 12,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    cafe.distance,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          // Details
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  cafe.name,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.location_on,
-                      size: 14,
-                      color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
-                    ),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        cafe.location,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(Icons.star, size: 14, color: Colors.yellow),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${cafe.rating}',
-                      style: TextStyle(
-                        fontSize: 12,
+                    child: Text(
+                      cafe.category ?? "Cafe",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black,
                       ),
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '(${cafe.reviews})',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),
-          ),
-        ],
+            // Details
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    cafe.name ?? "Unknown",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        size: 14,
+                        color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          cafe.address ?? cafe.city ?? "Location unknown",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.star, size: 14, color: Colors.yellow),
+                          const SizedBox(width: 4),
+                          Text(
+                            cafe.rating ?? '0.0',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: isDarkMode ? Colors.white : Colors.black,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '(${cafe.reviewCount ?? 0})',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (cafe.pricePerHour != null)
+                        Text(
+                          "₹${cafe.pricePerHour}/hr",
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.yellow,
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
-    ));
+    );
   }
 
-  Widget _buildCoWorkerCard(BuildContext context, CoWorkerModel coWorker, int index) {
+  Widget _buildCoWorkerCard(BuildContext context, NearbyUser coWorker, int index) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final profilePic = coWorker.profilePicture ?? "https://api.yellowpass.in/storage/profile-pictures/default.png";
+    final fullProfilePic = profilePic.startsWith("http") 
+        ? profilePic 
+        : "https://api.yellowpass.in$profilePic";
 
     return Container(
       width: (MediaQuery.of(context).size.width - 48) / 2,
@@ -297,29 +448,52 @@ class _NearbyScreenState extends State<NearbyScreen> {
           // Avatar
           CircleAvatar(
             radius: 40,
-            backgroundImage: NetworkImage(coWorker.imageUrl),
+            backgroundColor: Colors.yellow.withOpacity(0.2),
+            backgroundImage: NetworkImage(fullProfilePic),
           ),
           const SizedBox(height: 12),
           // Name
           Text(
-            coWorker.name,
+            coWorker.name ?? "Anonymous",
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: isDarkMode ? Colors.white : Colors.black,
             ),
             textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
-          // Role
+          // Description / Role
           Text(
-            coWorker.role,
+            coWorker.description ?? "Co-worker",
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 11,
               color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
             ),
             textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
+          const SizedBox(height: 8),
+          // Distance
+          if (coWorker.distance != null)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.yellow.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                "${coWorker.distance!.toStringAsFixed(1)} km away",
+                style: const TextStyle(
+                  fontSize: 10,
+                  color: Colors.yellow,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
         ],
       ),
     );

@@ -84,8 +84,10 @@ class SearchScreen extends GetView<SearchScreenController> {
                       onChanged: controller.onSearchChanged,
                       autofocus: true,
                       style: TextStyle(color: textColor),
-                      decoration: const InputDecoration(
+                      decoration:  InputDecoration(
                         hintText: "Search cafe, co-workers...",
+                        hintStyle: TextStyle(color: textColor.withOpacity(0.8)),
+
                         border: InputBorder.none,
                         isDense: true,
                         contentPadding: EdgeInsets.zero,

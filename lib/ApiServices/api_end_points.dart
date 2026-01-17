@@ -24,7 +24,13 @@ class ApiEndPoints {
   static const String userBookings = "$baseUrl/bookings/user_bookings";
   static const String checkIn = "$baseUrl/booking/checkin";
   static const String checkOut = "$baseUrl/booking/checkout";
+  static const String activeBooking = "$baseUrl/booking/user-active";
   static const String buyTokens = "$baseUrl/tokens/buy";
   static const String verifyTokens = "$baseUrl/tokens/verify";
   static const String transactionHistoryApi = "$baseUrl/wallet/user-transaction-history";
+  
+  // Nearby
+  static const String nearbyUsers = "$baseUrl/users/nearby";
+  static const String nearbyCafes = "$baseUrl/cafes";
+  static const String activeAdsAPI = "$baseUrl/ads/active-cafes";
 }

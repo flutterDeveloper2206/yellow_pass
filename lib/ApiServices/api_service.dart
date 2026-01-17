@@ -26,7 +26,7 @@ class ApiService extends GetConnect {
   Future<void> initApiService() async  {
     await NetworkInfo.checkNetwork().whenComplete(() async {
       authToken = SharedPrefs.getToken() ?? '';
-      // print("Auth Token from API service is :- $authToken");
+      print("Auth Token from API service is :- $authToken");
       headers = {
         "Content-Type": "application/json",
         "Accept": "application/json"
@@ -46,32 +46,29 @@ class ApiService extends GetConnect {
       bool showLoader = true,
       bool headerWithToken = true,
       bool handleError = true}) async {
-
-    if(isLogPrint) {
-      log("API :- $url");
-    }
-
     if (showLoader) {
       ProgressDialogUtils.showProgressDialog(isCancellable: false);
     }
-    
+
     try {
       await initApiService();
+      
+      final headersToUse = headerWithToken ? headersWithToken : headers;
+      _logRequest(url: url, body: body, headers: headersToUse, method: "POST");
+
       final response = await post(
         url,
         body,
-        headers: headerWithToken ? headersWithToken : headers,
+        headers: headersToUse,
         contentType: contentType,
       );
-      
+
       if (showLoader) {
         ProgressDialogUtils.hideProgressDialog();
       }
 
-      if(isLogPrint) {
-        log("RESPONSE :- ${response.body}");
-      }
-      
+      _logResponse(response, url: url);
+
       if (response.status.hasError) {
         if (handleError) {
           _handleError(response);
@@ -89,7 +86,7 @@ class ApiService extends GetConnect {
       if (showLoader) {
         ProgressDialogUtils.hideProgressDialog();
       }
-      log("Exception: $e");
+      log("Exception in callPostApi: $e");
       CommonSnackbar.showError(message: "An unexpected error occurred: $e");
       return null;
     }
@@ -102,10 +99,6 @@ class ApiService extends GetConnect {
     bool showLoader = true,
     bool headerWithToken = true,
   }) async {
-    if (isLogPrint) {
-      log("API :- $url");
-    }
-
     if (showLoader) {
       ProgressDialogUtils.showProgressDialog(isCancellable: false);
     }
@@ -120,8 +113,12 @@ class ApiService extends GetConnect {
         request.headers.addAll({
           "Authorization": "Bearer $authToken",
           "Accept": "application/json",
-           // "Content-Type": "multipart/form-data" // http package sets this automatically with boundary
         });
+      }
+
+      _logRequest(url: url, body: fields, headers: request.headers, method: "MULTIPART POST");
+      if (files != null && isLogPrint) {
+        log("│ Files: $files");
       }
 
       // 🔹 Text fields
@@ -145,39 +142,40 @@ class ApiService extends GetConnect {
 
       // 🔹 Send request
       var streamedResponse = await request.send();
-       var response = await http.Response.fromStream(streamedResponse);
+      var response = await http.Response.fromStream(streamedResponse);
 
       if (showLoader) {
         ProgressDialogUtils.hideProgressDialog();
       }
 
-      if (isLogPrint) {
-        log("RESPONSE :- ${response.body}");
+      // Convert http response to Get Response for logging consistency
+      dynamic responseBody;
+      try {
+        responseBody = json.decode(response.body);
+      } catch (_) {
+        responseBody = response.body;
       }
       
+      _logResponse(Response(
+        statusCode: response.statusCode,
+        body: responseBody,
+        statusText: response.reasonPhrase,
+      ), url: url);
+      
       if (response.statusCode >= 200 && response.statusCode < 300) {
-         try {
-           final bodyMap = json.decode(response.body);
-           if (_checkUnauthenticated(bodyMap)) {
-            return null;
-           }
-           return bodyMap;
-         } catch(e) {
-            return response.body; 
+         if (responseBody is Map && _checkUnauthenticated(responseBody)) {
+          return null;
          }
+         return responseBody;
       } else {
-        // Create a Get Response object to reuse existing error handling logic or handle manually
-        // Since _handleError takes Get's Response, we might refactor or just handle here simpler
-        
-        // Let's reuse _handleError by converting basic props
-        _handleError(Response(statusCode: response.statusCode, statusText: response.reasonPhrase, body:  json.decode(response.body)));
+        _handleError(Response(statusCode: response.statusCode, statusText: response.reasonPhrase, body: responseBody));
         return null;
       }
     } catch (e) {
       if (showLoader) {
         ProgressDialogUtils.hideProgressDialog();
       }
-      log("Exception: $e");
+      log("Exception in uploadMultipart: $e");
       CommonSnackbar.showError(message: "An unexpected error occurred: $e");
       return null;
     }
@@ -188,23 +186,21 @@ class ApiService extends GetConnect {
       required url,
       bool showLoader = true,
       bool headerWithToken = true}) async {
-
-    if(isLogPrint) {
-      log("API :- $url");
-      log("API :- ${isLogPrint.toString()}");
-    }
-
     if (showLoader) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-      ProgressDialogUtils.showProgressDialog(isCancellable: false);});
+        ProgressDialogUtils.showProgressDialog(isCancellable: false);
+      });
     }
     
     try {
       await initApiService();
+      
+      final headersToUse = headerWithToken ? headersWithToken : headers;
+      _logRequest(url: url, headers: headersToUse, method: "GET");
 
       final response = await get(
         url,
-        headers: headerWithToken ? headersWithToken : headers,
+        headers: headersToUse,
         contentType: contentType,
       );
       
@@ -212,9 +208,7 @@ class ApiService extends GetConnect {
         ProgressDialogUtils.hideProgressDialog();
       }
 
-      if(isLogPrint) {
-        log("RESPONSE :- ${response.body}");
-      }
+      _logResponse(response, url: url);
 
        if (response.status.hasError) {
         _handleError(response);
@@ -229,7 +223,7 @@ class ApiService extends GetConnect {
       if (showLoader) {
         ProgressDialogUtils.hideProgressDialog();
       }
-      log("Exception: $e");
+      log("Exception in callGetApi: $e");
       CommonSnackbar.showError(message: "An unexpected error occurred: $e");
       return null;
     }
@@ -245,21 +239,20 @@ class ApiService extends GetConnect {
       required url,
       bool showLoader = true,
       bool headerWithToken = true}) async {
-
-    if(isLogPrint) {
-      log("API :- $url");
-    }
-
     if (showLoader) {
       ProgressDialogUtils.showProgressDialog(isCancellable: false);
     }
 
     try {
       await initApiService();
+      
+      final headersToUse = headerWithToken ? headersWithToken : headers;
+      _logRequest(url: url, body: body, headers: headersToUse, method: "PUT");
+
       final response = await put(
         url,
         body,
-        headers: headerWithToken ? headersWithToken : headers,
+        headers: headersToUse,
         contentType: contentType,
       );
 
@@ -267,9 +260,7 @@ class ApiService extends GetConnect {
         ProgressDialogUtils.hideProgressDialog();
       }
 
-      if(isLogPrint) {
-        log("RESPONSE :- ${response.body}");
-      }
+      _logResponse(response, url: url);
 
       if (response.status.hasError) {
         _handleError(response);
@@ -284,7 +275,7 @@ class ApiService extends GetConnect {
       if (showLoader) {
         ProgressDialogUtils.hideProgressDialog();
       }
-      log("Exception: $e");
+      log("Exception in callPutApi: $e");
       CommonSnackbar.showError(message: "An unexpected error occurred: $e");
       return null;
     }
@@ -342,5 +333,38 @@ class ApiService extends GetConnect {
       return true;
     }
     return false;
+  }
+
+  void _logRequest({required String url, dynamic body, dynamic headers, required String method}) {
+    if (!isLogPrint) return;
+    log("┌──────────────────────────────────────────────────────────────────────────────");
+    log("│ [API REQUEST] $method");
+    log("│ URL: $url");
+    if (headers != null) {
+      log("│ Headers: $headers");
+    }
+    if (body != null) {
+      try {
+        log("│ Body: ${const JsonEncoder.withIndent('  ').convert(body)}");
+      } catch (e) {
+        log("│ Body: $body");
+      }
+    }
+    log("└──────────────────────────────────────────────────────────────────────────────");
+  }
+
+  void _logResponse(Response response, {required String url}) {
+    if (!isLogPrint) return;
+    log("┌──────────────────────────────────────────────────────────────────────────────");
+    log("│ [API RESPONSE] ${response.statusCode}");
+    log("│ URL: $url");
+    if (response.body != null) {
+      try {
+        log("│ Response: ${const JsonEncoder.withIndent('  ').convert(response.body)}");
+      } catch (e) {
+        log("│ Response: ${response.body}");
+      }
+    }
+    log("└──────────────────────────────────────────────────────────────────────────────");
   }
 }

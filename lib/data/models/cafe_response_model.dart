@@ -64,6 +64,7 @@ class Cafe {
   int? totalReviews;
   List<String>? timings;
   List<dynamic>? menuItems;
+  List<Ads>? ads;
 
   Cafe(
       {this.id,
@@ -96,7 +97,8 @@ class Cafe {
       this.averageRating,
       this.totalReviews,
       this.timings,
-      this.menuItems});
+      this.menuItems,
+      this.ads});
 
   Cafe.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -140,6 +142,12 @@ class Cafe {
         reviews!.add(Review.fromJson(v));
       });
     }
+    if (json['ads'] != null) {
+      ads = <Ads>[];
+      json['ads'].forEach((v) {
+        ads!.add(Ads.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -180,6 +188,9 @@ class Cafe {
     }
     if (reviews != null) {
       data['reviews'] = reviews!.map((v) => v.toJson()).toList();
+    }
+    if (ads != null) {
+      data['ads'] = ads!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -326,6 +337,55 @@ class ReviewUser {
     data['name'] = name;
     data['profile_picture'] = profilePicture;
     data['is_email_verified'] = isEmailVerified;
+    return data;
+  }
+}
+
+class Ads {
+  String? id;
+  String? cafeId;
+  int? durationDays;
+  String? startDate;
+  String? endDate;
+  int? tokensSpent;
+  String? status;
+  String? createdAt;
+  String? updatedAt;
+
+  Ads(
+      {this.id,
+      this.cafeId,
+      this.durationDays,
+      this.startDate,
+      this.endDate,
+      this.tokensSpent,
+      this.status,
+      this.createdAt,
+      this.updatedAt});
+
+  Ads.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    cafeId = json['cafe_id'];
+    durationDays = json['duration_days'];
+    startDate = json['start_date'];
+    endDate = json['end_date'];
+    tokensSpent = json['tokens_spent'];
+    status = json['status'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['cafe_id'] = cafeId;
+    data['duration_days'] = durationDays;
+    data['start_date'] = startDate;
+    data['end_date'] = endDate;
+    data['tokens_spent'] = tokensSpent;
+    data['status'] = status;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
     return data;
   }
 }
