@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
 import 'package:yellow_pass/core/utils/app_fonts.dart';
+import 'package:yellow_pass/core/utils/color_constant.dart';
 
 import 'controller/check_in_otp_controller.dart';
 
@@ -34,16 +35,21 @@ class CheckInOtpScreen extends GetView<CheckInOtpController> {
                   padding: const EdgeInsets.all(16),
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.yellow,
+                    color: ColorConstant.primaryColor,
                   ),
-                  child: Icon(isCheckOut ? Icons.logout : Icons.vpn_key_outlined, size: 30, color: Colors.black),
+                  child: Icon(
+                      isCheckOut ? Icons.logout : Icons.vpn_key_outlined,
+                      size: 30,
+                      color: Colors.black),
                 ),
               ),
               const SizedBox(height: 20),
               FadeInUp(
                 duration: const Duration(milliseconds: 500),
                 child: Text(
-                  isCheckOut ? "Check-out Verification" : "Check-in Verification",
+                  isCheckOut
+                      ? "Check-out Verification"
+                      : "Check-in Verification",
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: isDarkMode ? Colors.white : Colors.black,
@@ -58,7 +64,9 @@ class CheckInOtpScreen extends GetView<CheckInOtpController> {
                   "Please enter the 6-digit ${isCheckOut ? 'check-out' : 'check-in'} OTP\nprovided at $cafeName",
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700,
+                    color: isDarkMode
+                        ? Colors.grey.shade400
+                        : Colors.grey.shade700,
                   ),
                 ),
               ),
@@ -73,29 +81,32 @@ class CheckInOtpScreen extends GetView<CheckInOtpController> {
                 duration: const Duration(milliseconds: 900),
                 delay: const Duration(milliseconds: 400),
                 child: Obx(() => SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: controller.isProcessing.value 
-                      ? null 
-                      : () => controller.verifyOtp(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isDarkMode ? Colors.white : Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28),
-                      ),
-                    ),
-                    child: controller.isProcessing.value
-                      ? const CircularProgressIndicator(color: Colors.yellow)
-                      : Text(
-                          "Submit OTP",
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: isDarkMode ? Colors.black : Colors.white,
-                            fontWeight: FontWeight.bold,
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: controller.isProcessing.value
+                            ? null
+                            : () => controller.verifyOtp(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              isDarkMode ? Colors.white : Colors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(28),
                           ),
                         ),
-                  ),
-                )),
+                        child: controller.isProcessing.value
+                            ? const CircularProgressIndicator(
+                                color: ColorConstant.primaryColor)
+                            : Text(
+                                "Submit OTP",
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  color:
+                                      isDarkMode ? Colors.black : Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                      ),
+                    )),
               ),
               const SizedBox(height: 20),
             ],
@@ -111,8 +122,8 @@ class CheckInOtpScreen extends GetView<CheckInOtpController> {
         GestureDetector(
           onTap: () => Get.back(),
           child: Icon(
-            Icons.arrow_back_ios, 
-            size: 20, 
+            Icons.arrow_back_ios,
+            size: 20,
             color: isDarkMode ? Colors.white : Colors.black,
           ),
         ),
@@ -151,7 +162,7 @@ class CheckInOtpScreen extends GetView<CheckInOtpController> {
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade100,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.yellow, width: 2),
+        border: Border.all(color: ColorConstant.primaryColor, width: 2),
       ),
     );
 

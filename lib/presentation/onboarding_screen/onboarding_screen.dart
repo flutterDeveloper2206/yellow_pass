@@ -4,6 +4,7 @@ import 'package:yellow_pass/core/utils/size_utils.dart';
 import 'package:yellow_pass/widgets/custom_elavated_button.dart';
 import 'package:yellow_pass/widgets/custom_image_view.dart';
 import '../../core/theme/light_theme.dart';
+import 'package:yellow_pass/core/utils/color_constant.dart';
 import 'controller/onboarding_screen_controller.dart';
 
 class OnboardingScreen extends GetWidget<OnboardingScreenController> {
@@ -14,22 +15,24 @@ class OnboardingScreen extends GetWidget<OnboardingScreenController> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Obx(
-            () => Stack(
+        () => Stack(
           children: [
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 600),
               child: CustomImageView(
                 height: double.infinity,
                 fit: BoxFit.cover,
-                imagePath: controller.pages[controller.currentPage.value]["image"]!,
+                imagePath: controller.pages[controller.currentPage.value]
+                    ["image"]!,
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40,vertical: 40),
-              child: Row(mainAxisAlignment: MainAxisAlignment.end,
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   InkWell(
-                  onTap: () {
+                    onTap: () {
                       controller.goToLogin();
                     },
                     child: Text(
@@ -66,7 +69,8 @@ class OnboardingScreen extends GetWidget<OnboardingScreenController> {
                           children: [
                             TextSpan(
                               text: "CoWorking ",
-                              style: TextStyle(color: Colors.yellow),
+                              style:
+                                  TextStyle(color: ColorConstant.primaryColor),
                             ),
                             TextSpan(
                               text: "Spaces for creative ",
@@ -74,7 +78,8 @@ class OnboardingScreen extends GetWidget<OnboardingScreenController> {
                             ),
                             TextSpan(
                               text: "Idealist .",
-                              style: TextStyle(color: Colors.yellow),
+                              style:
+                                  TextStyle(color: ColorConstant.primaryColor),
                             ),
                           ],
                         ),
@@ -95,35 +100,34 @@ class OnboardingScreen extends GetWidget<OnboardingScreenController> {
                   Row(
                     children: List.generate(
                       controller.pages.length,
-                          (index) => AnimatedContainer(
+                      (index) => AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
                         margin: const EdgeInsets.all(4),
                         height: getHeight(10),
                         width: index == controller.currentPage.value ? 25 : 10,
                         decoration: BoxDecoration(
                           color: index == controller.currentPage.value
-                              ? Colors.yellow
+                              ? ColorConstant.primaryColor
                               : Colors.grey.shade400,
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                     ),
                   ),
-
                   SizedBox(height: getHeight(30)),
-
                   SizedBox(
                     width: MediaQuery.of(Get.context!).size.width / 2.5,
                     height: getHeight(55),
                     child: Obx(
-                          () => AppElevatedButton(
-                            radius: 50,
-                            buttonColor: Colors.white,
+                      () => AppElevatedButton(
+                        radius: 50,
+                        buttonColor: Colors.white,
                         textColor: Colors.black,
                         onPressed: () {
                           controller.nextPage();
                         },
-                        buttonName: controller.currentPage.value == controller.pages.length - 1
+                        buttonName: controller.currentPage.value ==
+                                controller.pages.length - 1
                             ? "Login"
                             : "Next",
                       ),

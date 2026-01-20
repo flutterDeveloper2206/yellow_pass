@@ -9,6 +9,7 @@ import 'package:yellow_pass/core/utils/shared_prefs.dart';
 import 'package:yellow_pass/data/models/booking_request_model.dart';
 import 'package:yellow_pass/data/models/booking_response_model.dart';
 import 'package:yellow_pass/widgets/common_snackbar.dart';
+import 'package:yellow_pass/core/utils/color_constant.dart';
 
 class CafeBookController extends GetxController {
   final CafeBookRepository _repository = Get.find<CafeBookRepository>();
@@ -17,9 +18,10 @@ class CafeBookController extends GetxController {
   RxInt selectedTimeSlotIndex = (-1).obs;
   RxInt selectedTableTypeIndex = 0.obs;
   RxDouble duration = 1.0.obs;
-  
-  final TextEditingController specialRequestsController = TextEditingController();
-  
+
+  final TextEditingController specialRequestsController =
+      TextEditingController();
+
   Rx<Cafe?> cafe = Rx<Cafe?>(null);
   RxBool isLoading = false.obs;
   RxBool isSlotsLoading = false.obs;
@@ -60,9 +62,11 @@ class CafeBookController extends GetxController {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: Colors.yellow.shade700,
+              primary: ColorConstant.primaryColor,
               onPrimary: Colors.black,
-              onSurface: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
+              onSurface: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black,
             ),
           ),
           child: child!,
@@ -71,17 +75,21 @@ class CafeBookController extends GetxController {
     );
     if (picked != null) {
       // Check if already in list
-      int index = dateObjects.indexWhere((d) => 
-        d.year == picked.year && d.month == picked.month && d.day == picked.day);
-      
+      int index = dateObjects.indexWhere((d) =>
+          d.year == picked.year &&
+          d.month == picked.month &&
+          d.day == picked.day);
+
       if (index != -1) {
         selectDate(index);
       } else {
         dateObjects.add(picked);
         // Sort dates
         dateObjects.sort((a, b) => a.compareTo(b));
-        int newIndex = dateObjects.indexWhere((d) => 
-          d.year == picked.year && d.month == picked.month && d.day == picked.day);
+        int newIndex = dateObjects.indexWhere((d) =>
+            d.year == picked.year &&
+            d.month == picked.month &&
+            d.day == picked.day);
         selectDate(newIndex);
       }
     }
@@ -95,7 +103,8 @@ class CafeBookController extends GetxController {
     try {
       var response = await _repository.getTableTypes(cafe.value!.id!);
       if (response != null && response['status'] == true) {
-        TableTypeResponse tableTypeResponse = TableTypeResponse.fromJson(response);
+        TableTypeResponse tableTypeResponse =
+            TableTypeResponse.fromJson(response);
         if (tableTypeResponse.data != null) {
           tableTypes.value = tableTypeResponse.data!;
           if (tableTypes.isNotEmpty) {
@@ -112,13 +121,14 @@ class CafeBookController extends GetxController {
 
   Future<void> fetchAvailability() async {
     if (tableTypes.isEmpty || cafe.value == null) return;
-    
+
     isSlotsLoading.value = true;
     selectedTimeSlotIndex.value = -1;
     timeSlots.clear();
-    
+
     try {
-      String date = DateFormat('yyyy-MM-dd').format(dateObjects[selectedDateIndex.value]);
+      String date =
+          DateFormat('yyyy-MM-dd').format(dateObjects[selectedDateIndex.value]);
       String tableTypeId = tableTypes[selectedTableTypeIndex.value].id!;
       int durationHours = duration.value.toInt();
 
@@ -130,8 +140,10 @@ class CafeBookController extends GetxController {
       );
 
       if (response != null && response['status'] == true) {
-        AvailabilityResponse availabilityResponse = AvailabilityResponse.fromJson(response);
-        if (availabilityResponse.data != null && availabilityResponse.data!.slots != null) {
+        AvailabilityResponse availabilityResponse =
+            AvailabilityResponse.fromJson(response);
+        if (availabilityResponse.data != null &&
+            availabilityResponse.data!.slots != null) {
           timeSlots.value = availabilityResponse.data!.slots!;
         }
       }
@@ -153,7 +165,7 @@ class CafeBookController extends GetxController {
 
   void selectTableType(int index) {
     selectedTableTypeIndex.value = index;
-    duration.value=1.0;
+    duration.value = 1.0;
     fetchAvailability();
   }
 
@@ -167,7 +179,9 @@ class CafeBookController extends GetxController {
   String formatMonthYear(DateTime date) => DateFormat('MMM, yyyy').format(date);
 
   Future<void> bookCafe() async {
-    if (cafe.value == null || tableTypes.isEmpty || selectedTimeSlotIndex.value == -1) {
+    if (cafe.value == null ||
+        tableTypes.isEmpty ||
+        selectedTimeSlotIndex.value == -1) {
       CommonSnackbar.showError(message: "Please select all details");
       return;
     }
@@ -179,23 +193,46 @@ class CafeBookController extends GetxController {
         return;
       }
 
-      String dateStr = DateFormat('yyyy-MM-dd').format(dateObjects[selectedDateIndex.value]);
+      String dateStr =
+          DateFormat('yyyy-MM-dd').format(dateObjects[selectedDateIndex.value]);
       String startTimeSlot = timeSlots[selectedTimeSlotIndex.value];
-      
-      // Parse token cost
+
+      // Parse hourly rate
       int hourlyRate = 200; // default
       if (cafe.value?.pricePerHour != null) {
         hourlyRate = int.tryParse(cafe.value!.pricePerHour!) ?? 200;
       }
-      int totalTokenCost = (hourlyRate * duration.value).toInt();
+
+      // Calculate discount from active subscription
+      double discountPercentage = 0;
+      final userData = SharedPrefs.getUser();
+      if (userData != null && userData['active_subscription'] != null) {
+        final activeSub = userData['active_subscription'];
+        if (activeSub['status'] == 'active' &&
+            activeSub['subscription'] != null) {
+          discountPercentage =
+              (activeSub['subscription']['discount_percentage'] ?? 0)
+                  .toDouble();
+        }
+      }
+
+      int baseTokenCost = (hourlyRate * duration.value).toInt();
+      int totalTokenCost = baseTokenCost;
+
+      if (discountPercentage > 0) {
+        totalTokenCost =
+            (baseTokenCost * (100 - discountPercentage) / 100).toInt();
+        print(
+            "Discount applied: $discountPercentage%, New cost: $totalTokenCost (was $baseTokenCost)");
+      }
 
       // Format start and end time
       // Assume startTimeSlot is like "10:00 AM" or "10:00:00"
       // Looking at availability_response, slots are just strings.
       // API example shows "2026-01-01 10:00:00"
-      
+
       String startTime = _formatDateTime(dateStr, startTimeSlot);
-      
+
       // For end time, add duration
       DateTime startDT = DateFormat('yyyy-MM-dd HH:mm:ss').parse(startTime);
       DateTime endDT = startDT.add(Duration(hours: duration.value.toInt()));
@@ -216,11 +253,13 @@ class CafeBookController extends GetxController {
       if (response != null) {
         BookingResponse bookingResponse = BookingResponse.fromJson(response);
         if (bookingResponse.status == true) {
-          CommonSnackbar.showSuccess(message: bookingResponse.message ?? "Cafe booking successfully");
+          CommonSnackbar.showSuccess(
+              message: bookingResponse.message ?? "Cafe booking successfully");
           Get.back(); // Close dialog if open
           Get.back(); // Go back to details or previous screen
         } else {
-          CommonSnackbar.showError(message: bookingResponse.message ?? "Insufficient tokens");
+          CommonSnackbar.showError(
+              message: bookingResponse.message ?? "Insufficient tokens");
         }
       }
     } catch (e) {

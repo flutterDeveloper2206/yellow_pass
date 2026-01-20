@@ -2,14 +2,15 @@ import 'package:get/get.dart';
 import 'package:yellow_pass/data/models/cafe_response_model.dart';
 import 'package:yellow_pass/data/models/cafe_details_response_model.dart';
 import '../repository/cafe_details_repository.dart';
+import '../../../ApiServices/api_end_points.dart';
 
 class CafeDetailsController extends GetxController {
   final CafeDetailsRepository _repository = Get.find<CafeDetailsRepository>();
-  
+
   // Cafe data received from arguments or API
   Rx<Cafe?> cafe = Rx<Cafe?>(null);
   RxBool isLoading = false.obs;
-  
+
   RxList<String> images = <String>[].obs;
   RxInt currentImageIndex = 0.obs;
 
@@ -40,7 +41,8 @@ class CafeDetailsController extends GetxController {
     try {
       var response = await _repository.getCafeDetails(id);
       if (response != null && response['status'] == true) {
-        CafeDetailsResponse cafeDetailsResponse = CafeDetailsResponse.fromJson(response);
+        CafeDetailsResponse cafeDetailsResponse =
+            CafeDetailsResponse.fromJson(response);
         if (cafeDetailsResponse.data != null) {
           cafe.value = cafeDetailsResponse.data;
           _updateImages();
@@ -55,7 +57,9 @@ class CafeDetailsController extends GetxController {
 
   void _updateImages() {
     if (cafe.value?.photos != null && cafe.value!.photos!.isNotEmpty) {
-      images.value = cafe.value!.photos!.map((e) => "https://api.yellowpass.in$e").toList();
+      images.value = cafe.value!.photos!
+          .map((e) => "${ApiEndPoints.imageBaseUrl}$e")
+          .toList();
     } else {
       // Default images if no data
       images.value = [
@@ -72,20 +76,22 @@ class CafeDetailsController extends GetxController {
 
   // Get cafe name
   String get cafeName => cafe.value?.name ?? 'Cafe Name';
-  
+
   // Get cafe location
-  String get cafeLocation => (cafe.value?.address != null && cafe.value?.city != null) 
-      ? "${cafe.value!.address}, ${cafe.value!.city}" 
-      : (cafe.value?.address ?? cafe.value?.city ?? 'Location');
-  
+  String get cafeLocation =>
+      (cafe.value?.address != null && cafe.value?.city != null)
+          ? "${cafe.value!.address}, ${cafe.value!.city}"
+          : (cafe.value?.address ?? cafe.value?.city ?? 'Location');
+
   // Get cafe rating
-  String get cafeRating => (cafe.value?.averageRating != null) 
-      ? "${cafe.value!.averageRating} (${cafe.value!.totalReviews ?? 0})" 
+  String get cafeRating => (cafe.value?.averageRating != null)
+      ? "${cafe.value!.averageRating} (${cafe.value!.totalReviews ?? 0})"
       : (cafe.value?.rating ?? '0.0');
-  
+
   // Get cafe description
-  String get cafeDescription => cafe.value?.description ?? 'No description available.';
-  
+  String get cafeDescription =>
+      cafe.value?.description ?? 'No description available.';
+
   // Get cafe timings
   String get cafeTimings {
     if (cafe.value?.timings != null && cafe.value!.timings!.isNotEmpty) {
@@ -95,15 +101,16 @@ class CafeDetailsController extends GetxController {
         ? "${cafe.value!.openTime} - ${cafe.value!.closeTime}"
         : 'Timings not set';
   }
-  
+
   // Get cafe discount (not yet in API)
   String get cafeDiscount => '';
-  
+
   // Get cafe seats
   String get cafeSeats => "${cafe.value?.totalSeats ?? 0} Seats Available";
-  
+
   // Get cafe tokens
-  String get cafeTokens => "${cafe.value?.pricePerHour ?? '0'} Yellow Tokens/hr";
+  String get cafeTokens =>
+      "${cafe.value?.pricePerHour ?? '0'} Yellow Tokens/hr";
 
   List<Review> get cafeReviews => cafe.value?.reviews ?? [];
 
@@ -111,7 +118,8 @@ class CafeDetailsController extends GetxController {
     if (cafe.value?.tables != null && cafe.value!.tables!.isNotEmpty) {
       return cafe.value!.tables!
           .where((t) => t.name != null)
-          .map((t) => "${t.name} (${t.capacity} Person)").toList();
+          .map((t) => "${t.name} (${t.capacity} Person)")
+          .toList();
     }
     return [];
   }

@@ -14,9 +14,9 @@ import '../../home_screen/controller/home_screen_controller.dart';
 import '../../../../widgets/common_snackbar.dart';
 import '../../../../core/utils/commonConstant.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:yellow_pass/core/utils/color_constant.dart';
 
 class DashboardScreenController extends GetxController {
-
   final RxInt currentIndex = 0.obs;
   final iconList = <IconData>[
     Icons.home_outlined,
@@ -44,31 +44,31 @@ class DashboardScreenController extends GetxController {
     try {
       final repository = Get.find<DashboardRepository>();
       final dynamic response = await repository.getUserProfile();
-      
+
       if (response != null) {
         final data = response; // ApiService returns response.body directly
-        
+
         if (data is Map && data['status'] == true) {
-           final userData = data['data']['user'];
-            if (userData != null) {
-             await SharedPrefs.setUser(userData);
-             
-             // Refresh data in other controllers if they exist
-             if (Get.isRegistered<ProfileScreenController>()) {
-               Get.find<ProfileScreenController>().loadUserData();
-             }
-             if (Get.isRegistered<ProfileDetailsController>()) {
-               Get.find<ProfileDetailsController>().loadUserData();
-             }
-             if (Get.isRegistered<HomeScreenController>()) {
-               Get.find<HomeScreenController>().loadUserData();
-             }
-           }
+          final userData = data['data']['user'];
+          if (userData != null) {
+            await SharedPrefs.setUser(userData);
+
+            // Refresh data in other controllers if they exist
+            if (Get.isRegistered<ProfileScreenController>()) {
+              Get.find<ProfileScreenController>().loadUserData();
+            }
+            if (Get.isRegistered<ProfileDetailsController>()) {
+              Get.find<ProfileDetailsController>().loadUserData();
+            }
+            if (Get.isRegistered<HomeScreenController>()) {
+              Get.find<HomeScreenController>().loadUserData();
+            }
+          }
         }
       }
     } catch (e) {
       debugPrint("Error fetching profile: $e");
-       // Silent failure or show snackbar if critical
+      // Silent failure or show snackbar if critical
     }
   }
 
@@ -101,88 +101,89 @@ class DashboardScreenController extends GetxController {
 
   Future<bool> _showExitDialog() async {
     return await Get.dialog<bool>(
-      Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.exit_to_app,
-                size: 60,
-                color: Colors.yellow,
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                "Exit App",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                "Are you sure you want to exit?",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
-              ),
-              const SizedBox(height: 30),
-              Row(
+          Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Get.back(result: false),
-                      style: OutlinedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      child: const Text(
-                        "No",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                  const Icon(
+                    Icons.exit_to_app,
+                    size: 60,
+                    color: ColorConstant.primaryColor,
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "Exit App",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Get.back(result: true);
-                        SystemNavigator.pop();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.yellow,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      child: const Text(
-                        "Yes",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "Are you sure you want to exit?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
                     ),
+                  ),
+                  const SizedBox(height: 30),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Get.back(result: false),
+                          style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          child: const Text(
+                            "No",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Get.back(result: true);
+                            SystemNavigator.pop();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ColorConstant.primaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          child: const Text(
+                            "Yes",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
-    ) ?? false;
+        ) ??
+        false;
   }
 }

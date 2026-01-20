@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/color_constant.dart';
 
 ColorScheme flexSchemeLight = const ColorScheme(
   brightness: Brightness.light,
@@ -6,11 +7,11 @@ ColorScheme flexSchemeLight = const ColorScheme(
   ///Fix Color for both theme
   onPrimaryContainer: Color(0xff070707),
 
-  primary: Colors.yellow,
-  onPrimary: Color(0xffffab3d),
-  primaryFixed: Color(0xffFF9100),
-  onPrimaryFixed: Color(0xffffab3d),
-  primaryContainer: Color(0xffffab3e),
+  primary: ColorConstant.primaryColor,
+  onPrimary: ColorConstant.primaryColor,
+  primaryFixed: ColorConstant.primaryColor,
+  onPrimaryFixed: ColorConstant.primaryColor,
+  primaryContainer: ColorConstant.primaryColor,
   primaryFixedDim: Color(0xff242128),
 
   secondary: Color(0xff070707),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:yellow_pass/data/models/transaction_history_response_model.dart';
+import 'package:yellow_pass/core/utils/color_constant.dart';
 import 'controller/wallet_history_controller.dart';
 
 class WalletHistoryScreen extends StatefulWidget {
@@ -61,10 +62,11 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                 child: _buildStatsSection(context),
               ),
             ),
-            
+
             // Header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: FadeInDown(
                 duration: const Duration(milliseconds: 500),
                 child: Row(
@@ -82,16 +84,18 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                       "${controller.transactions.length} total",
                       style: TextStyle(
                         fontSize: 14,
-                        color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                        color: isDarkMode
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade600,
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 8),
-            
+
             // Transactions List
             Expanded(
               child: controller.transactions.isEmpty
@@ -102,14 +106,18 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                           Icon(
                             Icons.receipt_long_outlined,
                             size: 80,
-                            color: isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300,
+                            color: isDarkMode
+                                ? Colors.grey.shade700
+                                : Colors.grey.shade300,
                           ),
                           const SizedBox(height: 16),
                           Text(
                             "No transactions yet",
                             style: TextStyle(
                               fontSize: 16,
-                              color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                              color: isDarkMode
+                                  ? Colors.grey.shade400
+                                  : Colors.grey.shade600,
                             ),
                           ),
                         ],
@@ -139,7 +147,7 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
 
   Widget _buildShimmerLoading(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Column(
       children: [
         // Stats Shimmer
@@ -148,7 +156,8 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade100,
+              color:
+                  isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade100,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
@@ -157,16 +166,20 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    Expanded(child: _buildShimmerBox(double.infinity, 80, isDarkMode)),
+                    Expanded(
+                        child:
+                            _buildShimmerBox(double.infinity, 80, isDarkMode)),
                     const SizedBox(width: 12),
-                    Expanded(child: _buildShimmerBox(double.infinity, 80, isDarkMode)),
+                    Expanded(
+                        child:
+                            _buildShimmerBox(double.infinity, 80, isDarkMode)),
                   ],
                 ),
               ],
             ),
           ),
         ),
-        
+
         // List Shimmer
         Expanded(
           child: ListView.builder(
@@ -177,7 +190,9 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade100,
+                  color: isDarkMode
+                      ? const Color(0xFF2C2C2C)
+                      : Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -233,7 +248,6 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: isDarkMode ? const Color(0xFF3C3C3C) : Colors.white,
-
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -269,7 +283,7 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.yellow,
+                          color: ColorConstant.primaryColor,
                         ),
                       ),
                     ],
@@ -278,9 +292,9 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Total Spent and Purchased - Side by Side
           Row(
             children: [
@@ -416,7 +430,8 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
     );
   }
 
-  Widget _buildStatItem(BuildContext context, String label, String value, IconData icon, Color color) {
+  Widget _buildStatItem(BuildContext context, String label, String value,
+      IconData icon, Color color) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
@@ -444,7 +459,9 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                   label,
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                    color: isDarkMode
+                        ? Colors.grey.shade400
+                        : Colors.grey.shade600,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -464,10 +481,11 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
     );
   }
 
-  Widget _buildTransactionItem(BuildContext context, Transaction transaction, int index) {
+  Widget _buildTransactionItem(
+      BuildContext context, Transaction transaction, int index) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final isPurchase = transaction.type == 'purchase';
-    
+
     // Format date
     String formattedDate = '';
     if (transaction.createdAt != null) {
@@ -504,7 +522,7 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
-              isPurchase 
+              isPurchase
                   ? Icons.account_balance_wallet_outlined
                   : Icons.event_seat_outlined,
               color: isPurchase ? Colors.green : Colors.red,
@@ -518,7 +536,8 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  transaction.description ?? (isPurchase ? 'Wallet Recharge' : 'Booking'),
+                  transaction.description ??
+                      (isPurchase ? 'Wallet Recharge' : 'Booking'),
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -532,7 +551,9 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                   formattedDate,
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                    color: isDarkMode
+                        ? Colors.grey.shade400
+                        : Colors.grey.shade600,
                   ),
                 ),
               ],
@@ -555,14 +576,19 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: (transaction.status == 'success' ? Colors.green : Colors.orange).withOpacity(0.1),
+                  color: (transaction.status == 'success'
+                          ? Colors.green
+                          : ColorConstant.primaryColor)
+                      .withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   transaction.status ?? 'pending',
                   style: TextStyle(
                     fontSize: 10,
-                    color: transaction.status == 'success' ? Colors.green : Colors.orange,
+                    color: transaction.status == 'success'
+                        ? Colors.green
+                        : ColorConstant.primaryColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

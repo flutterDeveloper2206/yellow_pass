@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'controller/check_in_success_controller.dart';
+import 'package:yellow_pass/core/utils/color_constant.dart';
 
 class CheckInSuccessScreen extends GetView<CheckInSuccessController> {
   const CheckInSuccessScreen({super.key});
@@ -16,66 +17,72 @@ class CheckInSuccessScreen extends GetView<CheckInSuccessController> {
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Obx(() => Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Spacer(),
-              // Dynamic Animation (Success or Error)
-              _buildAnimation(controller.isSuccess.value, isDark),
-              
-              const SizedBox(height: 40),
-              Text(
-                controller.title.value,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: controller.isSuccess.value 
-                      ? (isDark ? Colors.white : Colors.black)
-                      : Colors.red,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                controller.isSuccess.value 
-                    ? "You have successfully ${controller.title.value.contains("Check-out") ? "checked out from" : "checked in at"} ${controller.cafeName.value}."
-                    : (controller.message.value.isNotEmpty ? controller.message.value : "Something went wrong during check-in. Please try again or contact support."),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                ),
-              ),
-              
-              const SizedBox(height: 40),
-              
-              // Only show WiFi section on success
-              if (controller.isSuccess.value)
-                _buildWifiContainer(isDark),
-                
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => controller.onContinue(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: controller.isSuccess.value ? Colors.yellow : Colors.red,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    controller.isSuccess.value ? "Continue" : "Try Again",
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Spacer(),
+                  // Dynamic Animation (Success or Error)
+                  _buildAnimation(controller.isSuccess.value, isDark),
+
+                  const SizedBox(height: 40),
+                  Text(
+                    controller.title.value,
+                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: controller.isSuccess.value ? Colors.black : Colors.white,
-                      fontSize: 16,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
+                      color: controller.isSuccess.value
+                          ? (isDark ? Colors.white : Colors.black)
+                          : Colors.red,
                     ),
                   ),
-                ),
-              ),
-            ],
-          )),
+                  const SizedBox(height: 16),
+                  Text(
+                    controller.isSuccess.value
+                        ? "You have successfully ${controller.title.value.contains("Check-out") ? "checked out from" : "checked in at"} ${controller.cafeName.value}."
+                        : (controller.message.value.isNotEmpty
+                            ? controller.message.value
+                            : "Something went wrong during check-in. Please try again or contact support."),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color:
+                          isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                    ),
+                  ),
+
+                  const SizedBox(height: 40),
+
+                  // Only show WiFi section on success
+                  if (controller.isSuccess.value) _buildWifiContainer(isDark),
+
+                  const Spacer(),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => controller.onContinue(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: controller.isSuccess.value
+                            ? ColorConstant.primaryColor
+                            : Colors.red,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        controller.isSuccess.value ? "Continue" : "Try Again",
+                        style: TextStyle(
+                          color: controller.isSuccess.value
+                              ? Colors.black
+                              : Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )),
         ),
       ),
     );
@@ -89,7 +96,8 @@ class CheckInSuccessScreen extends GetView<CheckInSuccessController> {
         child: Lottie.network(
           'https://lottie.host/56d0c404-566b-4786-9441-d69d49313276/7p15g2q1Y8.json',
           repeat: false,
-          errorBuilder: (context, error, stackTrace) => _buildIconFallback(Icons.check_circle, Colors.green),
+          errorBuilder: (context, error, stackTrace) =>
+              _buildIconFallback(Icons.check_circle, Colors.green),
         ),
       );
     } else {

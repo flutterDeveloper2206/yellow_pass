@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:yellow_pass/core/utils/color_constant.dart';
 
 class RechargeResultScreen extends StatelessWidget {
   final bool isSuccess;
@@ -31,7 +32,7 @@ class RechargeResultScreen extends StatelessWidget {
               const Spacer(),
               // Dynamic Animation (Success or Error)
               _buildAnimation(isSuccess, isDark),
-              
+
               const SizedBox(height: 40),
               Text(
                 isSuccess ? "Recharge Successful!" : "Payment Failed",
@@ -39,31 +40,32 @@ class RechargeResultScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: isSuccess 
+                  color: isSuccess
                       ? (isDark ? Colors.white : Colors.black)
                       : Colors.red,
                 ),
               ),
               const SizedBox(height: 16),
               Text(
-                isSuccess 
+                isSuccess
                     ? "Your wallet has been recharged successfully"
-                    : (errorMessage ?? "Your payment could not be processed. Please try again."),
+                    : (errorMessage ??
+                        "Your payment could not be processed. Please try again."),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
                   color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                 ),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Only show details on success
               if (isSuccess && amount != null && tokens != null)
                 _buildDetailsContainer(isDark),
-                
+
               const Spacer(),
-              
+
               // Action Buttons
               if (isSuccess)
                 SizedBox(
@@ -74,7 +76,7 @@ class RechargeResultScreen extends StatelessWidget {
                       Get.back(); // Close recharge screen
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.yellow,
+                      backgroundColor: ColorConstant.primaryColor,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -125,7 +127,8 @@ class RechargeResultScreen extends StatelessWidget {
                           Get.back(); // Close recharge screen
                         },
                         style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: isDark ? Colors.white : Colors.black),
+                          side: BorderSide(
+                              color: isDark ? Colors.white : Colors.black),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -158,7 +161,8 @@ class RechargeResultScreen extends StatelessWidget {
         child: Lottie.network(
           'https://lottie.host/56d0c404-566b-4786-9441-d69d49313276/7p15g2q1Y8.json',
           repeat: false,
-          errorBuilder: (context, error, stackTrace) => _buildIconFallback(Icons.check_circle, Colors.green),
+          errorBuilder: (context, error, stackTrace) =>
+              _buildIconFallback(Icons.check_circle, Colors.green),
         ),
       );
     } else {
@@ -215,7 +219,9 @@ class RechargeResultScreen extends StatelessWidget {
                     Text(
                       "Amount Paid",
                       style: TextStyle(
-                        color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                        color: isDark
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade600,
                         fontSize: 12,
                       ),
                     ),
@@ -239,10 +245,11 @@ class RechargeResultScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.1),
+                  color: ColorConstant.primaryColor.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.toll, color: Colors.orange),
+                child:
+                    const Icon(Icons.toll, color: ColorConstant.primaryColor),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -252,7 +259,9 @@ class RechargeResultScreen extends StatelessWidget {
                     Text(
                       "Tokens Added",
                       style: TextStyle(
-                        color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                        color: isDark
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade600,
                         fontSize: 12,
                       ),
                     ),

@@ -5,7 +5,9 @@ import 'package:yellow_pass/presentation/search_screen/controller/search_control
 import 'package:yellow_pass/routes/app_routes.dart';
 import 'package:yellow_pass/widgets/custom_image_view.dart';
 import 'package:yellow_pass/widgets/shimmer_widget.dart';
+import '../../core/utils/color_constant.dart';
 import 'package:yellow_pass/data/models/cafe_response_model.dart';
+import '../../ApiServices/api_end_points.dart';
 
 class SearchScreen extends GetView<SearchScreenController> {
   const SearchScreen({super.key});
@@ -14,7 +16,8 @@ class SearchScreen extends GetView<SearchScreenController> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark ? const Color(0xFF121212) : const Color(0xFFFAFAFA);
+    final backgroundColor =
+        isDark ? const Color(0xFF121212) : const Color(0xFFFAFAFA);
     final textColor = isDark ? Colors.white : Colors.black;
     final subTextColor = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
     final cardColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
@@ -40,11 +43,13 @@ class SearchScreen extends GetView<SearchScreenController> {
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   itemCount: controller.searchResults.length,
                   itemBuilder: (context, index) {
                     final cafe = controller.searchResults[index];
-                    return _buildSearchResultItem(context, cafe, isDark, textColor, subTextColor, cardColor);
+                    return _buildSearchResultItem(context, cafe, isDark,
+                        textColor, subTextColor, cardColor);
                   },
                 );
               }),
@@ -84,10 +89,9 @@ class SearchScreen extends GetView<SearchScreenController> {
                       onChanged: controller.onSearchChanged,
                       autofocus: true,
                       style: TextStyle(color: textColor),
-                      decoration:  InputDecoration(
+                      decoration: InputDecoration(
                         hintText: "Search cafe, co-workers...",
                         hintStyle: TextStyle(color: textColor.withOpacity(0.8)),
-
                         border: InputBorder.none,
                         isDense: true,
                         contentPadding: EdgeInsets.zero,
@@ -97,7 +101,8 @@ class SearchScreen extends GetView<SearchScreenController> {
                   Obx(() => controller.updateSearchQuery.value.isNotEmpty
                       ? GestureDetector(
                           onTap: controller.clearSearch,
-                          child: Icon(Icons.close, color: Colors.grey, size: 20),
+                          child:
+                              Icon(Icons.close, color: Colors.grey, size: 20),
                         )
                       : const SizedBox.shrink()),
                 ],
@@ -109,21 +114,27 @@ class SearchScreen extends GetView<SearchScreenController> {
     );
   }
 
-  Widget _buildSearchResultItem(BuildContext context, Cafe cafe, bool isDark, Color textColor, Color subTextColor, Color cardColor) {
+  Widget _buildSearchResultItem(BuildContext context, Cafe cafe, bool isDark,
+      Color textColor, Color subTextColor, Color cardColor) {
     return GestureDetector(
-      onTap: () => Get.toNamed(AppRoutes.cafeDetailsScreenRoute, arguments: cafe),
+      onTap: () =>
+          Get.toNamed(AppRoutes.cafeDetailsScreenRoute, arguments: cafe),
       child: Container(
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
           color: cardColor,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey.withOpacity(0.2),
+            color: isDark
+                ? Colors.white.withOpacity(0.1)
+                : Colors.grey.withOpacity(0.2),
             width: 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: isDark ? Colors.black.withOpacity(0.3) : Colors.grey.withOpacity(0.15),
+              color: isDark
+                  ? Colors.black.withOpacity(0.3)
+                  : Colors.grey.withOpacity(0.15),
               blurRadius: 20,
               offset: const Offset(0, 8),
               spreadRadius: 2,
@@ -136,19 +147,23 @@ class SearchScreen extends GetView<SearchScreenController> {
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(24)),
                   child: ShaderMask(
                     shaderCallback: (rect) {
                       return LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [Colors.black.withOpacity(0.0), Colors.black.withOpacity(0.3)],
+                        colors: [
+                          Colors.black.withOpacity(0.0),
+                          Colors.black.withOpacity(0.3)
+                        ],
                       ).createShader(rect);
                     },
                     blendMode: BlendMode.darken,
                     child: CustomImageView(
                       url: (cafe.photos != null && cafe.photos!.isNotEmpty)
-                          ? "https://api.yellowpass.in${cafe.photos![0]}"
+                          ? "${ApiEndPoints.imageBaseUrl}${cafe.photos![0]}"
                           : "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2047&auto=format&fit=crop",
                       height: 200,
                       width: double.infinity,
@@ -160,49 +175,58 @@ class SearchScreen extends GetView<SearchScreenController> {
                   top: 16,
                   right: 16,
                   child: Container(
-                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                     decoration: BoxDecoration(
-                       color: Colors.white.withOpacity(0.9),
-                       borderRadius: BorderRadius.circular(20),
-                       boxShadow: [
-                         BoxShadow(
-                           color: Colors.black.withOpacity(0.1),
-                           blurRadius: 8,
-                           offset: const Offset(0, 2),
-                         ),
-                       ],
-                     ),
-                     child: Row(
-                       mainAxisSize: MainAxisSize.min,
-                       children: [
-                         const Icon(Icons.star_rounded, color: Colors.amber, size: 16),
-                         const SizedBox(width: 4),
-                         Text(
-                           cafe.rating ?? "New",
-                           style: PMT.style(12, fontColor: Colors.black, fontWeight: FontWeight.bold),
-                         ),
-                       ],
-                     ),
-                   ),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.star_rounded,
+                            color: ColorConstant.primaryColor, size: 16),
+                        const SizedBox(width: 4),
+                        Text(
+                          cafe.rating ?? "New",
+                          style: PMT.style(12,
+                              fontColor: Colors.black,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 Positioned(
                   bottom: 16,
                   left: 16,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.6),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
+                      border: Border.all(
+                          color: Colors.white.withOpacity(0.2), width: 1),
                       // backdropFilter: null, // Removed BackdropFilter for performance in lists
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.chair_alt_rounded, color: Colors.white, size: 14),
+                        const Icon(Icons.chair_alt_rounded,
+                            color: Colors.white, size: 14),
                         const SizedBox(width: 6),
                         Text(
                           "${cafe.totalSeats ?? 0} Seats Available",
-                          style: PMT.style(12, fontColor: Colors.white, fontWeight: FontWeight.w600),
+                          style: PMT.style(12,
+                              fontColor: Colors.white,
+                              fontWeight: FontWeight.w600),
                         ),
                       ],
                     ),
@@ -225,19 +249,23 @@ class SearchScreen extends GetView<SearchScreenController> {
                           children: [
                             Text(
                               cafe.name ?? "Unknown Cafe",
-                              style: PMT.style(20, fontColor: textColor, fontWeight: FontWeight.bold),
+                              style: PMT.style(20,
+                                  fontColor: textColor,
+                                  fontWeight: FontWeight.bold),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 6),
                             Row(
                               children: [
-                                Icon(Icons.location_on_outlined, color: subTextColor, size: 16),
+                                Icon(Icons.location_on_outlined,
+                                    color: subTextColor, size: 16),
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(
                                     "${cafe.address}, ${cafe.city}",
-                                    style: PMT.style(13, fontColor: subTextColor),
+                                    style:
+                                        PMT.style(13, fontColor: subTextColor),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -248,14 +276,17 @@ class SearchScreen extends GetView<SearchScreenController> {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
                           color: Colors.green.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                           "\$${cafe.pricePerHour ?? '15'}/hr",
-                           style: PMT.style(16, fontColor: Colors.green, fontWeight: FontWeight.bold),
+                          "\$${cafe.pricePerHour ?? '15'}/hr",
+                          style: PMT.style(16,
+                              fontColor: Colors.green,
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
@@ -269,11 +300,15 @@ class SearchScreen extends GetView<SearchScreenController> {
                           spacing: 8,
                           runSpacing: 8,
                           children: [
-                            _buildMiniChip("Wifi", Icons.wifi, isDark, subTextColor),
-                            if (cafe.amenities != null && cafe.amenities!.contains("Coffee"))
-                               _buildMiniChip("Coffee", Icons.coffee, isDark, subTextColor)
-                            else 
-                               _buildMiniChip("Power", Icons.bolt, isDark, subTextColor),
+                            _buildMiniChip(
+                                "Wifi", Icons.wifi, isDark, subTextColor),
+                            if (cafe.amenities != null &&
+                                cafe.amenities!.contains("Coffee"))
+                              _buildMiniChip(
+                                  "Coffee", Icons.coffee, isDark, subTextColor)
+                            else
+                              _buildMiniChip(
+                                  "Power", Icons.bolt, isDark, subTextColor),
                           ],
                         ),
                       ),
@@ -301,13 +336,15 @@ class SearchScreen extends GetView<SearchScreenController> {
     );
   }
 
-  Widget _buildMiniChip(String label, IconData icon, bool isDark, Color textColor) {
+  Widget _buildMiniChip(
+      String label, IconData icon, bool isDark, Color textColor) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF2C2C2C) : Colors.grey.shade100,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
+        border: Border.all(
+            color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -337,18 +374,19 @@ class SearchScreen extends GetView<SearchScreenController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const ShimmerWidget.rectangular(height: 180, width: double.infinity),
+              const ShimmerWidget.rectangular(
+                  height: 180, width: double.infinity),
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                       children: const [
-                          ShimmerWidget.rectangular(height: 20, width: 150),
-                          ShimmerWidget.rectangular(height: 20, width: 60),
-                       ],
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: const [
+                        ShimmerWidget.rectangular(height: 20, width: 150),
+                        ShimmerWidget.rectangular(height: 20, width: 60),
+                      ],
                     ),
                     const SizedBox(height: 10),
                     const ShimmerWidget.rectangular(height: 14, width: 200),
@@ -386,7 +424,9 @@ class SearchScreen extends GetView<SearchScreenController> {
           const SizedBox(height: 20),
           Text(
             "Find Your Perfect Workspace",
-            style: PMT.style(18, fontColor: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold),
+            style: PMT.style(18,
+                fontColor: isDark ? Colors.white : Colors.black,
+                fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
@@ -410,12 +450,15 @@ class SearchScreen extends GetView<SearchScreenController> {
               color: isDark ? const Color(0xFF2C2C2C) : Colors.red.shade50,
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.search_off_rounded, size: 50, color: Colors.red.shade300),
+            child: Icon(Icons.search_off_rounded,
+                size: 50, color: Colors.red.shade300),
           ),
           const SizedBox(height: 20),
           Text(
             "No Results Found",
-            style: PMT.style(18, fontColor: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold),
+            style: PMT.style(18,
+                fontColor: isDark ? Colors.white : Colors.black,
+                fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(

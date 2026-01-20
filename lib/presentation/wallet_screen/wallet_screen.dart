@@ -2,9 +2,10 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:yellow_pass/presentation/wallet_screen/recharge_screen.dart';
+import 'package:yellow_pass/core/utils/color_constant.dart';
 import 'controller/wallet_screen_controller.dart';
 
-class WalletScreen extends StatefulWidget{
+class WalletScreen extends StatefulWidget {
 // GetWidget<WalletScreenController> {
   const WalletScreen({super.key});
 
@@ -19,8 +20,9 @@ class _WalletScreenState extends State<WalletScreen> {
   void initState() {
     super.initState();
     controller = Get.put(WalletScreenController());
-controller.fetchUserBalance();
+    controller.fetchUserBalance();
   }
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -86,7 +88,7 @@ controller.fetchUserBalance();
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.yellow,
+                        color: ColorConstant.primaryColor,
                       ),
                     ),
                   ],
@@ -98,7 +100,8 @@ controller.fetchUserBalance();
               context,
               icon: Icons.people,
               title: "Refer a Friend",
-              subtitle: "Share this application with your friends and get 2 yellow coins on their registeration.",
+              subtitle:
+                  "Share this application with your friends and get 2 yellow coins on their registeration.",
               delay: 800,
             ),
             const SizedBox(height: 16),
@@ -143,7 +146,8 @@ controller.fetchUserBalance();
                   color: isDarkMode ? const Color(0xFF3C3C3C) : Colors.white,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(Icons.monetization_on, color: Colors.yellow, size: 30),
+                child: Icon(Icons.monetization_on,
+                    color: ColorConstant.primaryColor, size: 30),
               ),
               const SizedBox(width: 16),
               Column(
@@ -153,25 +157,27 @@ controller.fetchUserBalance();
                     "Available Token Balance",
                     style: TextStyle(
                       fontSize: 12,
-                      color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                      color: isDarkMode
+                          ? Colors.grey.shade400
+                          : Colors.grey.shade600,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Obx(() => Text(
-                    "${controller.balance.value}",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.black,
-                    ),
-                  )),
+                        "${controller.balance.value}",
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: isDarkMode ? Colors.white : Colors.black,
+                        ),
+                      )),
                 ],
               ),
             ],
           ),
           ElevatedButton(
             onPressed: () {
-               Get.to(() => const RechargeScreen());
+              Get.to(() => const RechargeScreen());
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: isDarkMode ? Colors.white : Colors.black,
@@ -212,7 +218,8 @@ controller.fetchUserBalance();
               children: [
                 Icon(
                   Icons.history,
-                  color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                  color:
+                      isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -235,7 +242,11 @@ controller.fetchUserBalance();
     );
   }
 
-  Widget _buildEarnMoreItem(BuildContext context, {required IconData icon, required String title, required String subtitle, required int delay}) {
+  Widget _buildEarnMoreItem(BuildContext context,
+      {required IconData icon,
+      required String title,
+      required String subtitle,
+      required int delay}) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return FadeInUp(
@@ -278,7 +289,9 @@ controller.fetchUserBalance();
                     subtitle,
                     style: TextStyle(
                       fontSize: 12,
-                      color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                      color: isDarkMode
+                          ? Colors.grey.shade400
+                          : Colors.grey.shade600,
                     ),
                   ),
                 ],

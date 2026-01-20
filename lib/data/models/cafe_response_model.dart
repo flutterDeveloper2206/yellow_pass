@@ -63,7 +63,7 @@ class Cafe {
   dynamic averageRating;
   int? totalReviews;
   List<String>? timings;
-  List<dynamic>? menuItems;
+  List<MenuItem>? menuItems;
   List<Ads>? ads;
 
   Cafe(
@@ -128,7 +128,12 @@ class Cafe {
     averageRating = json['average_rating'];
     totalReviews = json['total_reviews'];
     timings = json['timings']?.cast<String>();
-    menuItems = json['menu_items'];
+    if (json['menu_items'] != null) {
+      menuItems = <MenuItem>[];
+      json['menu_items'].forEach((v) {
+        menuItems!.add(MenuItem.fromJson(v));
+      });
+    }
     owner = json['owner'] != null ? User.fromJson(json['owner']) : null;
     if (json['tables'] != null) {
       tables = <CafeTable>[];
@@ -179,7 +184,9 @@ class Cafe {
     data['average_rating'] = averageRating;
     data['total_reviews'] = totalReviews;
     data['timings'] = timings;
-    data['menu_items'] = menuItems;
+    if (menuItems != null) {
+      data['menu_items'] = menuItems!.map((v) => v.toJson()).toList();
+    }
     if (owner != null) {
       data['owner'] = owner!.toJson();
     }
@@ -192,6 +199,59 @@ class Cafe {
     if (ads != null) {
       data['ads'] = ads!.map((v) => v.toJson()).toList();
     }
+    return data;
+  }
+}
+
+class MenuItem {
+  String? id;
+  String? cafeId;
+  String? name;
+  String? description;
+  String? category;
+  String? price;
+  String? imageUrl;
+  bool? isActive;
+  String? createdAt;
+  String? updatedAt;
+
+  MenuItem(
+      {this.id,
+      this.cafeId,
+      this.name,
+      this.description,
+      this.category,
+      this.price,
+      this.imageUrl,
+      this.isActive,
+      this.createdAt,
+      this.updatedAt});
+
+  MenuItem.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    cafeId = json['cafe_id'];
+    name = json['name'];
+    description = json['description'];
+    category = json['category'];
+    price = json['price'];
+    imageUrl = json['image_url'];
+    isActive = json['is_active'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['cafe_id'] = cafeId;
+    data['name'] = name;
+    data['description'] = description;
+    data['category'] = category;
+    data['price'] = price;
+    data['image_url'] = imageUrl;
+    data['is_active'] = isActive;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
     return data;
   }
 }

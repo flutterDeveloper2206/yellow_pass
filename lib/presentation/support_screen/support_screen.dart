@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:yellow_pass/core/utils/app_fonts.dart';
 import 'package:yellow_pass/presentation/support_screen/controller/support_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:yellow_pass/core/utils/color_constant.dart';
 
 class SupportScreen extends GetView<SupportController> {
   const SupportScreen({super.key});
@@ -11,7 +12,8 @@ class SupportScreen extends GetView<SupportController> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark ? const Color(0xFF121212) : const Color(0xFFFAFAFA);
+    final backgroundColor =
+        isDark ? const Color(0xFF121212) : const Color(0xFFFAFAFA);
     final textColor = isDark ? Colors.white : Colors.black;
     final subTextColor = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
     final cardColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
@@ -46,7 +48,8 @@ class SupportScreen extends GetView<SupportController> {
                     children: [
                       Text(
                         "How can we help you?",
-                        style: PMT.style(24, fontColor: textColor, fontWeight: FontWeight.bold),
+                        style: PMT.style(24,
+                            fontColor: textColor, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -54,7 +57,6 @@ class SupportScreen extends GetView<SupportController> {
                         style: PMT.style(14, fontColor: subTextColor),
                       ),
                       const SizedBox(height: 30),
-                      
                       _buildContactCard(
                         context,
                         icon: Icons.email_outlined,
@@ -64,7 +66,6 @@ class SupportScreen extends GetView<SupportController> {
                         cardColor: cardColor,
                         onTap: () => _launchUrl("mailto:${info.email}"),
                       ),
-                      
                       _buildContactCard(
                         context,
                         icon: Icons.phone_outlined,
@@ -74,7 +75,6 @@ class SupportScreen extends GetView<SupportController> {
                         cardColor: cardColor,
                         onTap: () => _launchUrl("tel:${info.phone}"),
                       ),
-                      
                       _buildContactCard(
                         context,
                         icon: Icons.location_on_outlined,
@@ -83,14 +83,14 @@ class SupportScreen extends GetView<SupportController> {
                         isDark: isDark,
                         cardColor: cardColor,
                       ),
-                      
                       const SizedBox(height: 20),
-                      _buildSupportHours(context, info.address ?? "", isDark, cardColor),
-                      
+                      _buildSupportHours(
+                          context, info.address ?? "", isDark, cardColor),
                       const SizedBox(height: 30),
                       Text(
                         "Follow Us",
-                        style: PMT.style(18, fontColor: textColor, fontWeight: FontWeight.bold),
+                        style: PMT.style(18,
+                            fontColor: textColor, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 16),
                       _buildSocialMediaRow(info.socialMedia),
@@ -117,14 +117,21 @@ class SupportScreen extends GetView<SupportController> {
           const SizedBox(width: 8),
           Text(
             "Customer Support",
-            style: PMT.style(18, fontColor: textColor, fontWeight: FontWeight.bold),
+            style: PMT.style(18,
+                fontColor: textColor, fontWeight: FontWeight.bold),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildContactCard(BuildContext context, {required IconData icon, required String title, required String value, required bool isDark, required Color cardColor, VoidCallback? onTap}) {
+  Widget _buildContactCard(BuildContext context,
+      {required IconData icon,
+      required String title,
+      required String value,
+      required bool isDark,
+      required Color cardColor,
+      VoidCallback? onTap}) {
     final textColor = isDark ? Colors.white : Colors.black;
     final subTextColor = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
 
@@ -136,23 +143,25 @@ class SupportScreen extends GetView<SupportController> {
         decoration: BoxDecoration(
           color: cardColor,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: isDark ? [] : [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          boxShadow: isDark
+              ? []
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.yellow.withOpacity(0.1),
+                color: ColorConstant.primaryColor.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: Colors.yellow, size: 24),
+              child: Icon(icon, color: ColorConstant.primaryColor, size: 24),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -166,7 +175,8 @@ class SupportScreen extends GetView<SupportController> {
                   const SizedBox(height: 4),
                   Text(
                     value,
-                    style: PMT.style(14, fontColor: textColor, fontWeight: FontWeight.w600),
+                    style: PMT.style(14,
+                        fontColor: textColor, fontWeight: FontWeight.w600),
                   ),
                 ],
               ),
@@ -179,20 +189,22 @@ class SupportScreen extends GetView<SupportController> {
     );
   }
 
-  Widget _buildSupportHours(BuildContext context, String hours, bool isDark, Color cardColor) {
+  Widget _buildSupportHours(
+      BuildContext context, String hours, bool isDark, Color cardColor) {
     final textColor = isDark ? Colors.white : Colors.black;
     final subTextColor = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.yellow.withOpacity(0.05),
+        color: ColorConstant.primaryColor.withOpacity(0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.yellow.withOpacity(0.2)),
+        border: Border.all(color: ColorConstant.primaryColor.withOpacity(0.2)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.access_time, color: Colors.yellow, size: 20),
+          const Icon(Icons.access_time,
+              color: ColorConstant.primaryColor, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -205,7 +217,8 @@ class SupportScreen extends GetView<SupportController> {
                 const SizedBox(height: 4),
                 Text(
                   hours,
-                  style: PMT.style(14, fontColor: textColor, fontWeight: FontWeight.w500),
+                  style: PMT.style(14,
+                      fontColor: textColor, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -217,17 +230,20 @@ class SupportScreen extends GetView<SupportController> {
 
   Widget _buildSocialMediaRow(socialMedia) {
     if (socialMedia == null) return const SizedBox();
-    
+
     return Row(
       children: [
         if (socialMedia.facebook != null)
           _buildSocialIcon(Icons.facebook, Colors.blue, socialMedia.facebook),
         if (socialMedia.twitter != null)
-          _buildSocialIcon(Icons.alternate_email, Colors.lightBlue, socialMedia.twitter),
+          _buildSocialIcon(
+              Icons.alternate_email, Colors.lightBlue, socialMedia.twitter),
         if (socialMedia.instagram != null)
-          _buildSocialIcon(Icons.camera_alt_outlined, Colors.pink, socialMedia.instagram),
+          _buildSocialIcon(
+              Icons.camera_alt_outlined, Colors.pink, socialMedia.instagram),
         if (socialMedia.linkedin != null)
-          _buildSocialIcon(Icons.work_outline, Colors.blue.shade800, socialMedia.linkedin),
+          _buildSocialIcon(
+              Icons.work_outline, Colors.blue.shade800, socialMedia.linkedin),
       ],
     );
   }

@@ -1,4 +1,3 @@
-
 import 'package:yellow_pass/presentation/dashboard_screen/binding/dashboard_screen_binding.dart';
 import 'package:yellow_pass/presentation/dashboard_screen/dashboard_screen.dart';
 import 'package:yellow_pass/presentation/home_screen/binding/home_screen_binding.dart';
@@ -7,7 +6,6 @@ import 'package:yellow_pass/presentation/login_screen/binding/login_screen_bindi
 import 'package:yellow_pass/presentation/login_screen/login_screen.dart';
 import 'package:yellow_pass/presentation/network_screen/binding/network_screen_binding.dart';
 import 'package:yellow_pass/presentation/network_screen/network_screen.dart';
-import 'package:yellow_pass/presentation/notification_screen/binding/notification_screen_binding.dart';
 import 'package:yellow_pass/presentation/notification_screen/notification_screen.dart';
 import 'package:yellow_pass/presentation/onboarding_screen/binding/onboarding_screen_binding.dart';
 import 'package:yellow_pass/presentation/profile_screen/binding/profile_screen_binding.dart';
@@ -28,7 +26,6 @@ import 'package:yellow_pass/presentation/cafe_book_screen/cafe_book_screen.dart'
 import 'package:yellow_pass/presentation/my_bookings_screen/binding/my_bookings_binding.dart';
 import 'package:yellow_pass/presentation/my_bookings_screen/my_bookings_screen.dart';
 import 'package:yellow_pass/presentation/notification_screen/binding/notification_binding.dart';
-import 'package:yellow_pass/presentation/notification_screen/notification_screen.dart';
 import 'package:yellow_pass/presentation/profile_details_screen/binding/profile_details_binding.dart';
 import 'package:yellow_pass/presentation/profile_details_screen/profile_details_screen.dart';
 import 'package:yellow_pass/presentation/settings_screen/binding/settings_binding.dart';
@@ -53,6 +50,16 @@ import 'package:yellow_pass/presentation/search_screen/binding/search_binding.da
 import 'package:yellow_pass/presentation/search_screen/search_screen.dart';
 import 'package:yellow_pass/presentation/check_in_otp_screen/binding/check_in_otp_binding.dart';
 import 'package:yellow_pass/presentation/check_in_otp_screen/check_in_otp_screen.dart';
+import 'package:yellow_pass/presentation/subscription_screen/binding/subscription_binding.dart';
+import 'package:yellow_pass/presentation/subscription_screen/subscription_screen.dart';
+import 'package:yellow_pass/presentation/menu_screen/binding/menu_binding.dart';
+import 'package:yellow_pass/presentation/menu_screen/menu_screen.dart';
+import 'package:yellow_pass/presentation/my_orders_screen/binding/my_orders_binding.dart';
+import 'package:yellow_pass/presentation/my_orders_screen/my_orders_screen.dart';
+import 'package:yellow_pass/presentation/other_profile_screen/binding/other_profile_binding.dart';
+import 'package:yellow_pass/presentation/other_profile_screen/other_profile_screen.dart';
+import 'package:yellow_pass/presentation/meeting_requests_screen/binding/meeting_requests_binding.dart';
+import 'package:yellow_pass/presentation/meeting_requests_screen/meeting_requests_screen.dart';
 
 class AppRoutes {
   static const String splashScreenRoute = '/splash_screen';
@@ -80,6 +87,11 @@ class AppRoutes {
   static const String supportScreenRoute = '/support_screen';
   static const String searchScreenRoute = '/search_screen';
   static const String checkInOtpScreenRoute = '/check_in_otp_screen';
+  static const String subscriptionScreenRoute = '/subscription_screen';
+  static const String menuScreenRoute = '/menu_screen';
+  static const String myOrdersScreenRoute = '/my_orders_screen';
+  static const String otherProfileScreenRoute = '/other_profile_screen';
+  static const String meetingRequestsScreenRoute = '/meeting_requests_screen';
 
   static List<GetPage> pages = [
     GetPage(
@@ -116,7 +128,7 @@ class AppRoutes {
         transitionDuration: const Duration(milliseconds: 300)),
     GetPage(
         name: dashboardScreenRoute,
-        page: () =>  DashboardScreen(),
+        page: () => DashboardScreen(),
         bindings: [
           DashboardScreenBinding(),
         ],
@@ -148,7 +160,7 @@ class AppRoutes {
         transitionDuration: const Duration(milliseconds: 300)),
     GetPage(
         name: onBoardingRoute,
-        page: () =>  OnboardingScreen(),
+        page: () => OnboardingScreen(),
         bindings: [
           OnboardingScreenBinding(),
         ],
@@ -294,6 +306,51 @@ class AppRoutes {
       page: () => const CheckInOtpScreen(),
       bindings: [
         CheckInOtpBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: subscriptionScreenRoute,
+      page: () => const SubscriptionScreen(),
+      bindings: [
+        SubscriptionBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: menuScreenRoute,
+      page: () => const MenuScreen(),
+      bindings: [
+        MenuBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: myOrdersScreenRoute,
+      page: () => const MyOrdersScreen(),
+      bindings: [
+        MyOrdersBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: otherProfileScreenRoute,
+      page: () => const OtherProfileScreen(),
+      bindings: [
+        OtherProfileBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: meetingRequestsScreenRoute,
+      page: () => const MeetingRequestsScreen(),
+      bindings: [
+        MeetingRequestsBinding(),
       ],
       transition: Transition.rightToLeft,
       transitionDuration: const Duration(milliseconds: 300),

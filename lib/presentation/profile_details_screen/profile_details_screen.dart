@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:yellow_pass/core/utils/app_fonts.dart';
 import 'package:yellow_pass/presentation/profile_details_screen/controller/profile_details_controller.dart';
+import 'package:yellow_pass/core/utils/color_constant.dart';
 
 class ProfileDetailsScreen extends GetView<ProfileDetailsController> {
   const ProfileDetailsScreen({super.key});
@@ -12,14 +13,15 @@ class ProfileDetailsScreen extends GetView<ProfileDetailsController> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     // Define colors based on screenshot
-    final backgroundColor = isDark ? const Color(0xFF121212) : const Color(0xFFFAFAFA);
+    final backgroundColor =
+        isDark ? const Color(0xFF121212) : const Color(0xFFFAFAFA);
     final textColor = isDark ? Colors.white : Colors.black;
     final subTextColor = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
     final cardColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
     final inputFillColor = isDark ? const Color(0xFF2C2C2C) : Colors.white;
-    final accentColor =  Colors.yellow; // Yellow
+    final accentColor = ColorConstant.primaryColor; // Yellow
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -30,9 +32,11 @@ class ProfileDetailsScreen extends GetView<ProfileDetailsController> {
             children: [
               _buildAppBar(context, textColor, isDark),
               const SizedBox(height: 30),
-              _buildProfileHeader(context, textColor, subTextColor, accentColor),
+              _buildProfileHeader(
+                  context, textColor, subTextColor, accentColor),
               const SizedBox(height: 30),
-              _buildForm(context, isDark, textColor, subTextColor, inputFillColor, accentColor),
+              _buildForm(context, isDark, textColor, subTextColor,
+                  inputFillColor, accentColor),
               const SizedBox(height: 40),
               _buildActionButton(context, isDark, textColor, accentColor),
               const SizedBox(height: 20),
@@ -55,13 +59,14 @@ class ProfileDetailsScreen extends GetView<ProfileDetailsController> {
             ),
             const SizedBox(width: 8),
             Obx(() => AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: Text(
-                controller.isEditing.value ? "Edit Details" : "My Details",
-                key: ValueKey(controller.isEditing.value),
-                style: PMT.style(18, fontColor: textColor, fontWeight: FontWeight.bold),
-              ),
-            )),
+                  duration: const Duration(milliseconds: 300),
+                  child: Text(
+                    controller.isEditing.value ? "Edit Details" : "My Details",
+                    key: ValueKey(controller.isEditing.value),
+                    style: PMT.style(18,
+                        fontColor: textColor, fontWeight: FontWeight.bold),
+                  ),
+                )),
           ],
         ),
         const Row(
@@ -73,7 +78,8 @@ class ProfileDetailsScreen extends GetView<ProfileDetailsController> {
     );
   }
 
-  Widget _buildProfileHeader(BuildContext context, Color textColor, Color subTextColor, Color accentColor) {
+  Widget _buildProfileHeader(BuildContext context, Color textColor,
+      Color subTextColor, Color accentColor) {
     return Column(
       children: [
         Stack(
@@ -83,10 +89,7 @@ class ProfileDetailsScreen extends GetView<ProfileDetailsController> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: accentColor, 
-                  width: 2, 
-                  style: BorderStyle.solid 
-                ),
+                    color: accentColor, width: 2, style: BorderStyle.solid),
               ),
               child: Obx(() {
                 if (controller.profileImage.value != null) {
@@ -94,10 +97,14 @@ class ProfileDetailsScreen extends GetView<ProfileDetailsController> {
                     radius: 50,
                     backgroundImage: FileImage(controller.profileImage.value!),
                   );
-                } else if (controller.userData['profile_picture'] != null && controller.userData['profile_picture'].toString().isNotEmpty) {
+                } else if (controller.userData['profile_picture'] != null &&
+                    controller.userData['profile_picture']
+                        .toString()
+                        .isNotEmpty) {
                   return CircleAvatar(
                     radius: 50,
-                    backgroundImage: NetworkImage("${controller.userData['profile_picture']}"),
+                    backgroundImage: NetworkImage(
+                        "${controller.userData['profile_picture']}"),
                   );
                 } else {
                   return const CircleAvatar(
@@ -133,117 +140,126 @@ class ProfileDetailsScreen extends GetView<ProfileDetailsController> {
         ),
         const SizedBox(height: 16),
         Obx(() => Text(
-          controller.userData['name'] ?? "User Name",
-          style: PMT.style(20, fontColor: textColor, fontWeight: FontWeight.bold),
-        )),
+              controller.userData['name'] ?? "User Name",
+              style: PMT.style(20,
+                  fontColor: textColor, fontWeight: FontWeight.bold),
+            )),
         const SizedBox(height: 4),
         Obx(() => Text(
-          controller.userData['email'] ?? "Email ID",
-          style: PMT.style(14, fontColor: subTextColor),
-        )),
+              controller.userData['email'] ?? "Email ID",
+              style: PMT.style(14, fontColor: subTextColor),
+            )),
         const SizedBox(height: 12),
-        // Bio is moved to form in this design, but kept short description here if needed, 
-        // or we can hide it if it's redundant with the form field. 
+        // Bio is moved to form in this design, but kept short description here if needed,
+        // or we can hide it if it's redundant with the form field.
         // Based on screenshot, the bio text is below title in View mode, but inside field in Edit mode?
         // Actually screenshot shows Bio field. Let's keep the header simple.
-        Obx(() => controller.isEditing.value 
-          ? const SizedBox.shrink()
-          : Column(
-              children: [
-                Obx(() => Text(
-                  controller.userData['description'] ?? "No Bio Added",
-                  textAlign: TextAlign.center,
-                  style: PMT.style(11, fontColor: subTextColor, fontWeight: FontWeight.w400),
-                )),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(4),
+        Obx(() => controller.isEditing.value
+            ? const SizedBox.shrink()
+            : Column(
+                children: [
+                  Obx(() => Text(
+                        controller.userData['description'] ?? "No Bio Added",
+                        textAlign: TextAlign.center,
+                        style: PMT.style(11,
+                            fontColor: subTextColor,
+                            fontWeight: FontWeight.w400),
+                      )),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.verified,
+                            size: 16, color: Colors.green),
+                        const SizedBox(width: 4),
+                        Text(
+                          "Verified",
+                          style: PMT.style(12,
+                              fontColor: Colors.green,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.verified, size: 16, color: Colors.green),
-                      const SizedBox(width: 4),
-                      Text(
-                        "Verified",
-                        style: PMT.style(12, fontColor: Colors.green, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            )
-        ),
+                ],
+              )),
       ],
     );
   }
 
-  Widget _buildForm(BuildContext context, bool isDark, Color textColor, Color subTextColor, Color inputFillColor, Color accentColor) {
+  Widget _buildForm(BuildContext context, bool isDark, Color textColor,
+      Color subTextColor, Color inputFillColor, Color accentColor) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Bio Field (Only visible in Edit mode based on screenshot flow, or always visible? 
+        // Bio Field (Only visible in Edit mode based on screenshot flow, or always visible?
         // Screenshot shows "Bio" label in Edit mode. In View mode it's under the profile pic.
         // Let's make it always visible in form for consistency or follow screenshot strictly.)
         // Screenshot 3 (Edit Details) shows Bio field. Screenshot 1 (My Details) shows text under profile.
         // So we toggle visibility of the Bio FIELD.
         Obx(() => AnimatedCrossFade(
-          firstChild: const SizedBox.shrink(),
-          secondChild: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Bio", style: PMT.style(12, fontColor: subTextColor)),
-              const SizedBox(height: 8),
-              _buildTextField(
-                controller: controller.bioController,
-                isDark: isDark,
-                textColor: textColor,
-                fillColor: inputFillColor,
-                maxLines: 4,
-                enabled: true, // Always enabled if visible in edit mode
+              firstChild: const SizedBox.shrink(),
+              secondChild: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Bio", style: PMT.style(12, fontColor: subTextColor)),
+                  const SizedBox(height: 8),
+                  _buildTextField(
+                    controller: controller.bioController,
+                    isDark: isDark,
+                    textColor: textColor,
+                    fillColor: inputFillColor,
+                    maxLines: 4,
+                    enabled: true, // Always enabled if visible in edit mode
+                  ),
+                  const SizedBox(height: 20),
+                ],
               ),
-              const SizedBox(height: 20),
-            ],
-          ),
-          crossFadeState: controller.isEditing.value ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-          duration: const Duration(milliseconds: 300),
-        )),
+              crossFadeState: controller.isEditing.value
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
+              duration: const Duration(milliseconds: 300),
+            )),
 
         Text("Full Name", style: PMT.style(12, fontColor: subTextColor)),
         const SizedBox(height: 8),
         Obx(() => _buildTextField(
-          controller: controller.nameController,
-          isDark: isDark,
-          textColor: textColor,
-          fillColor: inputFillColor,
-          enabled: controller.isEditing.value,
-        )),
+              controller: controller.nameController,
+              isDark: isDark,
+              textColor: textColor,
+              fillColor: inputFillColor,
+              enabled: controller.isEditing.value,
+            )),
         const SizedBox(height: 20),
 
         Text("Mobile Number", style: PMT.style(12, fontColor: subTextColor)),
         const SizedBox(height: 8),
         Obx(() => _buildTextField(
-          controller: controller.mobileController,
-          isDark: isDark,
-          textColor: textColor,
-          fillColor: inputFillColor,
-          enabled: controller.isEditing.value,
-        )),
+              controller: controller.mobileController,
+              isDark: isDark,
+              textColor: textColor,
+              fillColor: inputFillColor,
+              enabled: controller.isEditing.value,
+            )),
         const SizedBox(height: 20),
 
         Text("Email ID", style: PMT.style(12, fontColor: subTextColor)),
         const SizedBox(height: 8),
         Obx(() => _buildTextField(
-          controller: controller.emailController,
-          isDark: isDark,
-          textColor: textColor,
-          fillColor: inputFillColor,
-          enabled: controller.isEditing.value,
-        )),
+              controller: controller.emailController,
+              isDark: isDark,
+              textColor: textColor,
+              fillColor: inputFillColor,
+              enabled: controller.isEditing.value,
+            )),
       ],
     );
   }
@@ -262,17 +278,19 @@ class ProfileDetailsScreen extends GetView<ProfileDetailsController> {
         color: fillColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: enabled 
-              ? (isDark ? Colors.grey.shade600 : Colors.grey.shade300) 
+          color: enabled
+              ? (isDark ? Colors.grey.shade600 : Colors.grey.shade300)
               : Colors.transparent,
         ),
-        boxShadow: enabled || isDark ? [] : [
-           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: enabled || isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
       ),
       child: TextField(
         controller: controller,
@@ -288,48 +306,53 @@ class ProfileDetailsScreen extends GetView<ProfileDetailsController> {
     );
   }
 
-  Widget _buildActionButton(BuildContext context, bool isDark, Color textColor, Color accentColor) {
+  Widget _buildActionButton(
+      BuildContext context, bool isDark, Color textColor, Color accentColor) {
     return Obx(() => SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: ElevatedButton(
-        onPressed: controller.isUpdating.value ? null : () {
-          controller.toggleEditMode();
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: controller.isEditing.value 
-              ? (isDark ? Colors.white : Colors.black) 
-              : (isDark ? Colors.white : Colors.black),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
-          ),
-          elevation: 0,
-        ),
-        child: controller.isUpdating.value
-            ? SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    isDark ? Colors.black : Colors.white,
-                  ),
-                ),
-              )
-            : AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: Text(
-                  controller.isEditing.value ? "Update Profile" : "Edit Profile",
-                  key: ValueKey(controller.isEditing.value),
-                  style: TextStyle(
-                    color: isDark ? Colors.black : Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+          width: double.infinity,
+          height: 56,
+          child: ElevatedButton(
+            onPressed: controller.isUpdating.value
+                ? null
+                : () {
+                    controller.toggleEditMode();
+                  },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: controller.isEditing.value
+                  ? (isDark ? Colors.white : Colors.black)
+                  : (isDark ? Colors.white : Colors.black),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(28),
               ),
-      ),
-    ));
+              elevation: 0,
+            ),
+            child: controller.isUpdating.value
+                ? SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        isDark ? Colors.black : Colors.white,
+                      ),
+                    ),
+                  )
+                : AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: Text(
+                      controller.isEditing.value
+                          ? "Update Profile"
+                          : "Edit Profile",
+                      key: ValueKey(controller.isEditing.value),
+                      style: TextStyle(
+                        color: isDark ? Colors.black : Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+          ),
+        ));
   }
 
   void _showImagePickerOptions(BuildContext context) {

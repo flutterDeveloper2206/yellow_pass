@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:yellow_pass/routes/app_routes.dart';
 import 'package:yellow_pass/widgets/custom_image_view.dart';
 import '../../core/utils/image_constant.dart';
+import 'package:yellow_pass/core/utils/color_constant.dart';
 import 'controller/login_screen_controller.dart';
 
 class LoginScreen extends GetWidget<LoginScreenController> {
@@ -40,12 +41,14 @@ class LoginScreen extends GetWidget<LoginScreenController> {
           Align(
             alignment: Alignment.bottomCenter,
             child: Obx(() {
-              final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+              final isDarkMode =
+                  Theme.of(context).brightness == Brightness.dark;
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 500),
                 curve: Curves.easeInOut,
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 30),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 25, vertical: 30),
                 decoration: BoxDecoration(
                   color: isDarkMode ? Colors.black87 : Colors.white,
                   borderRadius: const BorderRadius.only(
@@ -73,7 +76,7 @@ class LoginScreen extends GetWidget<LoginScreenController> {
 
   Widget _buildGetStartedView(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     return FadeInUp(
       duration: const Duration(milliseconds: 500),
       child: Column(
@@ -93,7 +96,7 @@ class LoginScreen extends GetWidget<LoginScreenController> {
               IconButton(
                 onPressed: () {}, // Close action if needed
                 icon: Icon(
-                  Icons.close, 
+                  Icons.close,
                   color: isDarkMode ? Colors.grey : Colors.grey.shade600,
                 ),
               )
@@ -170,7 +173,9 @@ class LoginScreen extends GetWidget<LoginScreenController> {
                 Text(
                   "By Continuing you agree to Yellowspace's",
                   style: TextStyle(
-                    color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                    color: isDarkMode
+                        ? Colors.grey.shade400
+                        : Colors.grey.shade600,
                     fontSize: 12,
                   ),
                 ),
@@ -180,7 +185,7 @@ class LoginScreen extends GetWidget<LoginScreenController> {
                   child: Text(
                     "Terms and Conditions & Privacy Policy",
                     style: TextStyle(
-                      color: Colors.yellow.shade600,
+                      color: ColorConstant.primaryColor,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
@@ -197,7 +202,7 @@ class LoginScreen extends GetWidget<LoginScreenController> {
 
   Widget _buildReferralView(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     return FadeInUp(
       duration: const Duration(milliseconds: 500),
       child: Column(
@@ -219,7 +224,7 @@ class LoginScreen extends GetWidget<LoginScreenController> {
                   controller.toggleReferralView();
                 },
                 icon: Icon(
-                  Icons.close, 
+                  Icons.close,
                   color: isDarkMode ? Colors.grey : Colors.grey.shade600,
                 ),
               )
@@ -303,7 +308,9 @@ class LoginScreen extends GetWidget<LoginScreenController> {
                 Text(
                   "By Continuing you agree to Yellowspace's",
                   style: TextStyle(
-                    color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                    color: isDarkMode
+                        ? Colors.grey.shade400
+                        : Colors.grey.shade600,
                     fontSize: 12,
                   ),
                 ),
@@ -313,7 +320,7 @@ class LoginScreen extends GetWidget<LoginScreenController> {
                   child: Text(
                     "Terms and Conditions & Privacy Policy",
                     style: TextStyle(
-                      color: Colors.yellow.shade600,
+                      color: ColorConstant.primaryColor,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:yellow_pass/core/utils/color_constant.dart';
+import 'package:yellow_pass/core/utils/app_fonts.dart';
+import 'package:yellow_pass/widgets/bouncing_button.dart';
 import 'package:yellow_pass/presentation/cafe_details_screen/controller/cafe_details_controller.dart';
 import 'package:yellow_pass/routes/app_routes.dart';
 import 'package:yellow_pass/widgets/custom_image_view.dart';
+import '../../ApiServices/api_end_points.dart';
+import '../../core/utils/color_constant.dart';
 
 class CafeDetailsScreen extends GetView<CafeDetailsController> {
   const CafeDetailsScreen({super.key});
@@ -48,7 +51,9 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
                             child: Text(
                               "${controller.cafeDiscount} on all coffee orders when you book through Yellow Space.",
                               style: TextStyle(
-                                color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700,
+                                color: isDarkMode
+                                    ? Colors.grey.shade400
+                                    : Colors.grey.shade700,
                                 fontSize: 14,
                               ),
                             ),
@@ -113,30 +118,31 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
               left: 0,
               right: 0,
               child: Obx(() => Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  controller.images.length,
-                  (index) => Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: controller.currentImageIndex.value == index
-                          ? Colors.white
-                          : Colors.white.withOpacity(0.5),
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      controller.images.length,
+                      (index) => Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: controller.currentImageIndex.value == index
+                              ? Colors.white
+                              : Colors.white.withOpacity(0.5),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              )),
+                  )),
             ),
             Positioned(
               top: 40,
               right: 16,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.yellow, // Yellow color
+                  color: ColorConstant.primaryColor, // Yellow color
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -186,12 +192,13 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
             ),
             Row(
               children: [
-                const Icon(Icons.star, color: Colors.yellow, size: 20),
+                const Icon(Icons.star,
+                    color: ColorConstant.primaryColor, size: 20),
                 const SizedBox(width: 4),
                 Text(
                   controller.cafeRating,
                   style: TextStyle(
-                    color: Colors.yellow,
+                    color: ColorConstant.primaryColor,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
@@ -203,13 +210,17 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
         const SizedBox(height: 4),
         Row(
           children: [
-            Icon(Icons.location_on, size: 16, color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600),
+            Icon(Icons.location_on,
+                size: 16,
+                color:
+                    isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600),
             const SizedBox(width: 4),
             Expanded(
               child: Text(
                 controller.cafeLocation,
                 style: TextStyle(
-                  color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                  color:
+                      isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
                   fontSize: 14,
                 ),
               ),
@@ -240,7 +251,8 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final cafe = controller.cafe.value;
 
-    if (cafe?.timings == null || cafe!.timings!.isEmpty) return const SizedBox();
+    if (cafe?.timings == null || cafe!.timings!.isEmpty)
+      return const SizedBox();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -260,7 +272,9 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
           decoration: BoxDecoration(
             color: isDarkMode ? Colors.grey.shade900 : Colors.grey.shade50,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200),
+            border: Border.all(
+                color:
+                    isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200),
           ),
           child: Column(
             children: cafe.timings!.map((timing) {
@@ -276,14 +290,17 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
                     Text(
                       day,
                       style: TextStyle(
-                        color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700,
+                        color: isDarkMode
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade700,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     Text(
                       time,
                       style: TextStyle(
-                        color: isDarkMode ? Colors.green : Colors.green.shade700,
+                        color:
+                            isDarkMode ? Colors.green : Colors.green.shade700,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -319,7 +336,7 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
               Text(
                 "${reviews.length} total",
                 style: TextStyle(
-                  color: Colors.yellow.shade700,
+                  color: ColorConstant.primaryColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -329,7 +346,9 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
         if (reviews.isEmpty)
           Text(
             "No reviews yet.",
-            style: TextStyle(color: isDarkMode ? Colors.grey.shade500 : Colors.grey.shade600),
+            style: TextStyle(
+                color:
+                    isDarkMode ? Colors.grey.shade500 : Colors.grey.shade600),
           )
         else
           ListView.separated(
@@ -344,7 +363,10 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
                 decoration: BoxDecoration(
                   color: isDarkMode ? Colors.grey.shade900 : Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200),
+                  border: Border.all(
+                      color: isDarkMode
+                          ? Colors.grey.shade800
+                          : Colors.grey.shade200),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -369,7 +391,8 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
                                 review.user?.name ?? "Anonymous",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: isDarkMode ? Colors.white : Colors.black,
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.black,
                                 ),
                               ),
                               Row(
@@ -378,7 +401,7 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
                                     Icons.star,
                                     size: 14,
                                     color: starIndex < (review.rating ?? 0)
-                                        ? Colors.yellow
+                                        ? ColorConstant.primaryColor
                                         : Colors.grey.shade400,
                                   );
                                 }),
@@ -390,7 +413,9 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
                           review.createdAt?.split('T')[0] ?? "",
                           style: TextStyle(
                             fontSize: 12,
-                            color: isDarkMode ? Colors.grey.shade500 : Colors.grey.shade500,
+                            color: isDarkMode
+                                ? Colors.grey.shade500
+                                : Colors.grey.shade500,
                           ),
                         ),
                       ],
@@ -399,7 +424,9 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
                     Text(
                       review.reviewText ?? "",
                       style: TextStyle(
-                        color: isDarkMode ? Colors.grey.shade300 : Colors.grey.shade800,
+                        color: isDarkMode
+                            ? Colors.grey.shade300
+                            : Colors.grey.shade800,
                         fontSize: 14,
                       ),
                     ),
@@ -410,12 +437,14 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: review.photos!.length,
-                          separatorBuilder: (context, index) => const SizedBox(width: 8),
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(width: 8),
                           itemBuilder: (context, index) {
                             return ClipRRect(
                               borderRadius: BorderRadius.circular(8),
                               child: CustomImageView(
-                                url: "https://api.yellowpass.in${review.photos![index]}",
+                                url:
+                                    "${ApiEndPoints.imageBaseUrl}${review.photos![index]}",
                                 height: 80,
                                 width: 80,
                                 fit: BoxFit.cover,
@@ -442,7 +471,8 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
 
     if (amenities.isEmpty) return const SizedBox();
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           "Amenities",
@@ -452,14 +482,18 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
             color: isDarkMode ? Colors.white : Colors.black,
           ),
         ),
-        SizedBox(height: 10,),
+        SizedBox(
+          height: 10,
+        ),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: isDarkMode ? Colors.grey.shade900 : Colors.grey.shade50,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200),
+            border: Border.all(
+                color:
+                    isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200),
           ),
           child: Wrap(
             alignment: WrapAlignment.center,
@@ -503,9 +537,12 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
     return Column(
       children: [
         CircleAvatar(
-          backgroundColor: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200,
+          backgroundColor:
+              isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200,
           radius: 18,
-          child: Icon(icon, size: 18, color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700),
+          child: Icon(icon,
+              size: 18,
+              color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700),
         ),
         const SizedBox(height: 8),
         Text(
@@ -551,20 +588,28 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
                 width: 120,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isDarkMode ? Colors.grey.shade900 : Colors.grey.shade50,
+                  color:
+                      isDarkMode ? Colors.grey.shade900 : Colors.grey.shade50,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200),
+                  border: Border.all(
+                      color: isDarkMode
+                          ? Colors.grey.shade800
+                          : Colors.grey.shade200),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      table.capacity! > 4 ? Icons.groups : (table.capacity! > 1 ? Icons.group : Icons.person),
-                      color: Colors.yellow.shade700,
+                      table.capacity! > 4
+                          ? Icons.groups
+                          : (table.capacity! > 1 ? Icons.group : Icons.person),
+                      color: ColorConstant.primaryColor,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      (table.name == null || table.name!.isEmpty) ? "Standard Table" : table.name!,
+                      (table.name == null || table.name!.isEmpty)
+                          ? "Standard Table"
+                          : table.name!,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: isDarkMode ? Colors.white : Colors.black,
@@ -576,7 +621,9 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
                     Text(
                       "${table.capacity} Person",
                       style: TextStyle(
-                        color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                        color: isDarkMode
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade600,
                         fontSize: 10,
                       ),
                     ),
@@ -592,31 +639,77 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
 
   Widget _buildBottomButton(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final accentColor = ColorConstant.primaryColor;
+    final secondaryBtnColor =
+        isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade100;
 
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: ElevatedButton(
-        onPressed: () {
-          if (controller.cafe.value != null) {
-            Get.toNamed(AppRoutes.cafeBookScreenRoute, arguments: controller.cafe.value);
-          }
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isDarkMode ? Colors.white : Colors.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
+    return Row(
+      children: [
+        Expanded(
+          child: Bounce(
+            onTap: () {
+              if (controller.cafe.value != null) {
+                Get.toNamed(AppRoutes.menuScreenRoute,
+                    arguments: controller.cafe.value);
+              }
+            },
+            child: Container(
+              height: 56,
+              decoration: BoxDecoration(
+                color: secondaryBtnColor,
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Text(
+                  "Menu",
+                  style: PMT.style(16,
+                      fontColor: isDarkMode ? Colors.white : Colors.black,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
           ),
         ),
-        child: Text(
-          "Book",
-          style: TextStyle(
-            color: isDarkMode ? Colors.black : Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+        const SizedBox(width: 12),
+        Expanded(
+          child: Bounce(
+            onTap: () {
+              if (controller.cafe.value != null) {
+                Get.toNamed(AppRoutes.cafeBookScreenRoute,
+                    arguments: controller.cafe.value);
+              }
+            },
+            child: Container(
+              height: 56,
+              decoration: BoxDecoration(
+                color: accentColor,
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: accentColor.withOpacity(0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Text(
+                  "Book Now",
+                  style: PMT.style(16,
+                      fontColor: Colors.black, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 }

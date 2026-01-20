@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
 import 'package:yellow_pass/core/utils/app_fonts.dart';
 import 'package:yellow_pass/presentation/verify_otp_screen/controller/verify_otp_controller.dart';
+import 'package:yellow_pass/core/utils/color_constant.dart';
 
 class VerifyOtpScreen extends GetView<VerifyOtpController> {
   const VerifyOtpScreen({super.key});
@@ -14,9 +15,10 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
     final colorScheme = theme.colorScheme;
 
     final isEmail = controller.verificationType == 'email';
-    final title = isEmail ? "Verify your Email ID" : "Verify your Mobile Number";
+    final title =
+        isEmail ? "Verify your Email ID" : "Verify your Mobile Number";
     final icon = isEmail ? Icons.email : Icons.phone;
-    final instruction = isEmail 
+    final instruction = isEmail
         ? "Please enter the verification security\ncode sent to your registered email id,\n${controller.target}"
         : "Please enter the verification security\ncode sent to your registered mobile number,\n${controller.target}";
 
@@ -40,7 +42,7 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.yellow,
+                    color: ColorConstant.primaryColor,
                   ),
                   child: Icon(icon, size: 30, color: Colors.black),
                 ),
@@ -64,7 +66,9 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
                   instruction,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700,
+                    color: isDarkMode
+                        ? Colors.grey.shade400
+                        : Colors.grey.shade700,
                   ),
                 ),
               ),
@@ -79,15 +83,19 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
                 duration: const Duration(milliseconds: 800),
                 delay: const Duration(milliseconds: 300),
                 child: Obx(() => TextButton(
-                  onPressed: controller.timer.value == 0 ? controller.resendCode : null,
-                  child: Text(
-                    "(0:${controller.timer.value.toString().padLeft(2, '0')}) Resend Code",
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: controller.timer.value == 0 ? Colors.green : Colors.grey,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                )),
+                      onPressed: controller.timer.value == 0
+                          ? controller.resendCode
+                          : null,
+                      child: Text(
+                        "(0:${controller.timer.value.toString().padLeft(2, '0')}) Resend Code",
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: controller.timer.value == 0
+                              ? Colors.green
+                              : Colors.grey,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    )),
               ),
               const Spacer(),
               FadeInUp(
@@ -142,8 +150,8 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
             GestureDetector(
               onTap: () => Get.back(),
               child: Icon(
-                Icons.arrow_back_ios, 
-                size: 20, 
+                Icons.arrow_back_ios,
+                size: 20,
                 color: isDarkMode ? Colors.white : Colors.black,
               ),
             ),
@@ -158,14 +166,13 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
             ),
           ],
         ),
-
       ],
     );
   }
 
   Widget _buildPinput(BuildContext context, ColorScheme colorScheme) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     final defaultPinTheme = PinTheme(
       width: 60,
       height: 60,
@@ -187,10 +194,10 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.yellow, width: 2),
+        border: Border.all(color: ColorConstant.primaryColor, width: 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.yellow.withOpacity(0.3),
+            color: ColorConstant.primaryColor.withOpacity(0.3),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -202,7 +209,7 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.yellow),
+        border: Border.all(color: ColorConstant.primaryColor),
       ),
     );
 
@@ -216,7 +223,7 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
         width: 2,
         height: 24,
         decoration: BoxDecoration(
-          color: Colors.yellow,
+          color: ColorConstant.primaryColor,
           borderRadius: BorderRadius.circular(1),
         ),
       ),
@@ -234,13 +241,14 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
 
   void _showSuccessDialog(BuildContext context, ColorScheme colorScheme) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     Get.dialog(
       ZoomIn(
         duration: const Duration(milliseconds: 400),
         child: Dialog(
           backgroundColor: isDarkMode ? Colors.grey.shade900 : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
@@ -255,7 +263,8 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
                       shape: BoxShape.circle,
                       color: Colors.green,
                     ),
-                    child: const Icon(Icons.check, size: 40, color: Colors.white),
+                    child:
+                        const Icon(Icons.check, size: 40, color: Colors.white),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -273,7 +282,9 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700,
+                    color: isDarkMode
+                        ? Colors.grey.shade400
+                        : Colors.grey.shade700,
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -283,7 +294,8 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
                   child: ElevatedButton(
                     onPressed: () {
                       Get.back(); // Close dialog
-                      Get.offAllNamed('/dashboard_screen'); // Navigate to dashboard and clear stack
+                      Get.offAllNamed(
+                          '/dashboard_screen'); // Navigate to dashboard and clear stack
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isDarkMode ? Colors.white : Colors.black,
@@ -311,13 +323,14 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
 
   void _showFailureDialog(BuildContext context, ColorScheme colorScheme) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     Get.dialog(
       ZoomIn(
         duration: const Duration(milliseconds: 600),
         child: Dialog(
           backgroundColor: isDarkMode ? Colors.grey.shade900 : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
@@ -346,7 +359,9 @@ class VerifyOtpScreen extends GetView<VerifyOtpController> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700,
+                    color: isDarkMode
+                        ? Colors.grey.shade400
+                        : Colors.grey.shade700,
                   ),
                 ),
                 const SizedBox(height: 30),

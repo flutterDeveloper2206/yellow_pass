@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yellow_pass/core/utils/color_constant.dart';
 
 class CommonTextField extends StatelessWidget {
   final String? hintText;
@@ -10,7 +11,7 @@ class CommonTextField extends StatelessWidget {
   final Widget? suffix;
   final Color fillColor;
   final double borderRadius;
-  final Color borderColor;        // ✅ NEW
+  final Color borderColor; // ✅ NEW
   final Color focusedBorderColor; // ✅ NEW
 
   const CommonTextField({
@@ -24,8 +25,9 @@ class CommonTextField extends StatelessWidget {
     this.suffix,
     this.fillColor = const Color(0xff2b2b2b),
     this.borderRadius = 12,
-    this.borderColor = Colors.grey,           // ✅ default color
-    this.focusedBorderColor = Colors.yellow,  // ✅ default focused color
+    this.borderColor = Colors.grey, // ✅ default color
+    this.focusedBorderColor =
+        ColorConstant.primaryColor, // ✅ default focused color
   });
 
   @override
@@ -40,16 +42,16 @@ class CommonTextField extends StatelessWidget {
         fillColor: fillColor,
         hintText: hintText,
         hintStyle: const TextStyle(color: Colors.grey),
-        prefixIcon: prefixIcon != null
-            ? Icon(prefixIcon, color: Colors.grey)
-            : null,
+        prefixIcon:
+            prefixIcon != null ? Icon(prefixIcon, color: Colors.grey) : null,
         suffixIcon: suffixIcon,
         suffix: suffix,
         suffixIconConstraints: const BoxConstraints(
           minWidth: 35,
           minHeight: 35,
         ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
 
         // ✅ Borders
         enabledBorder: OutlineInputBorder(

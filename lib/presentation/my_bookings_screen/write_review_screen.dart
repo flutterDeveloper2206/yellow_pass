@@ -8,6 +8,8 @@ import 'package:yellow_pass/core/utils/app_fonts.dart';
 import 'package:yellow_pass/data/models/user_booking_response_model.dart';
 import 'package:yellow_pass/presentation/my_bookings_screen/controller/my_bookings_controller.dart';
 import 'package:yellow_pass/widgets/custom_image_view.dart';
+import 'package:yellow_pass/core/utils/color_constant.dart';
+import '../../ApiServices/api_end_points.dart';
 
 class WriteReviewScreen extends StatefulWidget {
   final UserBookingData booking;
@@ -22,7 +24,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
   final MyBookingsController _controller = Get.find<MyBookingsController>();
   final TextEditingController _reviewTextController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
-  
+
   double _rating = 5.0;
   final List<String> _selectedImages = [];
   bool _isSubmitting = false;
@@ -33,8 +35,9 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
       if (_selectedImages.length < 5) {
         File originalFile = File(image.path);
         // Compress to 555 KB (555 * 1024 bytes)
-        File compressedFile = await CommonConstant.instance.compressImage(originalFile, 555 * 1024);
-        
+        File compressedFile = await CommonConstant.instance
+            .compressImage(originalFile, 555 * 1024);
+
         setState(() {
           _selectedImages.add(compressedFile.path);
         });
@@ -80,7 +83,8 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor = isDark ? const Color(0xFF121212) : const Color(0xFFFAFAFA);
+    final backgroundColor =
+        isDark ? const Color(0xFF121212) : const Color(0xFFFAFAFA);
     final cardColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
     final textColor = isDark ? Colors.white : Colors.black;
 
@@ -89,7 +93,8 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
       appBar: AppBar(
         title: Text(
           "Write a Review",
-          style: PMT.style(18, fontColor: textColor, fontWeight: FontWeight.bold),
+          style:
+              PMT.style(18, fontColor: textColor, fontWeight: FontWeight.bold),
         ),
         backgroundColor: backgroundColor,
         elevation: 0,
@@ -109,22 +114,25 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
               decoration: BoxDecoration(
                 color: cardColor,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: isDark ? [] : [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                boxShadow: isDark
+                    ? []
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
               ),
               child: Row(
                 children: [
-                   ClipRRect(
+                  ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: CustomImageView(
-                       url: widget.booking.cafe!.image!.startsWith('/') 
-                        ? "https://api.yellowpass.in" + widget.booking.cafe!.image!
-                        : widget.booking.cafe!.image!,
+                      url: widget.booking.cafe!.image!.startsWith('/')
+                          ? "${ApiEndPoints.imageBaseUrl}" +
+                              widget.booking.cafe!.image!
+                          : widget.booking.cafe!.image!,
                       height: 60,
                       width: 60,
                       fit: BoxFit.cover,
@@ -137,11 +145,13 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                       children: [
                         Text(
                           widget.booking.cafe?.name ?? "N/A",
-                          style: PMT.style(16, fontColor: textColor, fontWeight: FontWeight.bold),
+                          style: PMT.style(16,
+                              fontColor: textColor,
+                              fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                           widget.booking.cafe?.address ?? "N/A",
+                          widget.booking.cafe?.address ?? "N/A",
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: PMT.style(12, fontColor: Colors.grey),
@@ -152,16 +162,17 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 30),
             Center(
               child: Text(
                 "How was your experience?",
-                style: PMT.style(18, fontColor: textColor, fontWeight: FontWeight.bold),
+                style: PMT.style(18,
+                    fontColor: textColor, fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Rating Stars
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -175,34 +186,39 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Icon(
-                      index < _rating ? Icons.star_rounded : Icons.star_outline_rounded,
-                      color: Colors.amber,
+                      index < _rating
+                          ? Icons.star_rounded
+                          : Icons.star_outline_rounded,
+                      color: ColorConstant.primaryColor,
                       size: 40,
                     ),
                   ),
                 );
               }),
             ),
-            
+
             const SizedBox(height: 30),
-            
+
             // Review Text
             Text(
               "Your Review",
-              style: PMT.style(14, fontColor: textColor, fontWeight: FontWeight.w600),
+              style: PMT.style(14,
+                  fontColor: textColor, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
                 color: cardColor,
                 borderRadius: BorderRadius.circular(12),
-                 boxShadow: isDark ? [] : [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                boxShadow: isDark
+                    ? []
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
               ),
               child: TextField(
                 controller: _reviewTextController,
@@ -216,14 +232,15 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-             Text(
+            Text(
               "Add Photos",
-              style: PMT.style(14, fontColor: textColor, fontWeight: FontWeight.w600),
+              style: PMT.style(14,
+                  fontColor: textColor, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 12),
-            
+
             // Photos List
             SizedBox(
               height: 100,
@@ -237,14 +254,21 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                       decoration: BoxDecoration(
                         color: isDark ? Colors.grey[800] : Colors.grey[200],
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey.withOpacity(0.5), style: BorderStyle.solid),
+                        border: Border.all(
+                            color: Colors.grey.withOpacity(0.5),
+                            style: BorderStyle.solid),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.add_a_photo_outlined, color: isDark ? Colors.white70 : Colors.black54),
+                          Icon(Icons.add_a_photo_outlined,
+                              color: isDark ? Colors.white70 : Colors.black54),
                           const SizedBox(height: 4),
-                          Text("Add", style: PMT.style(12, fontColor: isDark ? Colors.white70 : Colors.black54)),
+                          Text("Add",
+                              style: PMT.style(12,
+                                  fontColor: isDark
+                                      ? Colors.white70
+                                      : Colors.black54)),
                         ],
                       ),
                     ),
@@ -276,7 +300,8 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                                   color: Colors.red,
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.close, size: 12, color: Colors.white),
+                                child: const Icon(Icons.close,
+                                    size: 12, color: Colors.white),
                               ),
                             ),
                           ),
@@ -287,30 +312,33 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 40),
-            
+
             // Submit Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _isSubmitting ? null : _submitReview,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFFD700),
+                  backgroundColor: ColorConstant.primaryColor,
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                   elevation: 0,
                 ),
-                child: _isSubmitting 
-                  ? const SizedBox(
-                      width: 20, 
-                      height: 20, 
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black)
-                    )
-                  : Text(
-                      "Submit Review",
-                      style: PMT.style(16, fontColor: Colors.black, fontWeight: FontWeight.bold),
-                    ),
+                child: _isSubmitting
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.black))
+                    : Text(
+                        "Submit Review",
+                        style: PMT.style(16,
+                            fontColor: Colors.black,
+                            fontWeight: FontWeight.bold),
+                      ),
               ),
             ),
           ],

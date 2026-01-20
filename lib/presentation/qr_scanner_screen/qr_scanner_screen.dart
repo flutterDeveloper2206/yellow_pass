@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'controller/qr_scanner_controller.dart';
+import 'package:yellow_pass/core/utils/color_constant.dart';
 
 class QrScannerScreen extends GetView<QrScannerController> {
   const QrScannerScreen({super.key});
@@ -19,7 +20,7 @@ class QrScannerScreen extends GetView<QrScannerController> {
           Container(
             decoration: ShapeDecoration(
               shape: QrScannerOverlayShape(
-                borderColor:  Colors.yellow,
+                borderColor: ColorConstant.primaryColor,
                 borderRadius: 10,
                 borderLength: 30,
                 borderWidth: 10,
@@ -35,11 +36,12 @@ class QrScannerScreen extends GetView<QrScannerController> {
               icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
               onPressed: () => Get.back(),
             ),
-          ),  Positioned(
+          ),
+          Positioned(
             top: 100,
             right: 20,
             child: IconButton(
-              icon: const Text('Skip',style: TextStyle( color: Colors.white)),
+              icon: const Text('Skip', style: TextStyle(color: Colors.white)),
               onPressed: () {
                 controller.skipScanner();
               },

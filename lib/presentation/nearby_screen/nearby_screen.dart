@@ -5,6 +5,9 @@ import 'package:yellow_pass/widgets/custom_image_view.dart';
 import 'package:yellow_pass/widgets/shimmer_widget.dart';
 import '../../../data/models/cafe_response_model.dart';
 import '../../../data/models/nearby_users_response_model.dart';
+import 'package:yellow_pass/routes/app_routes.dart';
+import '../../ApiServices/api_end_points.dart';
+import '../../core/utils/color_constant.dart';
 import 'controller/nearby_controller.dart';
 
 class NearbyScreen extends StatefulWidget {
@@ -60,11 +63,13 @@ class _NearbyScreenState extends State<NearbyScreen> {
             children: [
               // Nearby Yellow Spaces Section
               Obx(() {
-                if (controller.isLoadingCafes.value && controller.nearbyCafes.isEmpty) {
+                if (controller.isLoadingCafes.value &&
+                    controller.nearbyCafes.isEmpty) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildSectionTitle(context, "Nearby Yellow Spaces", isDarkMode),
+                      _buildSectionTitle(
+                          context, "Nearby Yellow Spaces", isDarkMode),
                       _buildCafeShimmer(),
                     ],
                   );
@@ -77,7 +82,9 @@ class _NearbyScreenState extends State<NearbyScreen> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildSectionTitle(context, "Nearby Yellow Spaces", isDarkMode, isFadeInDown: true),
+                    _buildSectionTitle(
+                        context, "Nearby Yellow Spaces", isDarkMode,
+                        isFadeInDown: true),
                     SizedBox(
                       height: 280,
                       child: ListView.builder(
@@ -88,7 +95,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
                           return FadeInRight(
                             duration: const Duration(milliseconds: 400),
                             delay: Duration(milliseconds: 100 * index),
-                            child: _buildCafeCard(context, controller.nearbyCafes[index]),
+                            child: _buildCafeCard(
+                                context, controller.nearbyCafes[index]),
                           );
                         },
                       ),
@@ -99,12 +107,14 @@ class _NearbyScreenState extends State<NearbyScreen> {
               // const SizedBox(height: 24),
               // Nearby Co-workers Section
               Obx(() {
-                if (controller.isLoadingCoWorkers.value && controller.nearbyCoWorkers.isEmpty) {
+                if (controller.isLoadingCoWorkers.value &&
+                    controller.nearbyCoWorkers.isEmpty) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 24),
-                      _buildSectionTitle(context, "Nearby Co-workers", isDarkMode),
+                      _buildSectionTitle(
+                          context, "Nearby Co-workers", isDarkMode),
                       _buildCoWorkerShimmer(),
                     ],
                   );
@@ -118,7 +128,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // const SizedBox(height: 24),
-                    _buildSectionTitle(context, "Nearby Co-workers", isDarkMode, isFadeInUp: true),
+                    _buildSectionTitle(context, "Nearby Co-workers", isDarkMode,
+                        isFadeInUp: true),
                     const SizedBox(height: 10),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -130,7 +141,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
                           (index) => FadeInUp(
                             duration: const Duration(milliseconds: 400),
                             delay: Duration(milliseconds: 100 * index),
-                            child: _buildCoWorkerCard(context, controller.nearbyCoWorkers[index], index),
+                            child: _buildCoWorkerCard(context,
+                                controller.nearbyCoWorkers[index], index),
                           ),
                         ),
                       ),
@@ -139,9 +151,9 @@ class _NearbyScreenState extends State<NearbyScreen> {
                 );
               }),
               Obx(() {
-                if (!controller.isLoadingCafes.value && 
-                    !controller.isLoadingCoWorkers.value && 
-                    controller.nearbyCafes.isEmpty && 
+                if (!controller.isLoadingCafes.value &&
+                    !controller.isLoadingCoWorkers.value &&
+                    controller.nearbyCafes.isEmpty &&
                     controller.nearbyCoWorkers.isEmpty) {
                   return SizedBox(
                     height: MediaQuery.of(context).size.height * 0.7,
@@ -149,7 +161,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.location_off_outlined, size: 64, color: Colors.grey.shade400),
+                          Icon(Icons.location_off_outlined,
+                              size: 64, color: Colors.grey.shade400),
                           const SizedBox(height: 16),
                           Text(
                             "Nothing found nearby",
@@ -174,7 +187,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
     );
   }
 
-  Widget _buildSectionTitle(BuildContext context, String title, bool isDarkMode, {bool isFadeInDown = false, bool isFadeInUp = false}) {
+  Widget _buildSectionTitle(BuildContext context, String title, bool isDarkMode,
+      {bool isFadeInDown = false, bool isFadeInUp = false}) {
     Widget text = Padding(
       padding: const EdgeInsets.all(16.0),
       child: Text(
@@ -187,8 +201,11 @@ class _NearbyScreenState extends State<NearbyScreen> {
       ),
     );
 
-    if (isFadeInDown) return FadeInDown(duration: const Duration(milliseconds: 400), child: text);
-    if (isFadeInUp) return FadeInUp(duration: const Duration(milliseconds: 400), child: text);
+    if (isFadeInDown)
+      return FadeInDown(
+          duration: const Duration(milliseconds: 400), child: text);
+    if (isFadeInUp)
+      return FadeInUp(duration: const Duration(milliseconds: 400), child: text);
     return text;
   }
 
@@ -212,7 +229,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(16)),
                   child: ShimmerWidget.rectangular(height: 140, width: 220),
                 ),
                 Padding(
@@ -251,7 +269,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.symmetric(horizontal: 8),
               decoration: BoxDecoration(
-                color: isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade100,
+                color:
+                    isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade100,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -279,9 +298,9 @@ class _NearbyScreenState extends State<NearbyScreen> {
         : "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400";
 
     // Prepend base url if it's a relative path
-    final fullImageUrl = imageUrl.startsWith("http") 
-        ? imageUrl 
-        : "https://api.yellowpass.in$imageUrl";
+    final fullImageUrl = imageUrl.startsWith("http")
+        ? imageUrl
+        : "${ApiEndPoints.imageBaseUrl}$imageUrl";
 
     return GestureDetector(
       onTap: () => Get.toNamed('/cafe_details_screen', arguments: cafe.id),
@@ -307,7 +326,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(16)),
                   child: CustomImageView(
                     url: fullImageUrl,
                     height: 140,
@@ -319,7 +339,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
                   top: 12,
                   right: 12,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.6),
                       borderRadius: BorderRadius.circular(12),
@@ -358,7 +379,9 @@ class _NearbyScreenState extends State<NearbyScreen> {
                       Icon(
                         Icons.location_on,
                         size: 14,
-                        color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                        color: isDarkMode
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade600,
                       ),
                       const SizedBox(width: 4),
                       Expanded(
@@ -366,7 +389,9 @@ class _NearbyScreenState extends State<NearbyScreen> {
                           cafe.address ?? cafe.city ?? "Location unknown",
                           style: TextStyle(
                             fontSize: 12,
-                            color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                            color: isDarkMode
+                                ? Colors.grey.shade400
+                                : Colors.grey.shade600,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -380,7 +405,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.star, size: 14, color: Colors.yellow),
+                          const Icon(Icons.star,
+                              size: 14, color: ColorConstant.primaryColor),
                           const SizedBox(width: 4),
                           Text(
                             cafe.rating ?? '0.0',
@@ -395,7 +421,9 @@ class _NearbyScreenState extends State<NearbyScreen> {
                             '(${cafe.reviewCount ?? 0})',
                             style: TextStyle(
                               fontSize: 12,
-                              color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                              color: isDarkMode
+                                  ? Colors.grey.shade400
+                                  : Colors.grey.shade600,
                             ),
                           ),
                         ],
@@ -406,7 +434,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: Colors.yellow,
+                            color: ColorConstant.primaryColor,
                           ),
                         ),
                     ],
@@ -420,81 +448,87 @@ class _NearbyScreenState extends State<NearbyScreen> {
     );
   }
 
-  Widget _buildCoWorkerCard(BuildContext context, NearbyUser coWorker, int index) {
+  Widget _buildCoWorkerCard(
+      BuildContext context, NearbyUser coWorker, int index) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final profilePic = coWorker.profilePicture ?? "https://api.yellowpass.in/storage/profile-pictures/default.png";
-    final fullProfilePic = profilePic.startsWith("http") 
-        ? profilePic 
-        : "https://api.yellowpass.in$profilePic";
+    final profilePic = coWorker.profilePicture ??
+        "${ApiEndPoints.imageBaseUrl}/storage/profile-pictures/default.png";
+    final fullProfilePic = profilePic.startsWith("http")
+        ? profilePic
+        : "${ApiEndPoints.imageBaseUrl}$profilePic";
 
-    return Container(
-      width: (MediaQuery.of(context).size.width - 48) / 2,
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          if (!isDarkMode)
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // Avatar
-          CircleAvatar(
-            radius: 40,
-            backgroundColor: Colors.yellow.withOpacity(0.2),
-            backgroundImage: NetworkImage(fullProfilePic),
-          ),
-          const SizedBox(height: 12),
-          // Name
-          Text(
-            coWorker.name ?? "Anonymous",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-          // Description / Role
-          Text(
-            coWorker.description ?? "Co-worker",
-            style: TextStyle(
-              fontSize: 11,
-              color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 8),
-          // Distance
-          if (coWorker.distance != null)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.yellow.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
+    return GestureDetector(
+      onTap: () =>
+          Get.toNamed(AppRoutes.otherProfileScreenRoute, arguments: coWorker),
+      child: Container(
+        width: (MediaQuery.of(context).size.width - 48) / 2,
+        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        decoration: BoxDecoration(
+          color: isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            if (!isDarkMode)
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
               ),
-              child: Text(
-                "${coWorker.distance!.toStringAsFixed(1)} km away",
-                style: const TextStyle(
-                  fontSize: 10,
-                  color: Colors.yellow,
-                  fontWeight: FontWeight.bold,
+          ],
+        ),
+        child: Column(
+          children: [
+            // Avatar
+            CircleAvatar(
+              radius: 40,
+              backgroundColor: ColorConstant.primaryColor.withOpacity(0.2),
+              backgroundImage: NetworkImage(fullProfilePic),
+            ),
+            const SizedBox(height: 12),
+            // Name
+            Text(
+              coWorker.name ?? "Anonymous",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 4),
+            // Description / Role
+            Text(
+              coWorker.description ?? "Co-worker",
+              style: TextStyle(
+                fontSize: 11,
+                color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 8),
+            // Distance
+            if (coWorker.distance != null)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: ColorConstant.primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  "${coWorker.distance!.toStringAsFixed(1)} km away",
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: ColorConstant.primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
