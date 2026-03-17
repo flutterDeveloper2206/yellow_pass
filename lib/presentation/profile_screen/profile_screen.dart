@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:yellow_pass/core/utils/app_fonts.dart';
+import 'package:yellow_pass/core/utils/shared_prefs.dart';
 import 'package:yellow_pass/presentation/profile_screen/controller/profile_screen_controller.dart';
 import 'package:yellow_pass/routes/app_routes.dart';
 import 'package:yellow_pass/core/utils/color_constant.dart';
@@ -34,8 +35,8 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
     _slideAnimation =
         Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
-    );
+          CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+        );
     _animationController.forward();
   }
 
@@ -52,7 +53,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
     // Define specific colors based on the screenshot analysis
     final backgroundColor =
-        isDark ? const Color(0xFF121212) : const Color(0xFFFAFAFA);
+    isDark ? const Color(0xFF121212) : const Color(0xFFFAFAFA);
     final textColor = isDark ? Colors.white : Colors.black;
     final subTextColor = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
     final cardColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
@@ -82,57 +83,64 @@ class _ProfileScreenState extends State<ProfileScreen>
                   const SizedBox(height: 20),
                   _buildMenuItem(context,
                       icon: Icons.calendar_today_outlined,
-                      title: "My Bookings", onTap: () {
-                    Get.toNamed(AppRoutes.myBookingsScreenRoute);
-                  },
+                      title: "My Bookings",
+                      onTap: () {
+                        Get.toNamed(AppRoutes.myBookingsScreenRoute);
+                      },
                       isDark: isDark,
                       textColor: textColor,
                       cardColor: cardColor),
                   _buildMenuItem(context,
                       icon: Icons.wallet_membership_outlined,
-                      title: "Subscription", onTap: () {
-                    Get.toNamed(AppRoutes.subscriptionScreenRoute);
-                  },
+                      title: "Subscription",
+                      onTap: () {
+                        Get.toNamed(AppRoutes.subscriptionScreenRoute);
+                      },
                       isDark: isDark,
                       textColor: textColor,
                       cardColor: cardColor),
                   _buildMenuItem(context,
                       icon: Icons.receipt_long_outlined,
-                      title: "My Orders", onTap: () {
-                    Get.toNamed(AppRoutes.myOrdersScreenRoute);
-                  },
+                      title: "My Orders",
+                      onTap: () {
+                        Get.toNamed(AppRoutes.myOrdersScreenRoute);
+                      },
                       isDark: isDark,
                       textColor: textColor,
                       cardColor: cardColor),
                   _buildMenuItem(context,
                       icon: Icons.handshake_outlined,
-                      title: "Meeting Requests", onTap: () {
-                    Get.toNamed(AppRoutes.meetingRequestsScreenRoute);
-                  },
+                      title: "Meeting Requests",
+                      onTap: () {
+                        Get.toNamed(AppRoutes.meetingRequestsScreenRoute);
+                      },
                       isDark: isDark,
                       textColor: textColor,
                       cardColor: cardColor),
                   _buildMenuItem(context,
                       icon: Icons.person_outline,
-                      title: "My Details", onTap: () {
-                    Get.toNamed(AppRoutes.profileDetailsScreenRoute);
-                  },
+                      title: "My Details",
+                      onTap: () {
+                        Get.toNamed(AppRoutes.profileDetailsScreenRoute);
+                      },
                       isDark: isDark,
                       textColor: textColor,
                       cardColor: cardColor),
                   _buildMenuItem(context,
                       icon: Icons.settings_outlined,
-                      title: "Settings", onTap: () {
-                    Get.toNamed(AppRoutes.settingsScreenRoute);
-                  },
+                      title: "Settings",
+                      onTap: () {
+                        Get.toNamed(AppRoutes.settingsScreenRoute);
+                      },
                       isDark: isDark,
                       textColor: textColor,
                       cardColor: cardColor),
                   _buildMenuItem(context,
                       icon: Icons.headset_mic_outlined,
-                      title: "Customer Support", onTap: () {
-                    Get.toNamed(AppRoutes.supportScreenRoute);
-                  },
+                      title: "Customer Support",
+                      onTap: () {
+                        Get.toNamed(AppRoutes.supportScreenRoute);
+                      },
                       isDark: isDark,
                       textColor: textColor,
                       cardColor: cardColor),
@@ -175,7 +183,8 @@ class _ProfileScreenState extends State<ProfileScreen>
       Color subTextColor, Color accentColor) {
     return Column(
       children: [
-        Obx(() => Stack(
+        Obx(() =>
+            Stack(
               children: [
                 Container(
                   padding: const EdgeInsets.all(4),
@@ -187,14 +196,14 @@ class _ProfileScreenState extends State<ProfileScreen>
                   child: CircleAvatar(
                     radius: 50,
                     backgroundImage:
-                        (controller.userData['profile_picture'] != null &&
-                                controller.userData['profile_picture']
-                                    .toString()
-                                    .isNotEmpty)
-                            ? NetworkImage(
-                                    "${controller.userData['profile_picture']}")
-                                as ImageProvider
-                            : const AssetImage('assets/images/profiles.png'),
+                    (controller.userData['profile_picture'] != null &&
+                        controller.userData['profile_picture']
+                            .toString()
+                            .isNotEmpty)
+                        ? NetworkImage(
+                        "${controller.userData['profile_picture']}")
+                    as ImageProvider
+                        : const AssetImage('assets/images/profiles.png'),
                   ),
                 ),
                 Positioned(
@@ -212,25 +221,28 @@ class _ProfileScreenState extends State<ProfileScreen>
                         border: Border.all(color: Colors.black, width: 2),
                       ),
                       child:
-                          const Icon(Icons.edit, size: 14, color: Colors.black),
+                      const Icon(Icons.edit, size: 14, color: Colors.black),
                     ),
                   ),
                 ),
               ],
             )),
         const SizedBox(height: 16),
-        Obx(() => Text(
+        Obx(() =>
+            Text(
               controller.userData['name'] ?? "User Name",
               style: PMT.style(20,
                   fontColor: textColor, fontWeight: FontWeight.bold),
             )),
         const SizedBox(height: 4),
-        Obx(() => Text(
+        Obx(() =>
+            Text(
               controller.userData['email'] ?? "Email ID",
               style: PMT.style(14, fontColor: subTextColor),
             )),
         const SizedBox(height: 12),
-        Obx(() => Text(
+        Obx(() =>
+            Text(
               controller.userData['description'] ?? "No Bio Added",
               textAlign: TextAlign.center,
               style: PMT.styles(12,
@@ -274,19 +286,20 @@ class _ProfileScreenState extends State<ProfileScreen>
         color: isDark
             ? const Color(0xFF2C2C2C)
             : Colors
-                .transparent, // Dark mode has card bg, light mode transparent
+            .transparent, // Dark mode has card bg, light mode transparent
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Obx(() => _buildStatItem(
-              context,
-              "Tokens",
-              controller.userData['wallet_balance']?.toString() ?? "0",
-              Icons.monetization_on_outlined,
-              textColor,
-              subTextColor)),
+          Obx(() =>
+              _buildStatItem(
+                  context,
+                  "Tokens",
+                  controller.userData['wallet_balance']?.toString() ?? "0",
+                  Icons.monetization_on_outlined,
+                  textColor,
+                  subTextColor)),
           Container(
               height: 40,
               width: 1,
@@ -313,7 +326,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         Text(
           value,
           style:
-              PMT.style(24, fontColor: textColor, fontWeight: FontWeight.bold),
+          PMT.style(24, fontColor: textColor, fontWeight: FontWeight.bold),
         ),
       ],
     );
@@ -321,7 +334,8 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Widget _buildVisibilityToggle(BuildContext context, bool isDark,
       Color textColor, Color cardColor, Color accentColor) {
-    return Obx(() => Container(
+    return Obx(() =>
+        Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
             color: isDark ? Colors.transparent : cardColor,
@@ -329,12 +343,12 @@ class _ProfileScreenState extends State<ProfileScreen>
             boxShadow: isDark
                 ? []
                 : [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -362,11 +376,11 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Widget _buildMenuItem(BuildContext context,
       {required IconData icon,
-      required String title,
-      required VoidCallback onTap,
-      required bool isDark,
-      required Color textColor,
-      required Color cardColor}) {
+        required String title,
+        required VoidCallback onTap,
+        required bool isDark,
+        required Color textColor,
+        required Color cardColor}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -375,12 +389,12 @@ class _ProfileScreenState extends State<ProfileScreen>
         boxShadow: isDark
             ? []
             : [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: ListTile(
         onTap: onTap,
@@ -388,7 +402,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         title: Text(
           title,
           style:
-              PMT.style(14, fontColor: textColor, fontWeight: FontWeight.w500),
+          PMT.style(14, fontColor: textColor, fontWeight: FontWeight.w500),
         ),
         trailing: Icon(Icons.arrow_forward_ios,
             size: 16, color: isDark ? Colors.grey : Colors.black54),
@@ -398,14 +412,96 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   Widget _buildLogoutButton(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return TextButton.icon(
-      onPressed: () {},
-      icon: const Icon(Icons.logout, color: Colors.red),
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        foregroundColor: isDark ? Colors.white : Colors.red,
+        backgroundColor:
+        isDark ? Colors.red.withOpacity(0.16) : Colors.red.withOpacity(0.12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      onPressed: () => _showLogoutDialog(context),
+      icon: Icon(
+        Icons.logout,
+        color: isDark ? Colors.white : Colors.red,
+      ),
       label: Text(
         "Logout",
-        style:
-            PMT.style(16, fontColor: Colors.red, fontWeight: FontWeight.bold),
+        style: PMT.style(16,
+            fontColor: isDark ? Colors.white : Colors.red,
+            fontWeight: FontWeight.bold),
       ),
     );
   }
 }
+  Future<void> _showLogoutDialog(BuildContext context) async {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final accentColor = ColorConstant.primaryColor;
+    final dialogBackground = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFFFFFFF);
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: dialogBackground,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: accentColor.withOpacity(0.24), width: 1),
+          ),
+          titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+          contentPadding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+          actionsPadding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+          title: Row(
+            children: [
+              Icon(Icons.logout, color: accentColor),
+              const SizedBox(width: 12),
+              Text(
+                'Logout',
+                style: PMT.style(18,
+                    fontColor: isDark ? Colors.white : Colors.black,
+                    fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          content: Text(
+            'Are you sure you want to logout? Your local data will be cleared.',
+            style: PMT.style(14,
+                fontColor:
+                    isDark ? Colors.grey.shade200 : Colors.grey.shade800),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              style: TextButton.styleFrom(
+                foregroundColor:
+                    isDark ? Colors.grey.shade200 : Colors.grey.shade800,
+              ),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.of(dialogContext).pop();
+                await SharedPrefs.clear();
+                Get.offAllNamed(AppRoutes.loginScreenRoute);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text('Logout'),
+            ),
+          ],
+        );
+      },
+    );
+  }
