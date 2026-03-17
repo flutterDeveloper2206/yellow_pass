@@ -357,7 +357,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
                   decoration: BoxDecoration(
                     color: isDark
                         ? const Color(0xFF332F00)
-                        : const Color(0xFFFFF8E1),
+                        : ColorConstant.lightOrange,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Center(

@@ -8,7 +8,7 @@ ColorScheme flexSchemeDark = const ColorScheme(
   onPrimaryContainer: Color(0xff070707),
 
   primary: ColorConstant.primaryColor,
-  onPrimary: ColorConstant.primaryColor,
+  onPrimary: Colors.black,
   primaryFixed: ColorConstant.primaryColor,
   onPrimaryFixed: ColorConstant.primaryColor,
   primaryContainer: ColorConstant.primaryColor,

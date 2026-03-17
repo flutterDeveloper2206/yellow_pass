@@ -106,7 +106,7 @@ class CafeBookScreen extends GetView<CafeBookController> {
                                     controller.selectedDateIndex.value == index
                                         ? (isDarkMode
                                             ? ColorConstant.primaryColor
-                                            : const Color(0xFFFFF3E0))
+                                            : ColorConstant.lightOrange)
                                         : (isDarkMode
                                             ? Colors.grey.shade800
                                             : Colors.grey.shade100),
@@ -265,7 +265,7 @@ class CafeBookScreen extends GetView<CafeBookController> {
                       color: isSelected
                           ? (isDarkMode
                               ? ColorConstant.primaryColor
-                              : const Color(0xFFFFF3E0))
+                              : ColorConstant.lightOrange)
                           : (isDarkMode
                               ? Colors.grey.shade800
                               : Colors.grey.shade100),
@@ -344,7 +344,7 @@ class CafeBookScreen extends GetView<CafeBookController> {
                       color: isSelected
                           ? (isDarkMode
                               ? ColorConstant.primaryColor
-                              : const Color(0xFFFFF3E0))
+                              : ColorConstant.lightOrange)
                           : (isDarkMode
                               ? Colors.grey.shade800
                               : Colors.grey.shade100),
