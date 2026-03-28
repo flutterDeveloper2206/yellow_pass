@@ -17,7 +17,16 @@ class CafeBookController extends GetxController {
   RxInt selectedDateIndex = 0.obs;
   RxInt selectedTimeSlotIndex = (-1).obs;
   RxInt selectedTableTypeIndex = 0.obs;
+  RxInt selectedDurationPresetIndex = 0.obs;
   RxDouble duration = 1.0.obs;
+
+  /// Preset labels and hours: Quick Grind (1h), Hustle Mode (3h), Deep Work (5h).
+  final List<String> durationPresetLabels = [
+    'Quick Grind',
+    'Hustle Mode',
+    'Deep Work',
+  ];
+  final List<int> durationPresetHours = [1, 3, 5];
 
   final TextEditingController specialRequestsController =
       TextEditingController();
@@ -165,12 +174,30 @@ class CafeBookController extends GetxController {
 
   void selectTableType(int index) {
     selectedTableTypeIndex.value = index;
-    duration.value = 1.0;
+    selectedDurationPresetIndex.value = 0;
+    duration.value = durationPresetHours.first.toDouble();
     fetchAvailability();
   }
 
-  void updateDuration(double value) {
-    duration.value = value;
+  void selectDurationPreset(int index) {
+    if (index < 0 || index >= durationPresetHours.length) return;
+    selectedDurationPresetIndex.value = index;
+    duration.value = durationPresetHours[index].toDouble();
+    fetchAvailability();
+  }
+
+  /// Updates duration and preset from slider while dragging (no API call).
+  void onDurationSliderChanged(double value) {
+    final hours = value.round();
+    final idx = durationPresetHours.indexOf(hours);
+    if (idx < 0) return;
+    selectedDurationPresetIndex.value = idx;
+    duration.value = hours.toDouble();
+  }
+
+  /// After slider released, refetch slots for the chosen duration.
+  void onDurationSliderChangeEnd(double value) {
+    onDurationSliderChanged(value);
     fetchAvailability();
   }
 

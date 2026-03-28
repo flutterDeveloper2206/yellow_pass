@@ -123,4 +123,16 @@ class CafeDetailsController extends GetxController {
     }
     return [];
   }
+
+  /// Parsed lat/lng from API when valid for a map preview; otherwise null.
+  (double lat, double lng)? get mapCoordinates {
+    final rawLat = cafe.value?.latitude;
+    final rawLng = cafe.value?.longitude;
+    if (rawLat == null || rawLng == null) return null;
+    final lat = double.tryParse(rawLat.trim());
+    final lng = double.tryParse(rawLng.trim());
+    if (lat == null || lng == null) return null;
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+    return (lat, lng);
+  }
 }

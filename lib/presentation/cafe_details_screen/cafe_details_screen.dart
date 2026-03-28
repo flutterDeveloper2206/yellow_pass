@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:yellow_pass/core/utils/app_fonts.dart';
 import 'package:yellow_pass/widgets/bouncing_button.dart';
 import 'package:yellow_pass/presentation/cafe_details_screen/controller/cafe_details_controller.dart';
 import 'package:yellow_pass/routes/app_routes.dart';
 import 'package:yellow_pass/widgets/custom_image_view.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../ApiServices/api_end_points.dart';
 import '../../core/utils/color_constant.dart';
 
@@ -60,6 +62,8 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
                           ),
                         const SizedBox(height: 20),
                         _buildTimings(context),
+                        const SizedBox(height: 20),
+                        _buildLocationMap(context),
                         const SizedBox(height: 20),
                         _buildReviews(context),
                         const SizedBox(height: 100), // Space for bottom button
@@ -312,6 +316,109 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
         ),
       ],
     );
+  }
+
+  Widget _buildLocationMap(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return Obx(() {
+      final coords = controller.mapCoordinates;
+      if (coords == null) return const SizedBox.shrink();
+
+      final (lat, lng) = coords;
+      final target = LatLng(lat, lng);
+      final cafeMarkers = <Marker>{
+        Marker(
+          markerId: const MarkerId('cafe_preview'),
+          position: target,
+          icon:
+              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+          infoWindow: InfoWindow(title: controller.cafeName),
+        ),
+      };
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Location",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+          const SizedBox(height: 12),
+          GestureDetector(
+            onTap: () => _openFullScreenCafeMap(
+              context,
+              latitude: lat,
+              longitude: lng,
+              isDarkMode: isDarkMode,
+              cafeName: controller.cafeName,
+            ),
+            behavior: HitTestBehavior.opaque,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: SizedBox(
+                height: 200,
+                width: double.infinity,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: GoogleMap(
+                          key: ValueKey('cafe_map_${lat}_$lng'),
+                          initialCameraPosition: CameraPosition(
+                            target: target,
+                            zoom: 16,
+                          ),
+                          markers: cafeMarkers,
+                          zoomControlsEnabled: false,
+                          mapToolbarEnabled: false,
+                          myLocationButtonEnabled: false,
+                          compassEnabled: false,
+                          liteModeEnabled: false,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.fullscreen,
+                                color: Colors.white, size: 18),
+                            SizedBox(width: 4),
+                            Text(
+                              'Tap',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    });
   }
 
   Widget _buildReviews(BuildContext context) {
@@ -710,6 +817,129 @@ class CafeDetailsScreen extends GetView<CafeDetailsController> {
           ),
         ),
       ],
+    );
+  }
+
+  void _openFullScreenCafeMap(
+    BuildContext context, {
+    required double latitude,
+    required double longitude,
+    required bool isDarkMode,
+    required String cafeName,
+  }) {
+    Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        fullscreenDialog: true,
+        builder: (context) => _CafeFullScreenGoogleMapPage(
+          latitude: latitude,
+          longitude: longitude,
+          isDarkMode: isDarkMode,
+          cafeName: cafeName,
+        ),
+      ),
+    );
+  }
+}
+
+Future<void> _launchCafeInExternalGoogleMaps(double lat, double lng) async {
+  final uri = Uri.parse(
+    'https://www.google.com/maps/search/?api=1&query=$lat,$lng',
+  );
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+}
+
+class _CafeFullScreenGoogleMapPage extends StatelessWidget {
+  final double latitude;
+  final double longitude;
+  final bool isDarkMode;
+  final String cafeName;
+
+  const _CafeFullScreenGoogleMapPage({
+    required this.latitude,
+    required this.longitude,
+    required this.isDarkMode,
+    required this.cafeName,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final target = LatLng(latitude, longitude);
+    final markers = <Marker>{
+      Marker(
+        markerId: const MarkerId('cafe_fullscreen'),
+        position: target,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+        infoWindow: InfoWindow(title: cafeName),
+      ),
+    };
+
+    return Scaffold(
+      backgroundColor: isDarkMode ? const Color(0xFF121212) : Colors.white,
+      appBar: AppBar(
+        backgroundColor: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+        foregroundColor: isDarkMode ? Colors.white : Colors.black,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text(
+          cafeName,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          GoogleMap(
+            key: ValueKey('cafe_map_fs_${latitude}_$longitude'),
+            initialCameraPosition: CameraPosition(
+              target: target,
+              zoom: 17,
+            ),
+            markers: markers,
+            myLocationButtonEnabled: false,
+            mapToolbarEnabled: true,
+            zoomControlsEnabled: true,
+            compassEnabled: true,
+          ),
+          SafeArea(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: ColorConstant.primaryColor,
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () =>
+                        _launchCafeInExternalGoogleMaps(latitude, longitude),
+                    icon: const Icon(Icons.open_in_new),
+                    label: const Text(
+                      'Open in Google Maps',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -37,7 +37,7 @@ class CafeBookScreen extends GetView<CafeBookController> {
             _buildTableSize(context),
             const SizedBox(height: 20),
 
-            _buildDurationSlider(context),
+            _buildDurationPresets(context),
             const SizedBox(height: 20),
             _buildTimeSlots(context),
             const SizedBox(height: 20),
@@ -387,9 +387,10 @@ class CafeBookScreen extends GetView<CafeBookController> {
     );
   }
 
-  Widget _buildDurationSlider(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+  Widget _buildDurationPresets(BuildContext context) {
     final theme = Theme.of(context);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final presetCount = controller.durationPresetLabels.length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -403,55 +404,138 @@ class CafeBookScreen extends GetView<CafeBookController> {
           ),
         ),
         const SizedBox(height: 12),
-        Obx(() => SliderTheme(
-              data: SliderTheme.of(context).copyWith(
-                activeTrackColor: theme.colorScheme.outlineVariant,
-                inactiveTrackColor: theme.colorScheme.outlineVariant,
-                thumbColor: ColorConstant.primaryColor,
-                overlayColor: ColorConstant.primaryColor.withOpacity(0.2),
-                trackHeight: 4,
-                thumbShape: const RoundSliderThumbShape(
-                    enabledThumbRadius: 8, elevation: 2),
+        Obx(() {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: List.generate(presetCount, (index) {
+                  final label = controller.durationPresetLabels[index];
+                  final hours = controller.durationPresetHours[index];
+                  final isSelected =
+                      controller.selectedDurationPresetIndex.value == index;
+                  return GestureDetector(
+                    onTap: () => controller.selectDurationPreset(index),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? (isDarkMode
+                                ? ColorConstant.primaryColor
+                                : ColorConstant.lightOrange)
+                            : (isDarkMode
+                                ? Colors.grey.shade800
+                                : Colors.grey.shade100),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected
+                              ? (isDarkMode
+                                  ? ColorConstant.primaryColor
+                                  : ColorConstant.primaryColor)
+                              : (isDarkMode
+                                  ? Colors.grey.shade700
+                                  : Colors.grey.shade300),
+                        ),
+                        boxShadow: [
+                          if (!isDarkMode)
+                            BoxShadow(
+                              color: theme.shadowColor.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            label,
+                            style: TextStyle(
+                              color: isSelected
+                                  ? Colors.black
+                                  : (isDarkMode
+                                      ? Colors.grey.shade400
+                                      : Colors.grey.shade700),
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            hours == 1 ? '1 hr' : '$hours hrs',
+                            style: TextStyle(
+                              color: isSelected
+                                  ? Colors.black87
+                                  : (isDarkMode
+                                      ? Colors.grey.shade500
+                                      : Colors.grey.shade600),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
               ),
-              child: Slider(
-                value: controller.duration.value,
-                min: 1,
-                max: 5,
-                divisions: 4,
-                onChanged: (value) => controller.updateDuration(value),
-              ),
-            )),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "Min: 1hr",
-              style: TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
-            ),
-            Obx(
-              () => Text(
-                "Total: ${controller.duration.value.toStringAsFixed(0)}hr",
-                style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
+              const SizedBox(height: 16),
+              SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  activeTrackColor: theme.colorScheme.outlineVariant,
+                  inactiveTrackColor: theme.colorScheme.outlineVariant,
+                  thumbColor: ColorConstant.primaryColor,
+                  overlayColor: ColorConstant.primaryColor.withOpacity(0.2),
+                  trackHeight: 4,
+                  thumbShape: const RoundSliderThumbShape(
+                      enabledThumbRadius: 8, elevation: 2),
+                ),
+                child: Slider(
+                  value: controller.duration.value,
+                  min: 1,
+                  max: 5,
+                  divisions: 2,
+                  onChanged: controller.onDurationSliderChanged,
+                  onChangeEnd: controller.onDurationSliderChangeEnd,
                 ),
               ),
-            ),
-            Text(
-              "Max: 5hrs",
-              style: TextStyle(
-                color: Colors.green,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Min: 1hr",
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  Text(
+                    "Total: ${controller.duration.value.toStringAsFixed(0)}hr",
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.white : Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  Text(
+                    "Max: 5hrs",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
+            ],
+          );
+        }),
       ],
     );
   }
@@ -583,8 +667,11 @@ class CafeBookScreen extends GetView<CafeBookController> {
               _buildDetailRow(
                   "Date", DateFormat('dd MMM, yyyy').format(date), isDarkMode),
               _buildDetailRow("Time", timeSlot, isDarkMode),
-              _buildDetailRow("Duration",
-                  "${controller.duration.value.toInt()} Hours", isDarkMode),
+              _buildDetailRow(
+                  "Duration",
+                  "${controller.durationPresetLabels[controller.selectedDurationPresetIndex.value]} "
+                      "(${controller.duration.value.toInt()} ${controller.duration.value.toInt() == 1 ? 'hr' : 'hrs'})",
+                  isDarkMode),
               _buildDetailRow("Table", tableType.name ?? "N/A", isDarkMode),
               const Divider(height: 32),
               if (discountPercentage > 0) ...[

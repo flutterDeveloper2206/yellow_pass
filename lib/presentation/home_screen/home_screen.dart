@@ -127,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen>
                 padding: const EdgeInsets.all(2),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: accentColor, width: 2),
+                  // border: Border.all(color: accentColor, width: 2),
                 ),
                 child: CircleAvatar(
                   radius: 20,
