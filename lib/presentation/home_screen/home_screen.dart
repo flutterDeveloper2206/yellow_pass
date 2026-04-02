@@ -157,6 +157,7 @@ class _HomeScreenState extends State<HomeScreen>
         Row(
           children: [
             Obx(() => CupertinoSwitch(
+              thumbIcon: WidgetStatePropertyAll(Icon(controller.isProfileVisible.value?Icons.remove_red_eye:Icons.remove_red_eye_rounded)),
                   value: controller.isProfileVisible.value,
                   onChanged: (value) => controller.toggleVisibility(value),
                   activeColor: accentColor,
