@@ -100,79 +100,112 @@ class DashboardScreenController extends GetxController {
   }
 
   Future<bool> _showExitDialog() async {
+    final BuildContext? ctx = Get.context ?? Get.overlayContext;
+    final bool isDark = ctx != null
+        ? Theme.of(ctx).brightness == Brightness.dark
+        : Get.isDarkMode;
+
+    // Explicit dialog palette — app ColorScheme maps black surfaces to dark on* text,
+    // which is unreadable; keep contrast here without editing theme color files.
+    final Color dialogBg = isDark ? const Color(0xFF2C2C2C) : Colors.white;
+    final Color titleColor =
+        isDark ? const Color(0xFFE8E8E8) : const Color(0xFF090909);
+    final Color bodyColor =
+        isDark ? const Color(0xFFB0B3B8) : const Color(0xFF5F6368);
+    final Color borderColor =
+        isDark ? const Color(0xFF6B6B6B) : const Color(0xFFE0E0E0);
+
+    final TextTheme textTheme = Get.theme.textTheme;
+
     return await Get.dialog<bool>(
           Dialog(
+            backgroundColor: dialogBg,
+            surfaceTintColor: Colors.transparent,
+            elevation: isDark ? 8 : 2,
+            shadowColor: isDark ? Colors.black54 : Colors.black26,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
+              side: BorderSide(color: borderColor),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(24.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
-                    Icons.exit_to_app,
-                    size: 60,
-                    color: ColorConstant.primaryColor,
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: ColorConstant.primaryColor
+                          .withValues(alpha: isDark ? 0.22 : 0.18),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.logout_rounded,
+                      size: 36,
+                      color: ColorConstant.primaryColor,
+                    ),
                   ),
                   const SizedBox(height: 20),
-                  const Text(
+                  Text(
                     "Exit App",
-                    style: TextStyle(
-                      fontSize: 20,
+                    style: textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: titleColor,
                     ),
                   ),
                   const SizedBox(height: 10),
-                  const Text(
+                  Text(
                     "Are you sure you want to exit?",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: bodyColor,
+                      height: 1.35,
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 28),
                   Row(
                     children: [
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () => Get.back(result: false),
                           style: OutlinedButton.styleFrom(
+                            foregroundColor: titleColor,
+                            side: BorderSide(color: borderColor),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(24),
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text(
+                          child: Text(
                             "No",
                             style: TextStyle(
                               fontSize: 14,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
+                              color: titleColor,
                             ),
                           ),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: ElevatedButton(
+                        child: FilledButton(
                           onPressed: () {
                             Get.back(result: true);
                             SystemNavigator.pop();
                           },
-                          style: ElevatedButton.styleFrom(
+                          style: FilledButton.styleFrom(
                             backgroundColor: ColorConstant.primaryColor,
+                            foregroundColor: Colors.black,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(24),
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
                           child: const Text(
                             "Yes",
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black,
                             ),
                           ),
                         ),
@@ -183,6 +216,8 @@ class DashboardScreenController extends GetxController {
               ),
             ),
           ),
+          barrierDismissible: true,
+          barrierColor: Colors.black.withValues(alpha: isDark ? 0.65 : 0.45),
         ) ??
         false;
   }
