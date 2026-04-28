@@ -1,4 +1,4 @@
-package com.example.yellow_pass
+package com.yellow_pass.app
 
 import io.flutter.embedding.android.FlutterActivity
 
