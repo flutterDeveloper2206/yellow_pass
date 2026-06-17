@@ -2,6 +2,9 @@ import 'package:get/get.dart';
 import 'package:yellow_pass/presentation/dashboard_screen/repository/dashboard_repository.dart';
 import '../../../core/utils/shared_prefs.dart';
 import 'package:flutter/material.dart';
+import 'package:yellow_pass/presentation/settings_screen/repository/settings_repository.dart';
+import 'package:yellow_pass/widgets/common_snackbar.dart';
+import 'package:yellow_pass/routes/app_routes.dart';
 
 class ProfileScreenController extends GetxController {
   RxBool isProfileVisible = true.obs;
@@ -98,6 +101,37 @@ class ProfileScreenController extends GetxController {
     } catch (e) {
       debugPrint("Error updating profile: $e");
       return false;
+    }
+  }
+
+  Future<void> deleteUserAccount() async {
+    try {
+      if (!Get.isRegistered<SettingsRepository>()) {
+        Get.put(SettingsRepository());
+      }
+      final repository = Get.find<SettingsRepository>();
+      final dynamic response = await repository.deleteAccount();
+
+      if (response != null && response is Map) {
+        if (response['status'] == true) {
+          await SharedPrefs.clear();
+          
+          CommonSnackbar.showSuccess(
+            title: "Account Deleted",
+            message: response['message'] ?? "Account deleted successfully",
+          );
+
+          Get.offAllNamed(AppRoutes.loginScreenRoute);
+        } else {
+          throw Exception(response['message'] ?? "Failed to delete account");
+        }
+      }
+    } catch (e, stack) {
+      debugPrint("DeleteAccount Error: $e\n$stack");
+      CommonSnackbar.showError(
+        title: "Delete Account Failed",
+        message: e.toString().replaceAll("Exception: ", ""),
+      );
     }
   }
 }

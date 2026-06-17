@@ -11,13 +11,12 @@ import '../../../../core/utils/shared_prefs.dart';
 
 class LoginScreenController extends GetxController {
   final referralCodeController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
   final isReferralView = false.obs;
+  final isPasswordHidden = true.obs;
 
-  @override
-  void onClose() {
-    referralCodeController.dispose();
-    super.onClose();
-  }
+
 
 
   Future<void> goToLogin() async {
@@ -108,5 +107,64 @@ class LoginScreenController extends GetxController {
     // Implement referral logic here
     Get.snackbar("Success", "Referral code applied!");
     goToLogin();
+  }
+
+  Future<void> loginWithEmail() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (email.isEmpty) {
+      CommonSnackbar.showError(message: "Please enter your email");
+      return;
+    }
+    if (!GetUtils.isEmail(email)) {
+      CommonSnackbar.showError(message: "Please enter a valid email address");
+      return;
+    }
+    if (password.isEmpty) {
+      CommonSnackbar.showError(message: "Please enter your password");
+      return;
+    }
+
+    try {
+      final loginRepository = Get.find<LoginRepository>();
+      final Map<String, dynamic> body = {
+        "email": email,
+        "password": password,
+      };
+
+      final dynamic response = await loginRepository.emailLogin(body);
+
+      if (response != null && response is Map) {
+        if (response['status'] == true) {
+          final userData = response['data']['user'];
+          final token = response['data']['token'];
+
+          if (token != null) {
+            await SharedPrefs.setToken(token);
+            if (userData != null) {
+              await SharedPrefs.setUser(userData);
+            }
+
+            CommonSnackbar.showSuccess(
+              title: "Welcome",
+              message: "Logged in successfully!",
+            );
+
+            Get.offAllNamed(AppRoutes.dashboardScreenRoute);
+          } else {
+            throw Exception("Token not found in response");
+          }
+        } else {
+          throw Exception(response['message'] ?? "Login failed");
+        }
+      }
+    } catch (e, stack) {
+      debugPrint("Email Login Error: $e\n$stack");
+      CommonSnackbar.showError(
+        title: "Login Failed",
+        message: e.toString().replaceAll("Exception: ", ""),
+      );
+    }
   }
 }

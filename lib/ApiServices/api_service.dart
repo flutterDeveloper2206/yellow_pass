@@ -280,6 +280,51 @@ class ApiService extends GetConnect {
       return null;
     }
   }
+
+  Future<dynamic> callDeleteApi(
+      {required url,
+      bool showLoader = true,
+      bool headerWithToken = true}) async {
+    if (showLoader) {
+      ProgressDialogUtils.showProgressDialog(isCancellable: false);
+    }
+
+    try {
+      await initApiService();
+      
+      final headersToUse = headerWithToken ? headersWithToken : headers;
+      _logRequest(url: url, headers: headersToUse, method: "DELETE");
+
+      final response = await delete(
+        url,
+        headers: headersToUse,
+        contentType: contentType,
+      );
+
+      if (showLoader) {
+        ProgressDialogUtils.hideProgressDialog();
+      }
+
+      _logResponse(response, url: url);
+
+      if (response.status.hasError) {
+        _handleError(response);
+        return null;
+      } else {
+        if (_checkUnauthenticated(response.body)) {
+          return null;
+        }
+        return response.body;
+      }
+    } catch (e) {
+      if (showLoader) {
+        ProgressDialogUtils.hideProgressDialog();
+      }
+      log("Exception in callDeleteApi: $e");
+      CommonSnackbar.showError(message: "An unexpected error occurred: $e");
+      return null;
+    }
+  }
   
 
   void _handleError(Response response) {

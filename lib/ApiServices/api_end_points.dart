@@ -2,6 +2,10 @@ class ApiEndPoints {
   static const String imageBaseUrl = "https://api.yellowpass.in";
   static const String baseUrl = "$imageBaseUrl/api";
   static const String linkedinMobileLogin = "$baseUrl/linkedin/mobile-login";
+  static const String register = "$baseUrl/register";
+  static const String login = "$baseUrl/mobile/login";
+  static const String forgotPassword = "$baseUrl/forgot-password";
+  static const String resetPassword = "$baseUrl/reset-password";
   static const String userProfileApi = "$baseUrl/profile";
   static const String updateLocation = "$baseUrl/user/location";
   static const String updateVisibilityApi = "$baseUrl/user/visibility";

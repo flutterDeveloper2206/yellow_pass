@@ -1,8 +1,11 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:yellow_pass/routes/app_routes.dart';
 import 'package:yellow_pass/widgets/custom_image_view.dart';
+import 'package:yellow_pass/widgets/custom_app_text_form_field.dart';
+import 'package:yellow_pass/widgets/custom_elavated_button.dart';
 import '../../core/utils/image_constant.dart';
 import 'package:yellow_pass/core/utils/color_constant.dart';
 import 'controller/login_screen_controller.dart';
@@ -12,9 +15,6 @@ class LoginScreen extends GetWidget<LoginScreenController> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return Scaffold(
       body: Stack(
         alignment: AlignmentGeometry.center,
@@ -44,6 +44,7 @@ class LoginScreen extends GetWidget<LoginScreenController> {
               final isDarkMode =
                   Theme.of(context).brightness == Brightness.dark;
               return AnimatedContainer(
+                height: MediaQuery.of(context).size.height / 1.5,
                 duration: const Duration(milliseconds: 500),
                 curve: Curves.easeInOut,
                 width: double.infinity,
@@ -56,15 +57,17 @@ class LoginScreen extends GetWidget<LoginScreenController> {
                     topRight: Radius.circular(35),
                   ),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (!controller.isReferralView.value)
-                      _buildGetStartedView(context)
-                    else
-                      _buildReferralView(context),
-                  ],
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (!controller.isReferralView.value)
+                        _buildGetStartedView(context)
+                      else
+                        _buildReferralView(context),
+                    ],
+                  ),
                 ),
               );
             }),
@@ -111,7 +114,119 @@ class LoginScreen extends GetWidget<LoginScreenController> {
               height: 1.5,
             ),
           ),
-          const SizedBox(height: 25),
+          const SizedBox(height: 20),
+
+          // Email & Password Fields
+          Text(
+            "Email Address",
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white70 : Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 8),
+          CommonTextField(
+            hintText: "Enter your email",
+            controller: controller.emailController,
+            keyboardType: TextInputType.emailAddress,
+            fillColor:
+                isDarkMode ? const Color(0xff2b2b2b) : Colors.grey.shade100,
+            borderColor: isDarkMode ? Colors.transparent : Colors.grey.shade300,
+            focusedBorderColor: ColorConstant.primaryColor,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            "Password",
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white70 : Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Obx(() => CommonTextField(
+                hintText: "Enter your password",
+                controller: controller.passwordController,
+                obscureText: controller.isPasswordHidden.value,
+                fillColor:
+                    isDarkMode ? const Color(0xff2b2b2b) : Colors.grey.shade100,
+                borderColor:
+                    isDarkMode ? Colors.transparent : Colors.grey.shade300,
+                focusedBorderColor: ColorConstant.primaryColor,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    controller.isPasswordHidden.value
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () => controller.isPasswordHidden.toggle(),
+                ),
+              )),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: InkWell(
+              onTap: () {
+                Get.toNamed(AppRoutes.forgotPasswordScreenRoute);
+              },
+              child: Text(
+                "Forgot Password?",
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white70 : Colors.black87,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Login Button
+          AppElevatedButton2(
+            buttonName: "Log In",
+            buttonColor: ColorConstant.primaryColor,
+            textColor: Colors.black,
+            hasGradient: false,
+            onPressed: () {
+              controller.loginWithEmail();
+            },
+          ),
+          const SizedBox(height: 20),
+
+          // Divider
+          Row(
+            children: [
+              Expanded(
+                child: Divider(
+                  color:
+                      isDarkMode ? Colors.grey.shade800 : Colors.grey.shade300,
+                  thickness: 1,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Text(
+                  "or",
+                  style: TextStyle(
+                    color: isDarkMode
+                        ? Colors.grey.shade500
+                        : Colors.grey.shade600,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Divider(
+                  color:
+                      isDarkMode ? Colors.grey.shade800 : Colors.grey.shade300,
+                  thickness: 1,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
 
           // LinkedIn Button
           SizedBox(
@@ -164,6 +279,35 @@ class LoginScreen extends GetWidget<LoginScreenController> {
               ),
             ),
           ),
+          const SizedBox(height: 20),
+
+          // Don't have an account? Sign Up
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Don't have an account? ",
+                style: TextStyle(
+                  color:
+                      isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                  fontSize: 14,
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  Get.toNamed(AppRoutes.registerScreenRoute);
+                },
+                child: Text(
+                  "Sign Up",
+                  style: TextStyle(
+                    color: ColorConstant.primaryColor,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 25),
 
           // Terms & Privacy
@@ -181,7 +325,7 @@ class LoginScreen extends GetWidget<LoginScreenController> {
                 ),
                 const SizedBox(height: 4),
                 InkWell(
-                  onTap: () {},
+                  onTap: () => _showTermsAndPrivacyBottomSheet(context),
                   child: Text(
                     "Terms and Conditions & Privacy Policy",
                     style: TextStyle(
@@ -316,7 +460,7 @@ class LoginScreen extends GetWidget<LoginScreenController> {
                 ),
                 const SizedBox(height: 4),
                 InkWell(
-                  onTap: () {},
+                  onTap: () => _showTermsAndPrivacyBottomSheet(context),
                   child: Text(
                     "Terms and Conditions & Privacy Policy",
                     style: TextStyle(
@@ -331,6 +475,66 @@ class LoginScreen extends GetWidget<LoginScreenController> {
           ),
           const SizedBox(height: 5),
         ],
+      ),
+    );
+  }
+
+  Future<void> _launchURL(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      Get.snackbar("Error", "Could not launch URL");
+    }
+  }
+
+  void _showTermsAndPrivacyBottomSheet(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "Select Document",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+            const SizedBox(height: 15),
+            ListTile(
+              leading: Icon(Icons.description_outlined,
+                  color: ColorConstant.primaryColor),
+              title: Text(
+                "Terms and Conditions",
+                style:
+                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+              ),
+              onTap: () {
+                Get.back();
+                _launchURL("https://yellowpass.in/terms-and-conditions");
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.privacy_tip_outlined,
+                  color: ColorConstant.primaryColor),
+              title: Text(
+                "Privacy Policy",
+                style:
+                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+              ),
+              onTap: () {
+                Get.back();
+                _launchURL("https://yellowpass.in/privacy-policy");
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

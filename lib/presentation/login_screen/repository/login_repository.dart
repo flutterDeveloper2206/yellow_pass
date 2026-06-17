@@ -13,4 +13,31 @@ class LoginRepository {
       headerWithToken: false,
     );
   }
+
+  Future<dynamic> emailLogin(Map<String, dynamic> data) async {
+    return await _apiService.callPostApi(
+      url: ApiEndPoints.login,
+      body: data,
+      showLoader: true,
+      headerWithToken: false,
+    );
+  }
+
+  Future<dynamic> forgotPassword(Map<String, dynamic> data) async {
+    return await _apiService.callPostApi(
+      url: ApiEndPoints.forgotPassword,
+      body: data,
+      showLoader: true,
+      headerWithToken: false,
+    );
+  }
+
+  Future<dynamic> resetPassword(Map<String, dynamic> data) async {
+    return await _apiService.callPostApi(
+      url: ApiEndPoints.resetPassword,
+      body: data,
+      showLoader: true,
+      headerWithToken: false,
+    );
+  }
 }

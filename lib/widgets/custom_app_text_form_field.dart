@@ -14,6 +14,8 @@ class CommonTextField extends StatelessWidget {
   final Color borderColor; // ✅ NEW
   final Color focusedBorderColor; // ✅ NEW
 
+  final Color? textColor; // ✅ NEW
+
   const CommonTextField({
     super.key,
     this.hintText,
@@ -28,15 +30,20 @@ class CommonTextField extends StatelessWidget {
     this.borderColor = Colors.grey, // ✅ default color
     this.focusedBorderColor =
         ColorConstant.primaryColor, // ✅ default focused color
+    this.textColor, // ✅ NEW
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final defaultTextColor =
+        theme.brightness == Brightness.dark ? Colors.white : Colors.black;
+
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
       obscureText: obscureText,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: textColor ?? defaultTextColor),
       decoration: InputDecoration(
         filled: true,
         fillColor: fillColor,

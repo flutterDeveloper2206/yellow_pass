@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:yellow_pass/core/utils/app_fonts.dart';
 import 'package:yellow_pass/presentation/settings_screen/controller/settings_controller.dart';
 import 'package:yellow_pass/core/utils/color_constant.dart';
@@ -66,7 +67,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                   _buildMenuItem(context,
                       icon: Icons.history_edu,
                       title: "Privacy Policy",
-                      onTap: () {},
+                      onTap: () => _launchURL("https://yellowpass.in/privacy-policy"),
                       isDark: isDark,
                       textColor: textColor,
                       cardColor: cardColor)),
@@ -75,7 +76,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                   _buildMenuItem(context,
                       icon: Icons.history_edu,
                       title: "Terms & Conditions",
-                      onTap: () {},
+                      onTap: () => _launchURL("https://yellowpass.in/terms-and-conditions"),
                       isDark: isDark,
                       textColor: textColor,
                       cardColor: cardColor)),
@@ -97,6 +98,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                       isDark: isDark,
                       textColor: textColor,
                       cardColor: cardColor)),
+
             ],
           ),
         ),
@@ -294,7 +296,9 @@ class _SettingsScreenState extends State<SettingsScreen>
       required VoidCallback onTap,
       required bool isDark,
       required Color textColor,
-      required Color cardColor}) {
+      required Color cardColor,
+      Color? iconColor,
+      Color? titleColor}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -313,16 +317,25 @@ class _SettingsScreenState extends State<SettingsScreen>
       child: ListTile(
         onTap: onTap,
         leading:
-            Icon(icon, color: isDark ? Colors.grey : Colors.grey, size: 20),
+            Icon(icon, color: iconColor ?? (isDark ? Colors.grey : Colors.grey), size: 20),
         title: Text(
           title,
           style:
-              PMT.style(14, fontColor: textColor, fontWeight: FontWeight.w500),
+              PMT.style(14, fontColor: titleColor ?? textColor, fontWeight: FontWeight.w500),
         ),
         trailing: Icon(Icons.arrow_forward_ios,
-            size: 16, color: isDark ? Colors.grey : Colors.black54),
+            size: 16, color: titleColor ?? (isDark ? Colors.grey : Colors.black54)),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       ),
     );
+  }
+
+
+
+  Future<void> _launchURL(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      Get.snackbar("Error", "Could not launch URL");
+    }
   }
 }

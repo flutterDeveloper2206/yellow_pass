@@ -144,6 +144,30 @@ class _ProfileScreenState extends State<ProfileScreen>
                       isDark: isDark,
                       textColor: textColor,
                       cardColor: cardColor),
+                  _buildMenuItem(context,
+                      icon: Icons.lock_reset,
+                      title: "Reset Password",
+                      onTap: () {
+                        final email = controller.userData['email'] ?? "";
+                        Get.toNamed(AppRoutes.forgotPasswordScreenRoute, arguments: {"email": email});
+                      },
+                      isDark: isDark,
+                      textColor: textColor,
+                      cardColor: cardColor),
+                  _buildMenuItem(context,
+                      icon: Icons.delete_forever_outlined,
+                      title: "Delete Account",
+                      onTap: () {
+                        final titleColor = isDark ? const Color(0xFFE8E8E8) : const Color(0xFF090909);
+                        final bodyColor = isDark ? const Color(0xFFB0B3B8) : const Color(0xFF5F6368);
+                        final borderColor = isDark ? const Color(0xFF6B6B6B) : const Color(0xFFE0E0E0);
+                        _showDeleteConfirmationDialog(context, isDark, titleColor, bodyColor, borderColor);
+                      },
+                      isDark: isDark,
+                      textColor: textColor,
+                      cardColor: cardColor,
+                      iconColor: Colors.red,
+                      titleColor: Colors.red),
                   const SizedBox(height: 30),
                   _buildLogoutButton(context),
                   const SizedBox(height: 150),
@@ -380,7 +404,9 @@ class _ProfileScreenState extends State<ProfileScreen>
         required VoidCallback onTap,
         required bool isDark,
         required Color textColor,
-        required Color cardColor}) {
+        required Color cardColor,
+        Color? iconColor,
+        Color? titleColor}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -398,16 +424,122 @@ class _ProfileScreenState extends State<ProfileScreen>
       ),
       child: ListTile(
         onTap: onTap,
-        leading: Icon(icon, color: isDark ? Colors.white : Colors.black54),
+        leading: Icon(icon, color: iconColor ?? (isDark ? Colors.white : Colors.black54)),
         title: Text(
           title,
           style:
-          PMT.style(14, fontColor: textColor, fontWeight: FontWeight.w500),
+          PMT.style(14, fontColor: titleColor ?? textColor, fontWeight: FontWeight.w500),
         ),
         trailing: Icon(Icons.arrow_forward_ios,
-            size: 16, color: isDark ? Colors.grey : Colors.black54),
+            size: 16, color: titleColor ?? (isDark ? Colors.grey : Colors.black54)),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       ),
+    );
+  }
+
+  void _showDeleteConfirmationDialog(BuildContext context, bool isDark, Color titleColor, Color bodyColor, Color borderColor) {
+    Get.dialog(
+      Dialog(
+        backgroundColor: isDark ? const Color(0xFF2C2C2C) : Colors.white,
+        surfaceTintColor: Colors.transparent,
+        elevation: isDark ? 8 : 2,
+        shadowColor: isDark ? Colors.black54 : Colors.black26,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: borderColor),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(isDark ? 0.22 : 0.18),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.delete_forever_rounded,
+                  size: 36,
+                  color: Colors.red,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                "Delete Account",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: titleColor,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "Are you sure you want to permanently delete your account? This action cannot be undone and you will lose all your data.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: bodyColor,
+                  height: 1.35,
+                ),
+              ),
+              const SizedBox(height: 28),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Get.back(),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: titleColor,
+                        side: BorderSide(color: borderColor),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: titleColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () {
+                        Get.back(); // Dismiss dialog
+                        controller.deleteUserAccount();
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: const Text(
+                        "Delete",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(isDark ? 0.65 : 0.45),
     );
   }
 

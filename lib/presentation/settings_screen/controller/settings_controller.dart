@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SettingsController extends GetxController {
-  RxBool isDarkMode = false.obs;
-  RxBool isNotificationsEnabled = true.obs;
+  final isDarkMode = false.obs;
+  final isNotificationsEnabled = true.obs;
 
   @override
   void onInit() {
     super.onInit();
-    // Initialize isDarkMode based on current theme
     isDarkMode.value = Get.isDarkMode;
   }
 

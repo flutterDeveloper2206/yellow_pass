@@ -60,6 +60,10 @@ import 'package:yellow_pass/presentation/other_profile_screen/binding/other_prof
 import 'package:yellow_pass/presentation/other_profile_screen/other_profile_screen.dart';
 import 'package:yellow_pass/presentation/meeting_requests_screen/binding/meeting_requests_binding.dart';
 import 'package:yellow_pass/presentation/meeting_requests_screen/meeting_requests_screen.dart';
+import 'package:yellow_pass/presentation/forgot_password_screen/binding/forgot_password_binding.dart';
+import 'package:yellow_pass/presentation/forgot_password_screen/forgot_password_screen.dart';
+import 'package:yellow_pass/presentation/reset_password_screen/binding/reset_password_binding.dart';
+import 'package:yellow_pass/presentation/reset_password_screen/reset_password_screen.dart';
 
 class AppRoutes {
   static const String splashScreenRoute = '/splash_screen';
@@ -92,6 +96,8 @@ class AppRoutes {
   static const String myOrdersScreenRoute = '/my_orders_screen';
   static const String otherProfileScreenRoute = '/other_profile_screen';
   static const String meetingRequestsScreenRoute = '/meeting_requests_screen';
+  static const String forgotPasswordScreenRoute = '/forgot_password_screen';
+  static const String resetPasswordScreenRoute = '/reset_password_screen';
 
   static List<GetPage> pages = [
     GetPage(
@@ -351,6 +357,24 @@ class AppRoutes {
       page: () => const MeetingRequestsScreen(),
       bindings: [
         MeetingRequestsBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: forgotPasswordScreenRoute,
+      page: () => const ForgotPasswordScreen(),
+      bindings: [
+        ForgotPasswordBinding(),
+      ],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: resetPasswordScreenRoute,
+      page: () => const ResetPasswordScreen(),
+      bindings: [
+        ResetPasswordBinding(),
       ],
       transition: Transition.rightToLeft,
       transitionDuration: const Duration(milliseconds: 300),
