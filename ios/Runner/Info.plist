@@ -45,5 +45,13 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Yellow Pass requires access to the camera to scan QR codes for check-ins at workspaces and to capture profile pictures.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Yellow Pass requires access to the photo library to upload and change your profile picture.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Yellow Pass requires access to your location to find nearby creative workspaces and identify nearby coworkers.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Yellow Pass requires access to the microphone to support video recording if captured during profile uploads.</string>
 </dict>
 </plist>

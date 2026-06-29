@@ -30,16 +30,35 @@ class SupportScreen extends GetView<SupportController> {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                if (controller.contactInfo.value == null) {
-                  return Center(
-                    child: Text(
-                      "Something went wrong while fetching support details.",
-                      style: PMT.style(14, fontColor: subTextColor),
-                    ),
-                  );
-                }
+                final info = controller.contactInfo.value;
+                final email = (info?.email != null && info!.email!.isNotEmpty)
+                    ? info.email!
+                    : "hello@yellowpass.in";
+                final phone = (info?.phone != null && info!.phone!.isNotEmpty)
+                    ? info.phone!
+                    : "9909911990";
+                final address =
+                    (info?.address != null && info!.address!.isNotEmpty)
+                        ? info.address!
+                        : "804 Aalap-A, limda choak , Rajkot ,Gujarat -380001";
+                final supportHours = (info?.supportHours != null &&
+                        info!.supportHours!.isNotEmpty)
+                    ? info.supportHours!
+                    : "10:00 AM - 7:00 PM";
 
-                final info = controller.contactInfo.value!;
+                final facebookUrl = (info?.socialMedia?.facebook != null &&
+                        info!.socialMedia!.facebook!.isNotEmpty)
+                    ? info.socialMedia!.facebook!
+                    : "https://www.facebook.com/share/1Y5ZBDQx6t/";
+                final twitterUrl = info?.socialMedia?.twitter;
+                final instagramUrl = (info?.socialMedia?.instagram != null &&
+                        info!.socialMedia!.instagram!.isNotEmpty)
+                    ? info.socialMedia!.instagram!
+                    : "https://www.instagram.com/yellowpass.in/";
+                final linkedinUrl = (info?.socialMedia?.linkedin != null &&
+                        info!.socialMedia!.linkedin!.isNotEmpty)
+                    ? info.socialMedia!.linkedin!
+                    : "https://www.linkedin.com/company/yellowpass/";
 
                 return SingleChildScrollView(
                   padding: const EdgeInsets.all(20.0),
@@ -61,31 +80,31 @@ class SupportScreen extends GetView<SupportController> {
                         context,
                         icon: Icons.email_outlined,
                         title: "Email Support",
-                        value: info.email ?? "",
+                        value: email,
                         isDark: isDark,
                         cardColor: cardColor,
-                        onTap: () => _launchUrl("mailto:${info.email}"),
+                        onTap: () => _launchUrl("mailto:$email"),
                       ),
                       _buildContactCard(
                         context,
                         icon: Icons.phone_outlined,
                         title: "Phone",
-                        value: info.phone ?? "",
+                        value: phone,
                         isDark: isDark,
                         cardColor: cardColor,
-                        onTap: () => _launchUrl("tel:${info.phone}"),
+                        onTap: () => _launchUrl("tel:$phone"),
                       ),
                       _buildContactCard(
                         context,
                         icon: Icons.location_on_outlined,
                         title: "Address",
-                        value: info.address ?? "",
+                        value: address,
                         isDark: isDark,
                         cardColor: cardColor,
                       ),
                       const SizedBox(height: 20),
                       _buildSupportHours(
-                          context, info.address ?? "", isDark, cardColor),
+                          context, supportHours, isDark, cardColor),
                       const SizedBox(height: 30),
                       Text(
                         "Follow Us",
@@ -93,7 +112,12 @@ class SupportScreen extends GetView<SupportController> {
                             fontColor: textColor, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 16),
-                      _buildSocialMediaRow(info.socialMedia),
+                      _buildSocialMediaRow(
+                        facebook: facebookUrl,
+                        twitter: twitterUrl,
+                        instagram: instagramUrl,
+                        linkedin: linkedinUrl,
+                      ),
                     ],
                   ),
                 );
@@ -228,22 +252,20 @@ class SupportScreen extends GetView<SupportController> {
     );
   }
 
-  Widget _buildSocialMediaRow(socialMedia) {
-    if (socialMedia == null) return const SizedBox();
-
+  Widget _buildSocialMediaRow({
+    String? facebook,
+    String? twitter,
+    String? instagram,
+    String? linkedin,
+  }) {
     return Row(
       children: [
-        if (socialMedia.facebook != null)
-          _buildSocialIcon(Icons.facebook, Colors.blue, socialMedia.facebook),
-        if (socialMedia.twitter != null)
-          _buildSocialIcon(
-              Icons.alternate_email, Colors.lightBlue, socialMedia.twitter),
-        if (socialMedia.instagram != null)
-          _buildSocialIcon(
-              Icons.camera_alt_outlined, Colors.pink, socialMedia.instagram),
-        if (socialMedia.linkedin != null)
-          _buildSocialIcon(
-              Icons.work_outline, Colors.blue.shade800, socialMedia.linkedin),
+        if (facebook != null && facebook.isNotEmpty)
+          _buildSocialIcon(Icons.facebook, Colors.blue, facebook),
+        if (instagram != null && instagram.isNotEmpty)
+          _buildSocialIcon(Icons.camera_alt_outlined, Colors.pink, instagram),
+        if (linkedin != null && linkedin.isNotEmpty)
+          _buildSocialIcon(Icons.work_outline, Colors.blue.shade800, linkedin),
       ],
     );
   }

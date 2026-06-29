@@ -57,7 +57,7 @@
         <!-- Replace with your key from Google Cloud Console (Maps SDK for Android). -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_GOOGLE_MAPS_API_KEY" />
+            android:value="AIzaSyDgg87rM6O4Kf_df26pbOSY5r3jjwV-Yxk" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
